@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ValidationResult, Schema } from 'Joi'; 
+import { ValidationResult, Schema } from 'joi'; 
 import { STATUS_CODES } from '../utils/constants';
 
 interface CustomError {
