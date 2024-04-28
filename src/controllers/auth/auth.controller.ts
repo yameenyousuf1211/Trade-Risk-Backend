@@ -8,17 +8,18 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 // register user
     const body = parseBody(req.body);
 
-    const isUserExist = await findUser({ email: body?.email });
+        const isUserExist = await findUser({ email: body?.email });
 
-    if (isUserExist) return next({
-        statusCode: STATUS_CODES.BAD_REQUEST,
-        message: 'User already exist'
-    })
+        if (isUserExist) return next({
+            statusCode: STATUS_CODES.BAD_REQUEST,
+            message: 'User already exist'
+        })
+  
 
     const banks = await createBanks(body?.currentBanks);
-    req.body.password = generatePassword();
+    req.body.password = generatePassword(); // password will be generate and send to user via email later he can change
 
-    // email password to user later
+    // send password to user  via email later 
 
     const user = await createUser({ ...body, currentBanks: banks.map((bank: IBank) => bank._id) });
 

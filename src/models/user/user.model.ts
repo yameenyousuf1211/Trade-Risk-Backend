@@ -17,6 +17,7 @@ const userSchema = new Schema<IUser>({
     email: { type: String, lowercase: true, required: true },
     password: { type: String, select: false },
     address: { type: String },
+    country:{ type: String },
     phone: { type: String },
     constitution: { type: String, enum: Object.values(COMPANY_CONSTITUTION) },
     businessType: { type: String },

@@ -13,6 +13,7 @@ export interface IUser extends Document {
     name?: string;
     email: string;
     role: string;
+    country?: string;
     phone?: string;
     address?: string;
     constitution?: string;

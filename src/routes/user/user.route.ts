@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { fetchAllUsers } from "../../controllers";
+import { fetchAllUsers, fetchCountries } from "../../controllers";
 
 export default class UserAPI {
     constructor(private readonly router: Router) {
@@ -9,6 +9,8 @@ export default class UserAPI {
 
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
+        this.router.get('/countries', fetchCountries);
+
     }
 
     getRouter() {
