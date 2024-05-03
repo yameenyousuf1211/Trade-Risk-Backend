@@ -123,3 +123,16 @@ export function generatePassword(): string {
 
     return password;
 }
+
+export function generateRefId(): number {
+    const uniqueNumbers = new Set<number>();
+    
+    while (uniqueNumbers.size < 900000) { // Maximum possible unique 6-digit numbers
+      const randomNumber = Math.floor(100000 + Math.random() * 900000);
+      uniqueNumbers.add(randomNumber);
+    }
+    
+    // Convert the set to an array and return a random number from it
+    const uniqueNumbersArray = Array.from(uniqueNumbers);
+    return uniqueNumbersArray[Math.floor(Math.random() * uniqueNumbersArray.length)];
+  }

@@ -1,6 +1,6 @@
 import joi from 'joi';
-
 import { validateRequest } from '../../middlewares/validation.middleware';
+
 const registerValidator = joi.object({
     role: joi.string().valid('bank','corporate').required(),
     name: joi.string().required(),
@@ -115,6 +115,11 @@ const registerValidator = joi.object({
         then: joi.boolean().required(),
         otherwise: joi.forbidden(),
     }),
+    businessNature:joi.when('role', {
+        is: 'bank',
+        then: joi.forbidden(),
+        otherwise: joi.string().required(),
+    })
 });
 
 const loginValidator = joi.object({
