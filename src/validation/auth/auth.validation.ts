@@ -27,7 +27,7 @@ const registerValidator = joi.object({
         otherwise: joi.required(),
     }),
     swiftCode: joi.string().required(),
-    accountNumber: joi.number().when('role', {
+    accountNumber: joi.string().when('role', {
         is: 'bank',
         then: joi.forbidden(),
         otherwise: joi.required(),

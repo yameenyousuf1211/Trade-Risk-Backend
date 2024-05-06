@@ -12,9 +12,9 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     let query: any = { isDeleted: false, draft };
     
     if(createdBy) query = { ...query, createdBy };
-
+ 
     const data = await fetchLcs({ limit, page, query });
-    generateResponse(data, 'List fetched successfully', res);
+    generateResponse({data}, 'List fetched successfully', res);
 });
 
 export const createLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

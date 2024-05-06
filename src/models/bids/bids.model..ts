@@ -3,15 +3,16 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongoosePaginatedData } from "../../utils/helpers";
-import { QueryWithHelpers } from "mongoose";
 
-interface IBid extends Document {
-    status: string;
+export interface IBid extends Document {
     bidType: string;
+    bidValidity:Date
     discountingPrice:number
     confirmationPrice:number
     isDeleted:boolean
     createdAt: Date;
+    bidBy:string
+    status: string;
     updatedAt: Date;
 }
 
@@ -49,7 +50,7 @@ const bidSchema: Schema = new Schema({
         default:'Pending'
     },
     
- }, { timestamps: true}
+ }, { timestamps: true,versionKey:false}
 );
 bidSchema.plugin(mongoosePaginate);
 bidSchema.plugin(aggregatePaginate);
@@ -58,7 +59,7 @@ const BidModel = mongoose.model<IBid>('bid', bidSchema);
 
 export const createBid  = (obj:IBid) => BidModel.create(obj);
 export const findBid = (query: Record<string, any>) => BidModel.findOne(query);
-
+// export const findMany = (query: Record<string, any>) => BidModel.find(query);
 export const fetchBids = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<IBid>> => {
     const { data, pagination }: IPaginationResult<IBid> = await getMongoosePaginatedData({
@@ -67,3 +68,15 @@ export const fetchBids = async ({ query, page, limit, populate }: IPaginationFun
 
     return { data, pagination };
 };
+
+export const BidsStatusCount = (userId: string) => BidModel.aggregate([
+    {
+        $match: { bidBy: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+        $group: {
+            _id: '$status',
+            count: { $sum: 1 }
+        }
+    }
+]);
