@@ -7,6 +7,7 @@ import { QueryWithHelpers } from "mongoose";
 
 // Define the interface for your document
 interface ILcs extends Document {
+    _id:string
     participantRole?:string
     lcType?:string
     curreny:string 
@@ -68,7 +69,7 @@ const LcsSchema: Schema = new Schema({
         type: String,
         enum: ['importer', 'exporter'], // Assuming participant can be either importer or exporter
     },
-    curreny:{
+    currency:{
         type: String, // usd or any other currency
     },
     lcType:{

@@ -1,9 +1,10 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 
+
 const lcsValidator = joi.object({
     participantRole: joi.string().valid('importer', 'exporter').required(),
-    curreny: joi.string().required(),
+    currency: joi.string().required(),
     lcType: joi.string().valid("LC Confirmation","LC Discounting","LC Confirmation & Discounting").required(),
     amount: joi.number().required(),
     paymentTerms: joi.string().required(),
@@ -20,9 +21,9 @@ const lcsValidator = joi.object({
         country: joi.string().required()
     }).required(),
     advisingBank: joi.object({
-        bank: joi.string().required(),
-        country: joi.string().required()
-    }).required(),
+        bank: joi.string().optional(),
+        country: joi.string().optional()
+    }).optional(),
     confirmingBank: joi.object({
         bank: joi.string().required(),
         country: joi.string().required()
@@ -32,8 +33,16 @@ const lcsValidator = joi.object({
         port: joi.string().required()
     }).required(),
     transhipment: joi.boolean().required(),
-    expectedConfirmationDate: joi.date().required(),
-    expectedDiscountingDate: joi.date().required(),
+    expectedConfirmationDate: joi.date().when('lcType',{
+        is: 'LC Confirmation',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    expectedDiscountingDate: joi.date().when('lcType',{
+        is: 'LC Discounting',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
     productDescription: joi.string().required(),
     lcPeriod:{
         startDate: joi.date().required(),

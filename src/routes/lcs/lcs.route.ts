@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { acceptOrRejectBids, createLcs, deleteLc, fetchAllLcs } from "../../controllers";
+import { acceptOrRejectBids, createLcs, deleteLc, fetchAllLcs, findLcs } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { lcsValidation } from "../../validation/lcs/lcs.validation";
 import { ROLES } from "../../utils/constants";
@@ -13,10 +13,10 @@ export default class LcsAPI {
 
     setupRoutes() {
         this.router.get('/',authMiddleware(Object.values(ROLES)),fetchAllLcs);
+        this.router.get('/:id',authMiddleware(Object.values(ROLES)),findLcs);
         this.router.post('/create',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),lcsValidation,createLcs);
         this.router.delete('/:id',authMiddleware(Object.values(ROLES)),deleteLc);
         this.router.put('/',authMiddleware(Object.values(ROLES)),acceptOrRejectBids)
-
     }
 
     getRouter() {

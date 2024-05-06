@@ -41,3 +41,16 @@ export const deleteLc = asyncHandler(async (req: Request, res: Response, next: N
     await lc.save();
     generateResponse(null, 'Lc deleted successfully', res);
 })
+
+export const findLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id
+    
+    const lc = await findLc({_id:id});
+
+    if(!lc) return next({
+        message: 'Lc not found',
+        statusCode: STATUS_CODES.NOT_FOUND
+    })
+
+    generateResponse(lc, 'Lc fetched successfully', res);
+})
