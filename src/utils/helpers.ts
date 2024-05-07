@@ -2,6 +2,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { createUser, findUser } from '../models';
 import { hash } from 'bcrypt';
 import { ROLES } from './constants';
+// import { FCM } from "firebase-admin-push";
 
 // generate response with status code
 export const generateResponse = (data: any, message: string, res: Response, code = 200) => {
@@ -136,3 +137,26 @@ export function generateRefId(): number {
     const uniqueNumbersArray = Array.from(uniqueNumbers);
     return uniqueNumbersArray[Math.floor(Math.random() * uniqueNumbersArray.length)];
   }
+
+// export const sendNotification = ({ title, body, fcmTokens, data, priority = 'normal' }: { title: string, body: string, fcmTokens: string[], data: any, priority?: string }) => {
+//     const serverKey = process.env.FIREBASE_SERVER_KEY;
+//     const fcm: FCM = new FCM(serverKey);
+
+//     const message = {
+//         registration_ids: fcmTokens,
+//         priority,
+//         notification: {
+//             title,
+//             body,
+//         },
+//         data
+//     };
+//     // Send the notification
+//     fcm.send(message, (error: any, response: any) => {
+//         if (error) {
+//             console.error('Error sending notification:', error);
+//         } else {
+//             console.log('Notification sent successfully:', response);
+//         }
+//     });
+// }

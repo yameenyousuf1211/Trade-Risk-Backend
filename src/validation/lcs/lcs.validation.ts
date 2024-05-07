@@ -40,8 +40,8 @@ const lcsValidator = joi.object({
     }),
     expectedDiscountingDate: joi.date().when('lcType',{
         is: 'LC Discounting',
-        then: joi.forbidden(),
-        otherwise: joi.required()
+        then: joi.required(),
+        otherwise: joi.forbidden()
     }),
     productDescription: joi.string().required(),
     lcPeriod:{
