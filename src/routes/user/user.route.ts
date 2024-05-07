@@ -10,7 +10,7 @@ export default class UserAPI {
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
         this.router.get('/:country', banks);
-        this.router.get('/countries', fetchCountries);
+        this.router.get('/countries/list', fetchCountries);
 
     }
 

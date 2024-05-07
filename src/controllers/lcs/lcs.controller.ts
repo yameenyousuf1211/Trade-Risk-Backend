@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpers";
 import { ROLES, STATUS_CODES } from "../../utils/constants";
-import { createLc, fetchLcs, findLc } from "../../models";
+import { createLc, fetchLcs, findBid, findLc } from "../../models";
 
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
@@ -44,7 +44,6 @@ export const deleteLc = asyncHandler(async (req: Request, res: Response, next: N
 
 export const findLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
-    
     const lc = await findLc({_id:id});
 
     if(!lc) return next({
@@ -53,4 +52,15 @@ export const findLcs = asyncHandler(async (req: Request, res: Response, next: Ne
     })
 
     generateResponse(lc, 'Lc fetched successfully', res);
+})
+
+export const statusCheck = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.user._id
+    const lc = req.params.lc
+    
+    const bid = await findBid({ $and: [{ bidBy: id }, { lc: lc }] });
+   
+    if(!bid) return generateResponse("Add bid", 'Status Fetched successfully', res);
+
+    generateResponse(bid.status, 'Lc status fetched successfully', res);
 })

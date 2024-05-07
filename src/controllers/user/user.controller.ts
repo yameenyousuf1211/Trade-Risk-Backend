@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { getAllUsers } from "../../models";
-import { kenyaBanks, pakistanBanks, ROLES, saudiBanks, STATUS_CODES, uaeBanks } from "../../utils/constants";
+import {  ROLES,STATUS_CODES,banks as bank } from "../../utils/constants";
 import axios from "axios";
 
 
@@ -21,42 +21,28 @@ export const fetchAllUsers = asyncHandler(async (req: Request, res: Response, ne
 });
 
 export const fetchCountries = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-
-    const {data} = await axios.get('https://restcountries.com/v3.1/all?');
-    
-    const countries = data.map((country:any) => ({
-        name: country.name.common,
-    }));
-
-    generateResponse(countries, 'Countries fetched successfully', res);
+    const data = ["Bahrain","Pakistan","Qatar","Bangladesh","Saudi","UAE"]
+    generateResponse(data, 'Countries fetched successfully', res);
 });
 
 export const banks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const country = req.params.country;
 
-    if(!country) return next({
-        message: 'Country is required',
-        statusCode: STATUS_CODES.BAD_REQUEST
-    })
+    if (!country) {
+        return next({
+            message: 'Country is required',
+            statusCode: STATUS_CODES.BAD_REQUEST
+        });
+    }   
+ 
 
-    let banksList;
-
-    switch(country) {
-        case 'pakistan':
-            banksList = pakistanBanks;
-            break;
-        case 'saudi':
-            banksList = saudiBanks;
-            break;
-        case 'uae':
-            banksList = uaeBanks;
-            break;
-        case 'kenya':
-            banksList = kenyaBanks;
-            break;
-        default:
-            return res.status(400).json({ success: false, message: 'Invalid country provided' });
+    if (!(country in bank)) {
+        return next({
+            statusCode: STATUS_CODES.BAD_REQUEST,
+            message: 'invalid country name'
+        });
     }
 
+    const banksList = (bank as { [key: string]: { code: string; list: string[] } })[country].list;
     generateResponse(banksList, 'Banks fetched successfully', res);
 });
