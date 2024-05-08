@@ -56,7 +56,11 @@ const lcsValidator = joi.object({
         beneficiaryName: joi.string().required(),
         countryOfExport: joi.string().required(),
         beneficiaryCountry: joi.string().required(),
-        bank:joi.string().required()
+        bank:joi.string().when('lcType',{
+            is: 'LC Confirmation & Discounting',
+            then: joi.forbidden(),
+            otherwise: joi.required()
+        })
     }),
     discountingInfo:  joi.object({
         behalfOf: joi.string().required(),
