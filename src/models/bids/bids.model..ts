@@ -80,3 +80,50 @@ export const BidsStatusCount = (userId: string) => BidModel.aggregate([
         }
     }
 ]);
+
+export const allBidsOfOneUser = (userId:string) => BidModel.aggregate([
+    {
+        $lookup: {
+            from: 'lcs',
+            localField: 'lc',
+            foreignField: '_id',
+            as: 'lc'
+        }
+    },
+    {
+        $unwind: '$lc'
+    },
+    {
+        $project: {
+            _id: 1,
+            bidType: 1,
+            bidValidity: 1,
+            confirmationPrice: 1,
+            discountingPrice: 1,
+            isDeleted: 1,
+            status: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            lc: {
+                _id: 1,
+                lcNumber: 1,
+                lcType: 1,
+                lcValue: 1,
+                lcStatus: 1,
+                lcExpiryDate: 1,
+                createdAt: 1,
+                updatedAt: 1,
+                createdBy:1,
+                amount:1
+            }
+        }
+    },
+    {
+        $match: { 'lc.createdBy': new mongoose.Types.ObjectId(userId) }
+    },
+    {
+        $sort: {
+            'lc.amount': -1 // Sort by createdAt field in descending order
+        }
+    }
+]);

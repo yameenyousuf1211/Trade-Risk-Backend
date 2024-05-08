@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import { BidsStatusCount, createBid, fetchBids, findBid, findLc, IBid } from "../../models";
+import { allBidsOfOneUser, BidsStatusCount, createBid, fetchBids, findBid, findLc, IBid } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -71,4 +71,11 @@ export const findBidsCount = asyncHandler(async (req: Request, res: Response, ne
     
     const data = await BidsStatusCount(userId);
     generateResponse(data, 'Bids count fetched successfully', res);
+})
+
+export const bidAllBidsOfUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user._id
+    const data = await allBidsOfOneUser(userId);
+    
+    generateResponse(data, 'All bids of user fetched successfully', res);
 })

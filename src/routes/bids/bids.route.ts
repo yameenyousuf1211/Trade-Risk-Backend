@@ -1,4 +1,4 @@
-import {  acceptOrRejectBids, createBids, findBidsCount, getAllBids } from "../../controllers";
+import {  acceptOrRejectBids, bidAllBidsOfUser, createBids, findBidsCount, getAllBids } from "../../controllers";
 import { Router } from "express";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLES } from "../../utils/constants";
@@ -15,6 +15,7 @@ export default class BidsAPI {
         this.router.get('/count',authMiddleware(Object.values(ROLES)),findBidsCount);
         this.router.post('/',authMiddleware(Object.values(ROLES)),bidsValidation,createBids)
         this.router.put('/',authMiddleware(Object.values(ROLES)),acceptOrRejectBids)
+        this.router.get('/users-bids',authMiddleware(Object.values(ROLES)),bidAllBidsOfUser)
     }
 
     getRouter() {

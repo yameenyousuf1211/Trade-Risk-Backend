@@ -2,6 +2,9 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { createUser, findUser } from '../models';
 import { hash } from 'bcrypt';
 import { ROLES } from './constants';
+import { Resend } from 'resend';
+
+const resend = new Resend('re_PfY2RMhd_HcEgmT5L2qW5hT2HwzwqzM6G');
 // import { FCM } from "firebase-admin-push";
 
 // generate response with status code
@@ -160,3 +163,16 @@ export function generateRefId(): number {
 //         }
 //     });
 // }
+
+export const sendEmail  =  async ({subject,to,html}:{subject:string,to:string,html:string}) => {
+
+    const { data, error } = await resend.emails.send({
+        from: 'yameenyousuf2016@gmail.com',
+        to,
+        subject,
+        html,
+      });
+
+      if(error) return error;
+      return data;
+}
