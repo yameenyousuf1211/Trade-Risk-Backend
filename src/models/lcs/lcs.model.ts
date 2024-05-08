@@ -160,8 +160,25 @@ const LcsSchema: Schema = new Schema({
         beneficiaryCountry: {
             type: String,
         },
+        bank: {
+            type: String,
+        },
     },
-    confirmationCharges: {
+    confirmationInfo: {
+        behalfOf: {
+            type: String,
+        },
+        pricePerAnnum: {
+            type: Number,
+        },
+    },
+    discountingInfo:{
+        discountAtSight: {
+            type: String,
+        },
+        pricePerAnnum: {
+            type: Number,
+        },
         behalfOf: {
             type: String,
         },
@@ -170,9 +187,7 @@ const LcsSchema: Schema = new Schema({
         type:Schema.Types.ObjectId,
         ref:'User'
     },
-    pricePerAnnum: {
-        type: Number,
-    },
+ 
     attachments: {
         type: [String], // Assuming an array of strings for attachment URLs
     },
@@ -200,7 +215,6 @@ export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunc
     const { data, pagination }: IPaginationResult<ILcs> = await getMongoosePaginatedData({
         model: LcsModel, query,page, limit, populate
     });
-
     return { data, pagination };
 };
 

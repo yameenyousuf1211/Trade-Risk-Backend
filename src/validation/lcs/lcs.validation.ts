@@ -30,13 +30,13 @@ const lcsValidator = joi.object({
     }).required(),
     shipmentPort: joi.object({
         country: joi.string().required(),
-        port: joi.string().required()
+        port: joi.string().required(),
     }).required(),
     transhipment: joi.boolean().required(),
     expectedConfirmationDate: joi.date().when('lcType',{
-        is: 'LC Confirmation',
-        then: joi.required(),
-        otherwise: joi.forbidden()
+        is: 'LC Discounting',
+        then: joi.forbidden(),
+        otherwise: joi.required()
     }),
     expectedDiscountingDate: joi.date().when('lcType',{
         is: 'LC Discounting',
@@ -52,20 +52,30 @@ const lcsValidator = joi.object({
         applicantName: joi.string().required(),
         countryOfImport: joi.string().required()
     },
-    exporterInfo:{
+    exporterInfo:joi.object({
         beneficiaryName: joi.string().required(),
         countryOfExport: joi.string().required(),
-        beneficiaryCountry: joi.string().required()
-    },
-    confirmationCharges:{
-        behalfOf: joi.string().required()
-    },
-    discountAtSight: joi.string().when('lcType',{
+        beneficiaryCountry: joi.string().required(),
+        bank:joi.string().required()
+    }),
+    discountingInfo:  joi.object({
+        behalfOf: joi.string().required(),
+        pricePerAnnum: joi.number().required(),
+        discountAtSight: joi.string().required()
+        }).when('lcType',{
         is: 'LC Confirmation',
         then: joi.forbidden(),
         otherwise: joi.required()
     }),
-    pricePerAnnum: joi.number().required(),
+    confirmationInfo: joi.object({
+            behalfOf: joi.string().required(),
+            pricePerAnnum: joi.number().required(),
+    }).when('lcType',{
+        is: 'LC Discounting',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
+
     isDraft: joi.boolean().optional(),
 });
 
