@@ -72,9 +72,9 @@ export const portsDetail = asyncHandler(async (req: Request, res: Response, next
     });
 
     export const currencies = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-        const currencies = [
+    const currencies = [
             "BHD",
-           "PKR",
+            "PKR",
             "QAR",
             "BDT",
             "SAR",

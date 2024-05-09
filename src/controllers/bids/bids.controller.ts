@@ -11,7 +11,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     // const search = req.query.search || ''; 
     
     let query:any = {isDeleted: false};
-    if(lc) query = { ...query, lc,status: 'Pending'}; // if kc is provide then give all the bids that has status pending only
+    if(lc) query = { ...query, lc,status: 'Pending'};
     if(bidBy) query = { ...query, bidBy };
     
     const data = await fetchBids({limit, page, query,populate:'bidBy'});
@@ -67,7 +67,6 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
 
 export const findBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user._id
-    console.log(userId);
     
     const data = await BidsStatusCount(userId);
     generateResponse(data, 'Bids count fetched successfully', res);
@@ -76,6 +75,11 @@ export const findBidsCount = asyncHandler(async (req: Request, res: Response, ne
 export const bidAllBidsOfUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user._id
     const data = await allBidsOfOneUser(userId);
-    
     generateResponse(data, 'All bids of user fetched successfully', res);
+})
+
+export const fetchbid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id
+    const data = await findBid({_id:id});
+    generateResponse(data, 'Bid fetched successfully', res);
 })
