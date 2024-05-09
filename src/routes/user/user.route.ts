@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { banks, fetchAllUsers, fetchCountries } from "../../controllers";
+import { fetchAllUsers } from "../../controllers";
 
 export default class UserAPI {
     constructor(private readonly router: Router) {
@@ -9,8 +9,7 @@ export default class UserAPI {
 
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
-        this.router.get('/:country', banks);
-        this.router.get('/countries/list', fetchCountries);
+      
 
     }
 

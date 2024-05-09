@@ -176,3 +176,9 @@ export const sendEmail  =  async ({subject,to,html}:{subject:string,to:string,ht
       if(error) return error;
       return data;
 }
+
+  
+
+  
+
+  

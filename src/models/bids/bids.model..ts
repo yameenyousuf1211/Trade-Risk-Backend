@@ -83,6 +83,9 @@ export const BidsStatusCount = (userId: string) => BidModel.aggregate([
 
 export const allBidsOfOneUser = (userId:string) => BidModel.aggregate([
     {
+        $match: { 'status': 'Pending' } // Filter only the bids with status 'Pending'
+    },
+    {
         $lookup: {
             from: 'lcs',
             localField: 'lc',
@@ -94,36 +97,50 @@ export const allBidsOfOneUser = (userId:string) => BidModel.aggregate([
         $unwind: '$lc'
     },
     {
-        $project: {
-            _id: 1,
-            bidType: 1,
-            bidValidity: 1,
-            confirmationPrice: 1,
-            discountingPrice: 1,
-            isDeleted: 1,
-            status: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            lc: {
-                _id: 1,
-                lcNumber: 1,
-                lcType: 1,
-                lcValue: 1,
-                lcStatus: 1,
-                lcExpiryDate: 1,
-                createdAt: 1,
-                updatedAt: 1,
-                createdBy:1,
-                amount:1
+        $match: { 'lc.createdBy': new mongoose.Types.ObjectId(userId) }
+    },
+    {
+        $group: {
+            _id: '$lc._id',
+            lc: { $first: '$lc' },
+            bidCount: { $sum: 1 },
+            bids: {
+                $push: {
+                    _id: '$_id',
+                    bidType: '$bidType',
+                    bidValidity: '$bidValidity',
+                    confirmationPrice: '$confirmationPrice',
+                    isDeleted: '$isDeleted',
+                    status: '$status',
+                    createdAt: '$createdAt',
+                    updatedAt: '$updatedAt',
+                    bidBy: '$bidBy'
+                }
             }
         }
     },
     {
-        $match: { 'lc.createdBy': new mongoose.Types.ObjectId(userId) }
+        $addFields: {
+            'lc.bidCount': '$bidCount',
+            'lc.bids': '$bids'
+        }
+    },
+    {
+        $replaceRoot: { newRoot: '$lc' }
+    },
+    {
+        $project:{
+            currency:1,
+            lcType:1,
+            amount:1,
+            refId:1,
+            bidCount:1,
+            bids:1
+        }
     },
     {
         $sort: {
-            'lc.amount': -1 // Sort by createdAt field in descending order
+            'lc.bidCount': 1 
         }
     }
 ]);

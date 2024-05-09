@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { getAllUsers } from "../../models";
 import {  ROLES,STATUS_CODES,banks as bank } from "../../utils/constants";
-import axios from "axios";
-
+import fs from 'fs';
+import path from 'path';
 
 // get all users
 export const fetchAllUsers = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -25,24 +25,3 @@ export const fetchCountries = asyncHandler(async (req: Request, res: Response, n
     generateResponse(data, 'Countries fetched successfully', res);
 });
 
-export const banks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const country = req.params.country;
-
-    if (!country) {
-        return next({
-            message: 'Country is required',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
-    }   
- 
-
-    if (!(country in bank)) {
-        return next({
-            statusCode: STATUS_CODES.BAD_REQUEST,
-            message: 'invalid country name'
-        });
-    }
-
-    const banksList = (bank as { [key: string]: { code: string; list: string[] } })[country].list;
-    generateResponse(banksList, 'Banks fetched successfully', res);
-});
