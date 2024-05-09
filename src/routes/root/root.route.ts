@@ -9,7 +9,7 @@ export default class RootAPI {
 
     setupRoutes() {
         this.router.get('/', defaultHandler);
-        this.router.get('/:country', banks);
+        this.router.get('/banks/:country', banks);
         this.router.get('/countries/list', fetchCountries);
         this.router.get('/countries/list/cities',fetchCities)
         this.router.get('/ports/details',portsDetail)
