@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
-import { getMongoosePaginatedData } from "../../utils/helpers";
+import { getMongoosePaginatedData,getMongooseAggregatePaginatedData } from "../../utils/helpers";
 import { QueryWithHelpers } from "mongoose";
 
 // Define the interface for your document
@@ -212,8 +212,8 @@ const LcsModel =  mongoose.model<ILcs>('lcs', LcsSchema);
 
 export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<ILcs>> => {
-    const { data, pagination }: IPaginationResult<ILcs> = await getMongoosePaginatedData({
-        model: LcsModel, query,page, limit, populate
+    const { data, pagination }: IPaginationResult<ILcs> = await getMongooseAggregatePaginatedData({
+        model: LcsModel, query: [query], page, limit
     });
     return { data, pagination };
 };
@@ -221,4 +221,5 @@ export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunc
 
 export const createLc = (obj:ILcs) => LcsModel.create(obj)
 export const findLc = (query: Record<string, any>): QueryWithHelpers<any, Document> => LcsModel.findOne(query);
+export const updateLc = (query: Record<string, any>, update: Record<string, any>): QueryWithHelpers<any, Document> => LcsModel.findOneAndUpdate(query, update)
 

@@ -7,6 +7,8 @@ const bidsValidator = joi.object({
   confirmationPrice: joi.number().required(),
   discountingPrice: joi.number().when('bidType', { is: 'LC Confirmation', then: joi.forbidden(),otherwise:joi.required() }),
   lc: joi.string().required(),  
+  discountMargin:joi.number().optional(),
+  discountBaseRate:joi.number().optional()
 });
 
 export const bidsValidation = validateRequest(bidsValidator);

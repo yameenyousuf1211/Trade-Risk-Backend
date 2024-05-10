@@ -37,11 +37,7 @@ const registerValidator = joi.object({
         then: joi.forbidden(),
         otherwise: joi.required(),
     }),
-    accountCountry: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
+    accountCountry: joi.string().required(),
     accountCity: joi.string().when('role', {
         is: 'bank',
         then: joi.forbidden(),

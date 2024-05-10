@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpers";
 import { ROLES, STATUS_CODES } from "../../utils/constants";    
-import { createLc, fetchLcs, findBid, findLc } from "../../models";
-
+import { createLc, fetchLcs, findBid, findLc,updateLc } from "../../models";
 
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
@@ -10,18 +9,51 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     const limit = +(req.query.limit || 10);
     const draft = req.query.draft === 'true' ? true : false;
     const createdBy = req.query.createdBy || '';
-    const filter = req.query.filter || ''
-    const search = req.query.search || ''
-
-    let query: any = { isDeleted: false, draft };
+    const filter = req.query.filter || '';
+    const search = req.query.search;
     
-    if(filter) query  = {...query,lcType:filter}
-    if(search) query = {...query,refId:search}
-    if(createdBy) query = { ...query, createdBy};
- 
-    const data = await fetchLcs({ limit, page, query });
-    generateResponse({data}, 'List fetched successfully', res);
+    let pipeline: any = [
+        { $match: { isDeleted: false, draft }}
+    ];
+    
+    if (filter) pipeline.push({ $match: { lcType: filter } });
+    if (search) pipeline.push({ $match: { refId: Number(search) } });
+    if (createdBy) pipeline.push({ $match: { createdBy } });
+    
+    pipeline.push({
+        $lookup: {
+            from: 'bids',
+            localField: '_id',
+            foreignField: 'lc',
+            as: 'bids'
+        }
+    });
+
+
+    pipeline.push({
+        $addFields: {
+            bidsCount: { $size: '$bids' } 
+        }
+    });
+    
+    pipeline.push({
+        $project:{
+       refId:1,
+       lcType:1,
+       issuingBank:1,
+       exporterInfo:1,
+       amount:1,
+       'bidsCount':1,
+       lcPeriod:1,
+       importerInfo:1,
+       
+        }
+    })
+    const data = await fetchLcs({ limit, page, query: pipeline });
+    console.log(data);
+    generateResponse({ data }, 'List fetched successfully', res);
 });
+
 
 export const createLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
@@ -72,3 +104,14 @@ export const statusCheck = asyncHandler(async (req: Request, res: Response, next
 })
 
 
+export const updateLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+
+    const draft = req.body.isDraft === 'true' ? true : false;
+
+    req.body.draft = draft;
+
+    const updatedLc = await updateLc({ _id: id }, req.body); 
+
+    generateResponse(updatedLc, 'Lc updated successfully', res);
+});

@@ -44,6 +44,12 @@ const bidSchema: Schema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    discountMargin:{
+        type:Number
+    },
+    discountBaseRate:{
+        type:Number
+    },
     status:{
         type:String,
         enum:['Pending','Expired','Rejected','Accepted'],
@@ -83,7 +89,7 @@ export const BidsStatusCount = (userId: string) => BidModel.aggregate([
 
 export const allBidsOfOneUser = (userId:string) => BidModel.aggregate([
     {
-        $match: { 'status': 'Pending' } // Filter only the bids with status 'Pending'
+        $match: { 'status': 'Pending' } 
     },
     {
         $lookup: {
@@ -141,6 +147,18 @@ export const allBidsOfOneUser = (userId:string) => BidModel.aggregate([
     {
         $sort: {
             'lc.bidCount': 1 
+        }
+    }
+]);
+
+export const lcBidsCount = (lcId:string) => BidModel.aggregate([
+    {
+        $match: { lc: new mongoose.Types.ObjectId(lcId) }
+    },
+    {
+        $group: {
+            _id: null,
+            count: { $sum: 1 }
         }
     }
 ]);

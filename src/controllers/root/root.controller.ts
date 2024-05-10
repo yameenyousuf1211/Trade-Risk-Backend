@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import {  ROLES,STATUS_CODES,banks as bank } from "../../utils/constants";
-import fs from 'fs';
-import path from 'path';
-
+import {portsList} from '../../utils/helpers'
 
 export const defaultHandler = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     generateResponse(null, `Health check passed`, res);
@@ -61,15 +59,15 @@ export const fetchCities = asyncHandler(async (req: Request, res: Response, next
 
     generateResponse(countryEntry[1], 'Cities fetched successfully', res);
 }); 
-
 export const portsDetail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    
-        const filePath = path.join(__dirname, '/ports_details.json');
-        const portsData = fs.readFileSync(filePath, 'utf8');
-        const portsDetail = JSON.parse(portsData);
+    let data = portsList;
+    const country = req.query.country || '';
 
-        generateResponse(portsDetail, 'Ports detail fetched successfully', res);
-    });
+    if (country) {
+        data = data.filter((port:any) => port.country === country);
+    }
+    generateResponse(data, 'Ports detail fetched successfully', res);
+});
 
     export const currencies = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const currencies = [

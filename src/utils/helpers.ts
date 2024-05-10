@@ -62,26 +62,26 @@ export const getMongoosePaginatedData = async (
 }
 
 // aggregate pagination with mongoose paginate library
-// export const getMongooseAggregatePaginatedData = async ({ model, page = 1, limit = 10, query = [] }) => {
-//     const options = {
-//         page,
-//         limit,
-//         customLabels: {
-//             totalDocs: 'totalItems',
-//             docs: 'data',
-//             limit: 'perPage',
-//             page: 'currentPage',
-//             meta: 'pagination',
-//         },
-//     };
+export const getMongooseAggregatePaginatedData = async ({ model, page = 1, limit = 10, query = [] }: { model: any, page?: number, limit?: number, query?: any[] }) => {
+    const options = {
+        page,
+        limit,
+        customLabels: {
+            totalDocs: 'totalItems',
+            docs: 'data',
+            limit: 'perPage',
+            page: 'currentPage',
+            meta: 'pagination',
+        },
+    };
 
-//     const myAggregate = model.aggregate(query);
-//     const { data, pagination } = await model.aggregatePaginate(myAggregate, options);
+    const myAggregate = model.aggregate(query);
+    const { data, pagination } = await model.aggregatePaginate(myAggregate, options);
 
-//     delete pagination?.pagingCounter;
+    delete pagination?.pagingCounter;
 
-//     return { data, pagination };
-// }
+    return { data, pagination };
+}
 
 export const asyncHandler = (requestHandler: RequestHandler) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -181,4 +181,180 @@ export const sendEmail  =  async ({subject,to,html}:{subject:string,to:string,ht
 
   
 
-  
+  export const portsList = [
+    {
+      "country": "UAE",
+      "city": "Dubai",
+      "port_name": "Port of Jebel Ali"
+    },
+    {
+      "country": "UAE",
+      "city": "Fujairah",
+      "port_name": "Port of Fujairah"
+    },
+    {
+      "country": "UAE",
+      "city": "Ras Al Khaimah",
+      "port_name": "Port of Ras Al Khaimah"
+    },
+    {
+      "country": "UAE",
+      "city": "Dubai",
+      "port_name": "Mina Rashid Port"
+    },
+    {
+      "country": "UAE",
+      "city": "Sharjah",
+      "port_name": "Mina Khalid Port"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jubail",
+      "port_name": "Jubail"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Yanbu",
+      "port_name": "Yanbu Commercial"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jeddah",
+      "port_name": "Jeddah"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Dammam",
+      "port_name": "Dammam"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Gwadar",
+      "port_name": "Gwadar"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Karachi",
+      "port_name": "Karachi"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Muhammad bin qasim",
+      "port_name": "Muhammad bin qasim"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Port of ormara",
+      "port_name": "Port of ormara"
+    },
+    {
+      "country": "Oman",
+      "city": "Khasab",
+      "port_name": "Khasab."
+    },
+    {
+      "country": "Oman",
+      "city": "Muscat",
+      "port_name": "Muscat"
+    },
+    {
+      "country": "Oman",
+      "city": "Mina Qaboos",
+      "port_name": "Mina Qaboos"
+    },
+    {
+      "country": "Oman",
+      "city": "Sohar",
+      "port_name": "Sohar"
+    },
+    {
+      "country": "Oman",
+      "city": "Salalah",
+      "port_name": "Salalah"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Khalifa Bin Salman Port",
+      "port_name": "Khalifa Bin Salman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Muharraq",
+      "port_name": "Muharraq Fisherman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Budaiya",
+      "port_name": "Budaiya Fisherman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Hidd",
+      "port_name": "Hidd Fisherman Port"
+    },
+    {
+      "country": "Qatar",
+      "city": "Doha",
+      "port_name": "Doha"
+    },
+    {
+      "country": "Qatar",
+      "city": "Al Rayyan",
+      "port_name": "Al Rayyan Marine Terminal"
+    },
+    {
+      "country": "Qatar",
+      "city": "Mesaieed",
+      "port_name": "Mesaieed"
+    },
+    {
+      "country": "Qatar",
+      "city": "Ras Laffan",
+      "port_name": "Ras Laffan"
+    },
+    {
+      "country": "Qatar",
+      "city": "Hamad",
+      "port_name": "Hamad"
+    },
+    {
+      "country": "Qatar",
+      "city": "Umm Said",
+      "port_name": "Umm Said"
+    },
+    {
+      "country": "UAE",
+      "city": "Mina Zayed",
+      "port_name": "Port of Mina Zayed"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jizan",
+      "port_name": "Jizan"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jiwani",
+      "port_name": "Jiwani"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Keti Bandar",
+      "port_name": "Keti Bandar"
+    },
+    {
+      "country": "Oman",
+      "city": "Qalhat",
+      "port_name": "Qalhat"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Qalali",
+      "port_name": "Qalali Fisherman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Al Dur Jetty",
+      "port_name": "Al Dur Jetty Fisherman Posr"
+              }
+  ]

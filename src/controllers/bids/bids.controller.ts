@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import { allBidsOfOneUser, BidsStatusCount, createBid, fetchBids, findBid, findLc, IBid } from "../../models";
+import { allBidsOfOneUser, BidsStatusCount, createBid, fetchBids, findBid, findLc, lcBidsCount } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
+import mongoose from "mongoose";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
@@ -66,7 +67,7 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
 })
 
 export const findBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user._id
+    const userId = req.user._id;
     
     const data = await BidsStatusCount(userId);
     generateResponse(data, 'Bids count fetched successfully', res);
@@ -82,4 +83,11 @@ export const fetchbid = asyncHandler(async (req: Request, res: Response, next: N
     const id = req.params.id
     const data = await findBid({_id:id});
     generateResponse(data, 'Bid fetched successfully', res);
+})
+
+export const fetchLcBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const lcId = req.params.id;
+
+    const data = await lcBidsCount(lcId);
+    generateResponse(data, 'Bids count fetched successfully', res);
 })
