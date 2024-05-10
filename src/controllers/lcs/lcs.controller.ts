@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpers";
 import { ROLES, STATUS_CODES } from "../../utils/constants";    
 import { createLc, fetchLcs, findBid, findLc,updateLc } from "../../models";
-
+import mongoose  from 'mongoose';
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
     const page: number = +(req.query.page || 1);
@@ -18,8 +18,10 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     
     if (filter) pipeline.push({ $match: { lcType: filter } });
     if (search) pipeline.push({ $match: { refId: Number(search) } });
-    if (createdBy) pipeline.push({ $match: { createdBy } });
-    
+    if (createdBy) {
+        pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
+    }
+
     pipeline.push({
         $lookup: {
             from: 'bids',
@@ -46,11 +48,12 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
        'bidsCount':1,
        lcPeriod:1,
        importerInfo:1,
-       
+       createdBy:1
         }
     })
+   
+
     const data = await fetchLcs({ limit, page, query: pipeline });
-    console.log(data);
     generateResponse({ data }, 'List fetched successfully', res);
 });
 

@@ -185,7 +185,7 @@ const LcsSchema: Schema = new Schema({
     },
     createdBy:{
         type:Schema.Types.ObjectId,
-        ref:'User'
+        ref:'user'
     },
  
     attachments: {
