@@ -183,27 +183,27 @@ export const sendEmail  =  async ({subject,to,html}:{subject:string,to:string,ht
 
   export const portsList = [
     {
-      "country": "UAE",
+      "country": "Uae",
       "city": "Dubai",
       "port_name": "Port of Jebel Ali"
     },
     {
-      "country": "UAE",
+      "country": "Uae",
       "city": "Fujairah",
       "port_name": "Port of Fujairah"
     },
     {
-      "country": "UAE",
+      "country": "Uae",
       "city": "Ras Al Khaimah",
       "port_name": "Port of Ras Al Khaimah"
     },
     {
-      "country": "UAE",
+      "country": "Uae",
       "city": "Dubai",
       "port_name": "Mina Rashid Port"
     },
     {
-      "country": "UAE",
+      "country": "Uae",
       "city": "Sharjah",
       "port_name": "Mina Khalid Port"
     },
@@ -323,7 +323,7 @@ export const sendEmail  =  async ({subject,to,html}:{subject:string,to:string,ht
       "port_name": "Umm Said"
     },
     {
-      "country": "UAE",
+      "country": "Uae",
       "city": "Mina Zayed",
       "port_name": "Port of Mina Zayed"
     },

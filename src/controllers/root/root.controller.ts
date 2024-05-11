@@ -46,7 +46,7 @@ export const fetchCities = asyncHandler(async (req: Request, res: Response, next
         "Qatar": ["Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Umm Salal"],
         "Bangladesh": ["Dhaka", "Chittagong", "Khulna", "Rajshahi", "Sylhet"],
         "Saudi": ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam"],
-        "UAE": ["Dubai", "Abu Dhabi", "Sharjah", "Al Ain", "Ajman"]
+        "Uae": ["Dubai", "Abu Dhabi", "Sharjah", "Al Ain", "Ajman"]
     };
 
     const countryEntry = Object.entries(cities).find(([key, value]) => key === country);

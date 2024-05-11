@@ -1,20 +1,21 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import { allBidsOfOneUser, BidsStatusCount, createBid, fetchBids, findBid, findLc, lcBidsCount } from "../../models";
+import {  BidsStatusCount, createBid, fetchBids, findBid, findLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
-import mongoose from "mongoose";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
     const lc = req.query.lc || '';
     const bidBy = req.query.bidBy === 'true' ? req.user._id : null;
-    // const search = req.query.search || ''; 
-    
+    const search = req.query.search || ''; 
+    const filter = req.query.filter || '';
+
     let query:any = {isDeleted: false};
     if(lc) query = { ...query, lc,status: 'Pending'};
     if(bidBy) query = { ...query, bidBy };
-    
+    if(filter) query = {...query,bidType:filter};
+ 
     const data = await fetchBids({limit, page, query,populate:'bidBy'});
     generateResponse(data, 'List fetched successfully', res);
 })
@@ -73,21 +74,8 @@ export const findBidsCount = asyncHandler(async (req: Request, res: Response, ne
     generateResponse(data, 'Bids count fetched successfully', res);
 })
 
-export const bidAllBidsOfUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user._id
-    const data = await allBidsOfOneUser(userId);
-    generateResponse(data, 'All bids of user fetched successfully', res);
-})
-
 export const fetchbid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
     const data = await findBid({_id:id});
     generateResponse(data, 'Bid fetched successfully', res);
-})
-
-export const fetchLcBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const lcId = req.params.id;
-
-    const data = await lcBidsCount(lcId);
-    generateResponse(data, 'Bids count fetched successfully', res);
 })

@@ -6,7 +6,7 @@ export default class RootAPI {
         this.router = Router();
         this.setupRoutes();
     }
-
+    
     setupRoutes() {
         this.router.get('/', defaultHandler);
         this.router.get('/banks/:country', banks);

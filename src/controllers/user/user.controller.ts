@@ -2,8 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { getAllUsers } from "../../models";
 import {  ROLES,STATUS_CODES,banks as bank } from "../../utils/constants";
-import fs from 'fs';
-import path from 'path';
 
 // get all users
 export const fetchAllUsers = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +19,7 @@ export const fetchAllUsers = asyncHandler(async (req: Request, res: Response, ne
 });
 
 export const fetchCountries = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const data = ["Bahrain","Pakistan","Qatar","Bangladesh","Saudi","UAE"]
+    const data = ["Bahrain","Pakistan","Qatar","Bangladesh","Saudi","Uae"]
     generateResponse(data, 'Countries fetched successfully', res);
 });
 

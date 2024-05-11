@@ -18,6 +18,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     
     if (filter) pipeline.push({ $match: { lcType: filter } });
     if (search) pipeline.push({ $match: { refId: Number(search) } });
+    
     if (createdBy) {
         pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
     }
@@ -32,12 +33,29 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     });
 
 
+    
+
     pipeline.push({
         $addFields: {
-            bidsCount: { $size: '$bids' } 
+            bids: {
+                $filter: {
+                    input: "$bids",
+                    as: "bid",
+                    cond: { $eq: ["$$bid.status", "Pending"] }
+                }
+            },
+            bidsCount: {
+                $size: {
+                    $filter: {
+                        input: "$bids",
+                        as: "bid",
+                        cond: { $eq: ["$$bid.status", "Pending"] }
+                    }
+                }
+            }
         }
     });
-    
+
     pipeline.push({
         $project:{
        refId:1,
@@ -47,8 +65,11 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
        amount:1,
        'bidsCount':1,
        lcPeriod:1,
+       bids:1,
        importerInfo:1,
-       createdBy:1
+       createdBy:1,
+       createdAt:1,
+       updatedAt:1
         }
     })
    
