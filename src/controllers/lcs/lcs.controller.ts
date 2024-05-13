@@ -32,9 +32,6 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
         }
     });
 
-
-    
-
     pipeline.push({
         $addFields: {
             bids: {
@@ -57,26 +54,59 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     });
 
     pipeline.push({
-        $project:{
-       refId:1,
-       lcType:1,
-       issuingBank:1,
-       exporterInfo:1,
-       amount:1,
-       'bidsCount':1,
-       lcPeriod:1,
-       bids:1,
-       importerInfo:1,
-       createdBy:1,
-       createdAt:1,
-       updatedAt:1
+        $lookup: {
+            from: 'users',
+            localField: 'bids.bidBy',
+            foreignField: '_id',
+            as: 'userInfo'
         }
-    })
-   
+    });
+    pipeline.push({
+        $project: {
+            refId: 1,
+            lcType: 1,
+            issuingBank: 1,
+            exporterInfo: 1,
+            amount: 1,
+            bidsCount: 1,
+            lcPeriod: 1,
+            bids: {
+                $map: {
+                    input: "$bids",
+                    as: "bid",
+                    in: {
+                        $mergeObjects: [
+                            "$$bid",
+                            {
+                                userInfo: {
+                                    name: { $arrayElemAt: ["$userInfo.name", 0] },
+                                    email: { $arrayElemAt: ["$userInfo.email", 0] },
+                                    _id: { $arrayElemAt: ["$userInfo._id", 0] }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            importerInfo: 1,
+            createdBy: 1,
+            createdAt: 1,
+            updatedAt: 1
+        }
+    });
+    
+
+    pipeline.push({
+        $sort:{
+            createdAt:-1
+        }
+    });
 
     const data = await fetchLcs({ limit, page, query: pipeline });
     generateResponse({ data }, 'List fetched successfully', res);
 });
+
+
 
 
 export const createLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
