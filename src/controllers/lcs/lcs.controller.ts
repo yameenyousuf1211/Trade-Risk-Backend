@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpers";
-import { ROLES, STATUS_CODES } from "../../utils/constants";    
+import {  STATUS_CODES } from "../../utils/constants";    
 import { createLc, fetchLcs, findBid, findLc,updateLc } from "../../models";
 import mongoose  from 'mongoose';
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -11,11 +11,13 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     const createdBy = req.query.createdBy || '';
     const filter = req.query.filter || '';
     const search = req.query.search;
-    
+    const status = req.query.status;
+
     let pipeline: any = [
         { $match: { isDeleted: false, draft }}
     ];
-    
+
+    if(status) pipeline.push({ $match: { status } })
     if (filter) pipeline.push({ $match: { lcType: filter } });
     if (search) pipeline.push({ $match: { refId: Number(search) } });
     
@@ -31,28 +33,23 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             as: 'bids'
         }
     });
-
+   
     pipeline.push({
         $addFields: {
-            bids: {
-                $filter: {
-                    input: "$bids",
-                    as: "bid",
-                    cond: { $eq: ["$$bid.status", "Pending"] }
-                }
-            },
             bidsCount: {
-                $size: {
-                    $filter: {
-                        input: "$bids",
-                        as: "bid",
-                        cond: { $eq: ["$$bid.status", "Pending"] }
-                    }
-                }
-            }
+                $size: "$bids"
+            },
+            bids: "$bids"
         }
     });
-
+    
+    // bids: {
+    //     $filter: {
+    //         input: "$bids",
+    //         as: "bid",
+    //         cond: { $eq: ["$$bid.status", "Pending"] }
+    //     }
+    // }
     pipeline.push({
         $lookup: {
             from: 'users',
@@ -89,6 +86,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
                 }
             },
             importerInfo: 1,
+            status:1,
             createdBy: 1,
             createdAt: 1,
             updatedAt: 1
@@ -103,7 +101,21 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     });
 
     const data = await fetchLcs({ limit, page, query: pipeline });
-    generateResponse({ data }, 'List fetched successfully', res);
+
+    if (data) {
+        data.data.forEach(async (lc) => {
+            const endDate = new Date(lc.lcPeriod.endDate);
+            const today = new Date();
+    
+            if (endDate < today) {
+                await updateLc({ _id: lc._id }, { status: 'Expired' });
+            }
+        });
+    }
+
+    const updatedData = await fetchLcs({ limit, page, query: pipeline });
+
+    generateResponse({ updatedData }, 'List fetched successfully', res);
 });
 
 

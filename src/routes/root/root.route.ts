@@ -1,4 +1,4 @@
-import { currencies, defaultHandler,banks, fetchCities, fetchCountries, portsDetail  } from "../../controllers";
+import { defaultHandler  } from "../../controllers";
 import { Router } from "express";
 import { } from "../../controllers";
 export default class RootAPI {
@@ -9,11 +9,7 @@ export default class RootAPI {
     
     setupRoutes() {
         this.router.get('/', defaultHandler);
-        this.router.get('/banks/:country', banks);
-        this.router.get('/countries/list', fetchCountries);
-        this.router.get('/countries/list/cities',fetchCities)
-        this.router.get('/ports/details',portsDetail)
-        this.router.get('/currencies/list',currencies)
+        
     }
     
     

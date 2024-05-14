@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import {  BidsStatusCount, createBid, fetchBids, findBid, findLc } from "../../models";
+import {  BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
+
+import mongoose, { PipelineStage } from "mongoose";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
@@ -10,15 +12,79 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const bidBy = req.query.bidBy === 'true' ? req.user._id : null;
     const search = req.query.search || ''; 
     const filter = req.query.filter || '';
+    const lcOwner = req.query.lcOwner || '';
 
-    let query:any = {isDeleted: false};
-    if(lc) query = { ...query, lc,status: 'Pending'};
-    if(bidBy) query = { ...query, bidBy };
-    if(filter) query = {...query,bidType:filter};
+    let pipeline: PipelineStage[] = [{ $match: { isDeleted: false } }];
+
+    if (lc) {
+        pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string), status: 'Pending' } });
+    }
+
+    if (bidBy) {
+        pipeline.push({ $match: { bidBy:new mongoose.Types.ObjectId(bidBy as string) } });
+    }
+
+    if (filter) {
+        pipeline.push({ $match: { bidType: filter } });
+    }
+
+    if (search) {
+        pipeline.push({ $match: { status: search } });
+    }
+
+
+    pipeline.push({
+        $lookup: {
+            from: 'users',
+            localField: 'bidBy',
+            foreignField: '_id',
+            as: 'bidBy'
+        }
+    })
+    pipeline.push({
+        $lookup:{
+            from:'lcs',
+            localField:'lc',
+            foreignField:'_id',
+            as: 'lcOwner'
+        }
+    });
+
+    if(lcOwner){
+        pipeline.push({
+            $match: { 'lcOwner.createdBy': new mongoose.Types.ObjectId(lcOwner as string) }
+        })
+    }
+
+    pipeline.push({
+        $project: {
+            'lcOwner': [
+            {
+                $arrayElemAt: ['$lcOwner.createdBy', 0]
+            }
+            ],
+            'bidBy': [
+                { $arrayElemAt: ['$bidBy.name', 0] },
+                { $arrayElemAt: ['$bidBy.email', 0] },
+                { $arrayElemAt: ['$bidBy.country', 0] }
+            ],
+            'status': 1,
+            'createdAt': 1,
+            'updatedAt': 1,
+            'isDeleted': 1,
+            'bidType': 1,
+            'confirmationPrice': 1,
+            'discountingPrice': 1,
+            'bidValidity': 1,
+        }
+    });
+    
  
-    const data = await fetchBids({limit, page, query,populate:'bidBy'});
+    const data = await fetchBids({ limit, page, query:pipeline });
+
     generateResponse(data, 'List fetched successfully', res);
-})
+});
+
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
@@ -64,6 +130,15 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
     bid.status = status;
     
     await bid.save();
+
+    if(bid.status === 'Accepted'){
+        const bids = await findBids({ _id: { $ne: bid._id }, lc: bid.lc });
+
+        bids.forEach(async (bid) => {
+            bid.status = 'Rejected';
+            await bid.save();
+        });
+    }
     generateResponse(bid, 'Bids status Updated', res);
 })
 

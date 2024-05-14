@@ -18,8 +18,5 @@ export const fetchAllUsers = asyncHandler(async (req: Request, res: Response, ne
     generateResponse(usersData, 'List fetched successfully', res);
 });
 
-export const fetchCountries = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const data = ["Bahrain","Pakistan","Qatar","Bangladesh","Saudi","Uae"]
-    generateResponse(data, 'Countries fetched successfully', res);
-});
+
 

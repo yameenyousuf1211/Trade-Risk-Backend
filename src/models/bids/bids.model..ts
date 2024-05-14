@@ -2,11 +2,12 @@ import mongoose, { Schema, Document } from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
-import { getMongoosePaginatedData } from "../../utils/helpers";
+import { getMongooseAggregatePaginatedData, getMongoosePaginatedData } from "../../utils/helpers";
 
 export interface IBid extends Document {
     bidType: string;
     bidValidity:Date
+    lc:string;
     discountingPrice:number
     confirmationPrice:number
     isDeleted:boolean
@@ -65,11 +66,12 @@ const BidModel = mongoose.model<IBid>('bid', bidSchema);
 
 export const createBid  = (obj:IBid) => BidModel.create(obj);
 export const findBid = (query: Record<string, any>) => BidModel.findOne(query);
+export const findBids = (query: Record<string, any>) => BidModel.find(query);
 // export const findMany = (query: Record<string, any>) => BidModel.find(query);
 export const fetchBids = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<IBid>> => {
-    const { data, pagination }: IPaginationResult<IBid> = await getMongoosePaginatedData({
-        model: BidModel, query,page, limit, populate
+    const { data, pagination }: IPaginationResult<IBid> = await getMongooseAggregatePaginatedData({
+        model: BidModel, query:[query],page, limit, 
     });
 
     return { data, pagination };

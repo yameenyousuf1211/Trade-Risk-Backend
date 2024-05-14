@@ -5,6 +5,7 @@ import AuthAPI from "./auth/auth.route";
 import UserAPI from "./user/user.route";
 import LcsAPI from "./lcs/lcs.route";
 import BidsAPI from "./bids/bids.route";
+import CountryAPI from "./country/country.route";
 
 export default class API {
     router: Router;
@@ -24,6 +25,8 @@ export default class API {
         routeGroups.push(new UserAPI(router));
         routeGroups.push(new LcsAPI(router))
         routeGroups.push(new BidsAPI(router))
+        routeGroups.push(new CountryAPI(router))
+
     }
 
     setContentType(req: Request, res: Response, next: NextFunction) {
