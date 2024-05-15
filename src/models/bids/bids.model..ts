@@ -67,6 +67,7 @@ const BidModel = mongoose.model<IBid>('bid', bidSchema);
 export const createBid  = (obj:IBid) => BidModel.create(obj);
 export const findBid = (query: Record<string, any>) => BidModel.findOne(query);
 export const findBids = (query: Record<string, any>) => BidModel.find(query);
+export const updateBid = (query: Record<string, any>, update: Record<string, any>) => BidModel.updateOne(query, update);
 // export const findMany = (query: Record<string, any>) => BidModel.find(query);
 export const fetchBids = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<IBid>> => {

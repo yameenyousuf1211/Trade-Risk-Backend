@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import {  BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc } from "../../models";
+import {  BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, IBid, updateBid } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 import mongoose, { PipelineStage } from "mongoose";
@@ -24,13 +24,16 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
         pipeline.push({ $match: { bidBy:new mongoose.Types.ObjectId(bidBy as string) } });
     }
 
+    // if (filter) {
+    //     pipeline.push({ $match: { bidType: filter } });
+    // }
+    
     if (filter) {
-        pipeline.push({ $match: { bidType: filter } });
+        pipeline.push({ $match: { $or: [{ bidType: filter },{status:filter}]}});
     }
-
-    if (search) {
-        pipeline.push({ $match: { status: search } });
-    }
+    // if (search) {
+    //     pipeline.push({ $match: { status: search } });
+    // }
 
 
     pipeline.push({
@@ -80,9 +83,17 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     });
     
  
-    const data = await fetchBids({ limit, page, query:pipeline });
+    const fetchedBids = await fetchBids({ limit, page, query: pipeline });
 
-    generateResponse(data, 'List fetched successfully', res);
+    // Iterate through fetched bids
+    for (const bid of fetchedBids.data) {
+        if (new Date(bid.bidValidity) < new Date()) {
+            bid.status = "Expired";
+            await updateBid({ _id: bid._id }, { status: 'Expired' });
+        }
+    }
+
+    generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
 
@@ -93,6 +104,14 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     if(!lc) return next({
         message: 'Lc not found',
         statusCode: STATUS_CODES.NOT_FOUND
+    })
+
+    // we can only bid to those lc again if they dont have a bid with status accepted
+    const isbidExist = await findBid({lc: req.body.lc, status:'Accepted'}); 
+    
+    if(isbidExist) return next({
+        message: 'Lc already accepted a bid',
+        statusCode: STATUS_CODES.BAD_REQUEST
     })
 
     lc.status = 'Pending'

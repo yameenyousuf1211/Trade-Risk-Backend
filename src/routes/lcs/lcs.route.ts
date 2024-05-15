@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { acceptOrRejectBids, createLcs, deleteLc, fetchAllLcs, findLcs, statusCheck,updateLcs } from "../../controllers";
+import { acceptOrRejectBids, createLcs, deleteLc, fetchAllLcs, findLcs, statusCheck,totalRequestLc,updateLcs } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { lcsValidation } from "../../validation/lcs/lcs.validation";
 import { ROLES } from "../../utils/constants";
@@ -14,6 +14,7 @@ export default class LcsAPI {
     setupRoutes() {
         this.router.get('/',authMiddleware(Object.values(ROLES)),fetchAllLcs);
         this.router.get('/:id',authMiddleware(Object.values(ROLES)),findLcs);
+        this.router.get('/total-request/list',authMiddleware(Object.values(ROLES)),totalRequestLc);
         this.router.get('/status/check/:lc',authMiddleware(Object.values(ROLES)),statusCheck);
         this.router.post('/create',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),lcsValidation,createLcs);
         this.router.delete('/:id',authMiddleware(Object.values(ROLES)),deleteLc);

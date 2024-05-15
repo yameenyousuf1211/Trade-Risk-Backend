@@ -181,3 +181,86 @@ export const updateLcs = asyncHandler(async (req: Request, res: Response, next: 
 
     generateResponse(updatedLc, 'Lc updated successfully', res);
 });
+
+
+export const totalRequestLc = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+   
+    const pipeline: any = [
+        {
+            $match: {
+                createdBy: new mongoose.Types.ObjectId(req.user._id as string)
+            }
+        },
+        {
+            $match:{
+                isDeleted: false
+            }
+        },
+       
+        {
+            $lookup:{
+                from: 'bids',
+                localField: '_id',
+                foreignField: 'lc',
+                as: 'bids'
+            }
+        },
+        {
+            $group: {
+                _id: "$_id", // Group by _id to maintain document count
+                totalLCCount: { $sum: 1 },
+                bidStatusCounts: { 
+                    $push: {
+                        $cond: {
+                            if: { $ne: ["$bids.status", []] },
+                            then: "$bids.status",
+                            else: null
+                        }
+                    }
+                }
+            }
+        },
+        { $unwind: "$bidStatusCounts" },
+        { $unwind: "$bidStatusCounts" },
+        {
+            $group: {
+                _id: "$bidStatusCounts",
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                status: "$_id",
+                count: 1
+            }
+        }
+    ];
+    
+
+    const data = await fetchLcs({ query: pipeline });
+
+    generateResponse(data, 'Lc status count fetched successfully', res);
+})
+// {
+//     $group: {
+//         _id: {
+//             status: "$status",
+//             createdBy: "$createdBy"
+//         },
+//         count: { $sum: 1 },
+//         totalSize: { $sum: 1 } 
+//     }
+// },
+// {
+//     $group: {
+//         _id: "$_id.createdBy", 
+//         countsByStatus: {
+//             $push: {
+//                 status: "$_id.status",
+//                 count: "$count"
+//             }
+//         },
+//         totalSize: { $sum: "$totalSize" }
+//     }
+// }
