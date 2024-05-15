@@ -64,6 +64,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             lcType: 1,
             issuingBank: 1,
             exporterInfo: 1,
+            advisingBank:1,
             amount: 1,
             bidsCount: 1,
             lcPeriod: 1,

@@ -52,20 +52,21 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             as: 'lcOwner'
         }
     });
-
+    
     if(lcOwner){
         pipeline.push({
             $match: { 'lcOwner.createdBy': new mongoose.Types.ObjectId(lcOwner as string) }
         })
     }
-
+    
     pipeline.push({
         $project: {
             'lcOwner': [
-            {
-                $arrayElemAt: ['$lcOwner.createdBy', 0]
-            }
+                {
+                    $arrayElemAt: ['$lcOwner.createdBy', 0]
+                }
             ],
+            'lc': '$lcOwner._id',
             'bidBy': [
                 { $arrayElemAt: ['$bidBy.name', 0] },
                 { $arrayElemAt: ['$bidBy.email', 0] },
@@ -81,6 +82,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             'bidValidity': 1,
         }
     });
+    
     
  
     const fetchedBids = await fetchBids({ limit, page, query: pipeline });

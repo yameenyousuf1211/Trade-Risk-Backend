@@ -44,7 +44,7 @@ const registerValidator = joi.object({
         otherwise: joi.required(),
     }),
     productInfo: joi.object({
-        product: joi.string().required(),
+        products: joi.array().items(joi.string()).required(),
         annualSalary: joi.number().required(),
         annualValueExports: joi.number().required(),
         annualValueImports: joi.number().required(),

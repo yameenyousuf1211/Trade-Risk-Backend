@@ -21,7 +21,7 @@ const userSchema = new Schema<IUser>({
     businessType: { type: String },
     role: { type: String, enum: Object.values(ROLES), default: "user", required: true },
     productInfo: {
-        product: { type: String },
+        product: [{ type: String }],
         annualSalary: { type: Number },
         annualValueExports: { type: Number },
         annualValueImports: { type: Number }
