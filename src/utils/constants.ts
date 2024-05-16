@@ -25,7 +25,7 @@ export enum COMPANY_CONSTITUTION {
     Individual_Proprietorship_Co = 'individual_proprietorship_co',
 }
 export const banks = {
-  Bahrain: {
+  bahrain: {
     code: "650b50f4d5446e62c254e274",
     list: [
       "Ahli United Bank",
@@ -45,7 +45,7 @@ export const banks = {
       "Khaleeji Commercial Bank"
     ]
   },
-  Bangladesh: {
+  bangladesh: {
     code: "650b50f4d5446e62c254dc50",
     list: [
       "Sonali Bank Limited",
@@ -63,7 +63,7 @@ export const banks = {
       "United Commercial Bank Limited (UCB)"
     ]
   },
-  Saudi: {
+  saudi: {
     code: "650b50f4d5446e62c25526d8",
     list: [
       "National Commercial Bank (NCB)",
@@ -78,7 +78,7 @@ export const banks = {
       "Bank Albilad"
     ]
   },
-  Pakistan: {
+  pakistan: {
     code: "650b50f4d5446e62c2550b28",
     list: [
       "National Bank of Pakistan (NBP)",
@@ -96,7 +96,7 @@ export const banks = {
       "JS Bank Limited"
     ]
   },
-  UAE: {
+  uae: {
     code: "650b50f4d5446e62c255f04d",
     list: [
       "First Abu Dhabi Bank (FAB)",
@@ -114,7 +114,7 @@ export const banks = {
       "Emirates Islamic Bank"
     ]
   },
-  Qatar: {
+  qatar: {
     code: "650b50f4d5446e62c2560853",
     list: [
       "Qatar National Bank (QNB)",
