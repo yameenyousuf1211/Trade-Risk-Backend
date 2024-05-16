@@ -16,7 +16,7 @@ export const banks = asyncHandler(async (req: Request, res: Response, next: Next
         });
     }   
  
-    if (!(country in bank)) {
+    if (!(country.toLowerCase() in bank)) {
         return next({
             statusCode: STATUS_CODES.BAD_REQUEST,
             message: 'invalid country name'

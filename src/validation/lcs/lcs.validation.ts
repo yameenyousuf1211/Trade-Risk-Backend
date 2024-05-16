@@ -45,6 +45,7 @@ const lcsValidator = joi.object({
     }),
     productDescription: joi.string().required(),
     lcPeriod:{
+        expectedDate: joi.boolean().required(),
         startDate: joi.date().required(),
         endDate: joi.date().required()
     },
