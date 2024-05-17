@@ -7,7 +7,7 @@ import { findUser } from '../models';
 const authMiddleware = (roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const accessToken = req.headers.authorization?.split(' ')[1] ?? req.session?.accessToken;
-        
+                
         if (!accessToken) {
             return next({
                 statusCode: STATUS_CODES.UNAUTHORIZED,

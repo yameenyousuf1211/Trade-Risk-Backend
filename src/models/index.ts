@@ -1,2 +1,5 @@
 export * from './user/user.model'
 export * from './bank/bank.model'
+export * from './lcs/lcs.model'
+export * from './bids/bids.model.'
+export * from './risk/risk.model'

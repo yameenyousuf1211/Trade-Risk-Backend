@@ -1,4 +1,4 @@
-import { Document, ObjectId, Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
@@ -9,20 +9,19 @@ import { QueryWithHelpers } from "mongoose";
 import { sign } from "jsonwebtoken";
 import { IUser } from "../../interface";
 
-
-
 // Define the Mongoose schema
 const userSchema = new Schema<IUser>({
     name: { type: String },
     email: { type: String, lowercase: true, required: true },
     password: { type: String, select: false },
     address: { type: String },
+    country:{ type: String },
     phone: { type: String },
     constitution: { type: String, enum: Object.values(COMPANY_CONSTITUTION) },
     businessType: { type: String },
     role: { type: String, enum: Object.values(ROLES), default: "user", required: true },
     productInfo: {
-        product: { type: String },
+        product: [{ type: String }],
         annualSalary: { type: Number },
         annualValueExports: { type: Number },
         annualValueImports: { type: Number }
@@ -99,7 +98,7 @@ export const findUser = (query: Record<string, any>): QueryWithHelpers<any, Docu
 export const getAllUsers = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<IUser>> => {
     const { data, pagination }: IPaginationResult<IUser> = await getMongoosePaginatedData({
-        model: UserModel, query, page, limit, populate
+        model: UserModel, query,page, limit, populate
     });
 
     return { data, pagination };

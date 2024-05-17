@@ -9,6 +9,8 @@ export default class UserAPI {
 
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
+      
+
     }
 
     getRouter() {

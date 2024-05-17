@@ -3,6 +3,10 @@ import { Request, Response, NextFunction, Application, Router } from "express";
 import RootAPI from "./root/root.route";
 import AuthAPI from "./auth/auth.route";
 import UserAPI from "./user/user.route";
+import LcsAPI from "./lcs/lcs.route";
+import BidsAPI from "./bids/bids.route";
+import CountryAPI from "./country/country.route";
+import RiskAPI from "./risk/risk.route";
 
 export default class API {
     router: Router;
@@ -20,6 +24,10 @@ export default class API {
         routeGroups.push(new RootAPI(router));
         routeGroups.push(new AuthAPI(router));
         routeGroups.push(new UserAPI(router));
+        routeGroups.push(new LcsAPI(router))
+        routeGroups.push(new BidsAPI(router))
+        routeGroups.push(new CountryAPI(router))
+        routeGroups.push(new RiskAPI(router))
     }
 
     setContentType(req: Request, res: Response, next: NextFunction) {

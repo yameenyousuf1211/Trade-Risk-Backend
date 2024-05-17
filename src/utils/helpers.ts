@@ -2,6 +2,10 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { createUser, findUser } from '../models';
 import { hash } from 'bcrypt';
 import { ROLES } from './constants';
+import { Resend } from 'resend';
+
+const resend = new Resend('re_PfY2RMhd_HcEgmT5L2qW5hT2HwzwqzM6G');
+// import { FCM } from "firebase-admin-push";
 
 // generate response with status code
 export const generateResponse = (data: any, message: string, res: Response, code = 200) => {
@@ -58,26 +62,26 @@ export const getMongoosePaginatedData = async (
 }
 
 // aggregate pagination with mongoose paginate library
-// export const getMongooseAggregatePaginatedData = async ({ model, page = 1, limit = 10, query = [] }) => {
-//     const options = {
-//         page,
-//         limit,
-//         customLabels: {
-//             totalDocs: 'totalItems',
-//             docs: 'data',
-//             limit: 'perPage',
-//             page: 'currentPage',
-//             meta: 'pagination',
-//         },
-//     };
+export const getMongooseAggregatePaginatedData = async ({ model, page = 1, limit = 10, query = [] }: { model: any, page?: number, limit?: number, query?: any[] }) => {
+    const options = {
+        page,
+        limit,
+        customLabels: {
+            totalDocs: 'totalItems',
+            docs: 'data',
+            limit: 'perPage',
+            page: 'currentPage',
+            meta: 'pagination',
+        },
+    };
 
-//     const myAggregate = model.aggregate(query);
-//     const { data, pagination } = await model.aggregatePaginate(myAggregate, options);
+    const myAggregate = model.aggregate(query);
+    const { data, pagination } = await model.aggregatePaginate(myAggregate, options);
 
-//     delete pagination?.pagingCounter;
+    delete pagination?.pagingCounter;
 
-//     return { data, pagination };
-// }
+    return { data, pagination };
+}
 
 export const asyncHandler = (requestHandler: RequestHandler) => {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -123,3 +127,234 @@ export function generatePassword(): string {
 
     return password;
 }
+
+export function generateRefId(): number {
+    const uniqueNumbers = new Set<number>();
+    
+    while (uniqueNumbers.size < 900000) { // Maximum possible unique 6-digit numbers
+      const randomNumber = Math.floor(100000 + Math.random() * 900000);
+      uniqueNumbers.add(randomNumber);
+    }
+    
+    // Convert the set to an array and return a random number from it
+    const uniqueNumbersArray = Array.from(uniqueNumbers);
+    return uniqueNumbersArray[Math.floor(Math.random() * uniqueNumbersArray.length)];
+  }
+
+// export const sendNotification = ({ title, body, fcmTokens, data, priority = 'normal' }: { title: string, body: string, fcmTokens: string[], data: any, priority?: string }) => {
+//     const serverKey = process.env.FIREBASE_SERVER_KEY;
+//     const fcm: FCM = new FCM(serverKey);
+
+//     const message = {
+//         registration_ids: fcmTokens,
+//         priority,
+//         notification: {
+//             title,
+//             body,
+//         },
+//         data
+//     };
+//     // Send the notification
+//     fcm.send(message, (error: any, response: any) => {
+//         if (error) {
+//             console.error('Error sending notification:', error);
+//         } else {
+//             console.log('Notification sent successfully:', response);
+//         }
+//     });
+// }
+
+export const sendEmail  =  async ({subject,to,html}:{subject:string,to:string,html:string}) => {
+
+    const { data, error } = await resend.emails.send({
+        from: 'yameenyousuf2016@gmail.com',
+        to,
+        subject,
+        html,
+      });
+
+      if(error) return error;
+      return data;
+}
+
+  
+
+  
+
+  export const portsList = [
+    {
+      "country": "Uae",
+      "city": "Dubai",
+      "port_name": "Port of Jebel Ali"
+    },
+    {
+      "country": "Uae",
+      "city": "Fujairah",
+      "port_name": "Port of Fujairah"
+    },
+    {
+      "country": "Uae",
+      "city": "Ras Al Khaimah",
+      "port_name": "Port of Ras Al Khaimah"
+    },
+    {
+      "country": "Uae",
+      "city": "Dubai",
+      "port_name": "Mina Rashid Port"
+    },
+    {
+      "country": "Uae",
+      "city": "Sharjah",
+      "port_name": "Mina Khalid Port"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jubail",
+      "port_name": "Jubail"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Yanbu",
+      "port_name": "Yanbu Commercial"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jeddah",
+      "port_name": "Jeddah"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Dammam",
+      "port_name": "Dammam"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Gwadar",
+      "port_name": "Gwadar"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Karachi",
+      "port_name": "Karachi"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Muhammad bin qasim",
+      "port_name": "Muhammad bin qasim"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Port of ormara",
+      "port_name": "Port of ormara"
+    },
+    {
+      "country": "Oman",
+      "city": "Khasab",
+      "port_name": "Khasab."
+    },
+    {
+      "country": "Oman",
+      "city": "Muscat",
+      "port_name": "Muscat"
+    },
+    {
+      "country": "Oman",
+      "city": "Mina Qaboos",
+      "port_name": "Mina Qaboos"
+    },
+    {
+      "country": "Oman",
+      "city": "Sohar",
+      "port_name": "Sohar"
+    },
+    {
+      "country": "Oman",
+      "city": "Salalah",
+      "port_name": "Salalah"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Khalifa Bin Salman Port",
+      "port_name": "Khalifa Bin Salman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Muharraq",
+      "port_name": "Muharraq Fisherman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Budaiya",
+      "port_name": "Budaiya Fisherman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Hidd",
+      "port_name": "Hidd Fisherman Port"
+    },
+    {
+      "country": "Qatar",
+      "city": "Doha",
+      "port_name": "Doha"
+    },
+    {
+      "country": "Qatar",
+      "city": "Al Rayyan",
+      "port_name": "Al Rayyan Marine Terminal"
+    },
+    {
+      "country": "Qatar",
+      "city": "Mesaieed",
+      "port_name": "Mesaieed"
+    },
+    {
+      "country": "Qatar",
+      "city": "Ras Laffan",
+      "port_name": "Ras Laffan"
+    },
+    {
+      "country": "Qatar",
+      "city": "Hamad",
+      "port_name": "Hamad"
+    },
+    {
+      "country": "Qatar",
+      "city": "Umm Said",
+      "port_name": "Umm Said"
+    },
+    {
+      "country": "Uae",
+      "city": "Mina Zayed",
+      "port_name": "Port of Mina Zayed"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jizan",
+      "port_name": "Jizan"
+    },
+    {
+      "country": "Saudi Arabia",
+      "city": "Jiwani",
+      "port_name": "Jiwani"
+    },
+    {
+      "country": "Pakistan",
+      "city": "Keti Bandar",
+      "port_name": "Keti Bandar"
+    },
+    {
+      "country": "Oman",
+      "city": "Qalhat",
+      "port_name": "Qalhat"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Qalali",
+      "port_name": "Qalali Fisherman Port"
+    },
+    {
+      "country": "Bahrain",
+      "city": "Al Dur Jetty",
+      "port_name": "Al Dur Jetty Fisherman Posr"
+              }
+  ]
