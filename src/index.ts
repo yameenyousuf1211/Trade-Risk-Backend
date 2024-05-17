@@ -34,7 +34,7 @@ app.use(cookieSession({
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
 }));
 app.use(cors({ origin: ["http://localhost:3000",'https://trade-risk.vercel.app'], credentials: true }));
-app.use(rateLimiter);
+// app.use(rateLimiter);
 
 app.get('/', (req, res) => generateResponse(null, `Welcome to ${process.env.APP_NAME}!`, res));
 

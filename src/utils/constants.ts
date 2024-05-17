@@ -24,111 +24,105 @@ export enum COMPANY_CONSTITUTION {
     Limited_Liability_Co  = 'limited_liability_co',
     Individual_Proprietorship_Co = 'individual_proprietorship_co',
 }
-export const banks = {
-  bahrain: {
-    code: "650b50f4d5446e62c254e274",
-    list: [
-      "Ahli United Bank",
-      "Bank of Bahrain and Kuwait (BBK)",
-      "National Bank of Bahrain (NBB)",
-      "Bahrain Islamic Bank (BisB)",
-      "Gulf International Bank (GIB)",
-      "Kuwait Finance House (KFH) - Bahrain",
-      "HSBC Bank Middle East Limited - Bahrain",
-      "Standard Chartered Bank Bahrain",
-      "Citibank Bahrain",
-      "Ithmaar Bank",
-      "Bahrain Development Bank",
-      "BMI Bank (Bank of Muscat International)",
-      "Arab Banking Corporation (ABC)",
-      "Al Salam Bank Bahrain",
-      "Khaleeji Commercial Bank"
-    ]
-  },
-  bangladesh: {
-    code: "650b50f4d5446e62c254dc50",
-    list: [
-      "Sonali Bank Limited",
-      "Agrani Bank Limited",
-      "Janata Bank Limited",
-      "Rupali Bank Limited",
-      "Pubali Bank Limited",
-      "National Bank Limited",
-      "Dutch-Bangla Bank Limited",
-      "BRAC Bank Limited",
-      "Standard Chartered Bank Bangladesh",
-      "HSBC Bangladesh",
-      "City Bank Limited",
-      "Eastern Bank Limited",
-      "United Commercial Bank Limited (UCB)"
-    ]
-  },
-  saudi: {
-    code: "650b50f4d5446e62c25526d8",
-    list: [
-      "National Commercial Bank (NCB)",
-      "Al Rajhi Bank",
-      "Riyad Bank",
-      "Saudi British Bank (SABB)",
-      "Banque Saudi Fransi (BSF)",
-      "Arab National Bank (ANB)",
-      "Saudi Investment Bank",
-      "Alinma Bank",
-      "Bank AlJazira",
-      "Bank Albilad"
-    ]
-  },
-  pakistan: {
-    code: "650b50f4d5446e62c2550b28",
-    list: [
-      "National Bank of Pakistan (NBP)",
-      "Habib Bank Limited (HBL)",
-      "United Bank Limited (UBL)",
-      "Muslim Commercial Bank (MCB Bank)",
-      "Askari Bank Limited",
-      "Allied Bank Limited (ABL)",
-      "Bank Alfalah Limited",
-      "Faysal Bank Limited",
-      "Bank Al-Habib Limited",
-      "Meezan Bank Limited",
-      "Standard Chartered Bank Pakistan",
-      "Soneri Bank Limited",
-      "JS Bank Limited"
-    ]
-  },
-  uae: {
-    code: "650b50f4d5446e62c255f04d",
-    list: [
-      "First Abu Dhabi Bank (FAB)",
-      "Emirates NBD - Emirates National Bank of Dubai",
-      "Abu Dhabi Commercial Bank (ADCB)",
-      "Dubai Islamic Bank (DIB)",
-      "Mashreq Bank",
-      "Abu Dhabi Islamic Bank (ADIB)",
-      "Bank of Sharjah",
-      "Commercial Bank of Dubai (CBD)",
-      "RAKBANK (National Bank of Ras Al Khaimah)",
-      "Sharjah Islamic Bank (SIB)",
-      "National Bank of Fujairah (NBF)",
-      "Noor Bank",
-      "Emirates Islamic Bank"
-    ]
-  },
-  qatar: {
-    code: "650b50f4d5446e62c2560853",
-    list: [
-      "Qatar National Bank (QNB)",
-      "Commercial Bank of Qatar",
-      "Doha Bank",
-      "Ahli Bank Qatar",
-      "Qatar Islamic Bank (QIB)",
-      "Masraf Al Rayan",
-      "Barwa Bank",
-      "Qatar International Islamic Bank (QIIB)",
-      "Al Khaliji Commercial Bank (al khaliji)",
-      "International Bank of Qatar (IBQ)",
-      "Al Rayan Bank",
-      "Qatar Development Bank (QDB)"
-    ]
-  }
+interface BankData {
+  name: string;
+}
+
+interface BanksByCountry {
+  [country: string]: BankData[];
+}
+
+
+export const banks:BanksByCountry  = {
+  "United Arab Emirates": [
+      { name: "Abu Dhabi Commercial Bank" },
+      { name: "Abu Dhabi Islamic Bank" },
+      { name: "Ajman Bank" },
+      { name: "Al Hilal Bank" },
+      { name: "Al Maryah Community Bank" },
+      { name: "Al Masraf Arab Bank for Investment & Foreign Trade" },
+      { name: "Bank of Sharjah" },
+      { name: "Commercial Bank International" },
+      { name: "Commercial Bank of Dubai" },
+      { name: "Dubai Bank" },
+      { name: "Dubai Finance Bank" },
+      { name: "Dubai Islamic Bank" },
+      { name: "Emirates Investment Bank" },
+      { name: "Emirates Islamic" },
+      { name: "Emirates NBD" },
+      { name: "First Abu Dhabi Bank" },
+      { name: "Invest Bank" },
+      { name: "Mashreq" },
+      { name: "National Bank of Fujairah" },
+  ],
+  "Saudi Arabia": [
+      { name: "Saudi National Bank (SNB)" },
+      { name: "Saudi Awwal Bank (SAB)" },
+      { name: "The Saudi Investment Bank (SAIB)" },
+      { name: "Alinma Bank" },
+      { name: "Banque Saudi Fransi (BSF)" },
+      { name: "Riyad Bank" },
+      { name: "Al-Rajhi Bank" },
+      { name: "Arab National Bank (ANB)" },
+      { name: "Bank AlBilad" },
+      { name: "Bank Aljazira" },
+      { name: "Gulf International Bank Saudi Arabia (GIB-SA)" },
+  ],
+  "Pakistan": [
+      { name: "Al Baraka Bank (Pakistan) Limited" },
+      { name: "Allied Bank Limited (ABL)" },
+      { name: "Askari Bank" },
+      { name: "Bank Alfalah Limited (BAFL)" },
+      { name: "Bank Al-Habib Limited (BAHL)" },
+      { name: "BankIslami Pakistan Limited" },
+      { name: "Bank Makramah Limited (BML)" },
+      { name: "Bank of Punjab (BOP)" },
+      { name: "Bank of Khyber" },
+      { name: "Deutsche Bank A.G" },
+      { name: "Dubai Islamic Bank Pakistan Limited (DIB Pakistan)" },
+      { name: "Faysal Bank Limited (FBL)" },
+      { name: "First Women Bank Limited" },
+      { name: "Habib Bank Limited (HBL)" },
+      { name: "Habib Metropolitan Bank Limited" },
+      { name: "Industrial and Commercial Bank of China" },
+      { name: "Industrial Development Bank of Pakistan" },
+      { name: "JS Bank Limited" },
+      { name: "MCB Bank Limited" },
+  ],
+  "Oman": [
+      { name: "Bank Muscat" },
+      { name: "Bank Dhofar" },
+      { name: "National Bank of Oman" },
+      { name: "Sohar International" },
+      { name: "Oman Arab Bank" },
+      { name: "HSBC Oman" },
+      { name: "Ahli Bank" },
+      { name: "Bank Nizwa" },
+      { name: "Alizz Islamic Bank" },
+      { name: "First Abu Dhabi Bank Oman" },
+      { name: "Qatar National Bank Oman" },
+      { name: "Standard Chartered Bank Oman" },
+      { name: "State Bank of India Oman" },
+  ],
+  "Bahrain": [
+      { name: "Ahli United Bank" },
+      { name: "Arab Bank plc" },
+      { name: "Arab Banking Corporation" },
+      { name: "Allied Bank Limited, Wholesale Branch" },
+      { name: "Alubaf Arab International Bank" },
+      { name: "The Arab Investment Company S.A.A." },
+      { name: "Arab Petroleum Investment Corporation" },
+      { name: "Askari Wholesale Bank" },
+      { name: "BNP Paribas CRB" },
+      { name: "Bahrain Development Bank" },
+      { name: "Bank of Bahrain and Kuwait" },
+      { name: "Bahrain Middle East Bank" },
+      { name: "Bank Al Habib Wholesale Branch, Manama" },
+      { name: "Bank Alfalah" },
+      { name: "Bank of Jordan" },
+      { name: "Citibank N.A" },
+      { name: "Credit Libanais SAL" },
+      { name: "Cairo Amman Bank" },
+      { name: "Citicorp Banking Corporation" },
+  ],
 };

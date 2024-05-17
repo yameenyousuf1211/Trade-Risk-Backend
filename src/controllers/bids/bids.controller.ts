@@ -14,6 +14,8 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const filter = req.query.filter || '';
     const lcOwner = req.query.lcOwner || '';
 
+    console.log(filter);
+    
     let pipeline: PipelineStage[] = [{ $match: { isDeleted: false } }];
 
     if (lc) {

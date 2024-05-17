@@ -15,7 +15,6 @@ export const banks = asyncHandler(async (req: Request, res: Response, next: Next
             statusCode: STATUS_CODES.BAD_REQUEST
         });
     }   
- 
     if (!(country in bank)) {
         return next({
             statusCode: STATUS_CODES.BAD_REQUEST,
@@ -23,7 +22,8 @@ export const banks = asyncHandler(async (req: Request, res: Response, next: Next
         });
     }
 
-    const banksList = (bank as { [key: string]: { code: string; list: string[] } })[country].list;
+    const banksList = bank[country];
+    
     generateResponse(banksList, 'Banks fetched successfully', res);
 });
 
@@ -42,13 +42,22 @@ export const fetchCities = asyncHandler(async (req: Request, res: Response, next
 }); 
 
 export const portsDetail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const country = req.query.country
+
+    if(!country) return next({
+        message: 'Country is  query params required',
+        statusCode: STATUS_CODES.BAD_REQUEST
+    })
+    
     const filePath = path.join(__dirname, './ports_details.json');
 
     // Read the contents of ports_detail.json
     const rawData = fs.readFileSync(filePath).toString();
     const portsData = JSON.parse(rawData );
-    
-    generateResponse(portsData, 'Ports details fetched successfully', res);
+    const data = portsData.data
+    const filteredPortsData = data.filter((port: any) => port.COUNTRY == country);
+    generateResponse(filteredPortsData, 'Filtered ports details fetched successfully', res);
+
 });
 
     export const currencies = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

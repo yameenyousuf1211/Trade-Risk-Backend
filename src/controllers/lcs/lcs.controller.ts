@@ -63,7 +63,9 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             refId: 1,
             lcType: 1,
             issuingBank: 1,
+            currency:1,
             exporterInfo: 1,
+            confirmingBank:1,
             advisingBank:1,
             amount: 1,
             bidsCount: 1,
@@ -79,7 +81,8 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
                                 userInfo: {
                                     name: { $arrayElemAt: ["$userInfo.name", 0] },
                                     email: { $arrayElemAt: ["$userInfo.email", 0] },
-                                    _id: { $arrayElemAt: ["$userInfo._id", 0] }
+                                    _id: { $arrayElemAt: ["$userInfo._id", 0] },
+                                    country:{$arrayElemAt:["$userInfo.accountCountry",0]}
                                 }
                             }
                         ]
