@@ -39,6 +39,7 @@ interface ILcs extends Document {
     expectedDiscountingDate:Date
     productDescription:string
     lcPeriod:{
+        expectedDate:boolean
         startDate:Date
         endDate:Date
     }
@@ -135,6 +136,9 @@ const LcsSchema: Schema = new Schema({
         type: String,
     },
     lcPeriod: {
+        expectedDate:{
+            type: Boolean,
+        },
         startDate: {
             type: Date,
         },

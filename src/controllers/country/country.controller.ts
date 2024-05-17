@@ -48,7 +48,7 @@ export const portsDetail = asyncHandler(async (req: Request, res: Response, next
         message: 'Country is  query params required',
         statusCode: STATUS_CODES.BAD_REQUEST
     })
-    
+
     const filePath = path.join(__dirname, './ports_details.json');
 
     // Read the contents of ports_detail.json
@@ -57,7 +57,6 @@ export const portsDetail = asyncHandler(async (req: Request, res: Response, next
     const data = portsData.data
     const filteredPortsData = data.filter((port: any) => port.COUNTRY == country);
     generateResponse(filteredPortsData, 'Filtered ports details fetched successfully', res);
-
 });
 
     export const currencies = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
