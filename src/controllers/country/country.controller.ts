@@ -23,8 +23,8 @@ export const banks = asyncHandler(async (req: Request, res: Response, next: Next
     }
 
     const banksList = bank[country];
-    
-    generateResponse(banksList, 'Banks fetched successfully', res);
+    const filterData = banksList.map((bank) => bank.name)
+    generateResponse(filterData, 'Banks fetched successfully', res);
 });
 
 
