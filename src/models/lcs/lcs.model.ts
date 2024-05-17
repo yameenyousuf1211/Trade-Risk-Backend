@@ -110,6 +110,12 @@ const LcsSchema: Schema = new Schema({
             type: String,
         },
     },
+    expectedDiscountingDate:{
+        type:Date
+    },
+    expectedConfirmationDate:{
+        type:Date
+    },
     confirmingBank: {
         bank: {
             type: String,
