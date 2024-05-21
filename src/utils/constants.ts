@@ -33,7 +33,9 @@ interface BanksByCountry {
     "Oman": string[];
     "Bahrain": string[];
     "Nigeria": string[];
-    "India": string[]
+    "India": string[],
+    "Bangladesh":string[],
+    "Qatar":string[]
 }
 export const banks: BanksByCountry = {
     "United Arab Emirates": [
@@ -266,6 +268,50 @@ export const banks: BanksByCountry = {
       "Paschim Banga Gramin Bank",
       "Uttarbanga Kshetriya Gramin Bank",
     ],
+    "Bangladesh":[
+      "AB Bank PLC",
+      "Bangladesh Commerce Bank Limited",
+      "Bank Asia Limited",
+      "Bengal Commercial Bank Limited",
+      "BRAC Bank PLC",
+      "City Bank PLC",
+      "Community Bank Bangladesh Limited",
+      "Dhaka Bank Limited",
+      "Dhaka Mercantile Co-Operative Bank Limited",
+      "Dutch-Bangla Bank Limited",
+      "Eastern Bank PLC",
+      "IFIC Bank PLC",
+      "Jamuna Bank Limited",
+      "Meghna Bank Limited",
+      "Mercantile Bank PLC",
+      "Midland Bank Limited",
+      "Modhumoti Bank Limited",
+      "Mutual Trust Bank Limited",
+      "National Credit & Commerce Bank Limited",
+      "NRB Bank Limited",
+      "NRBC Bank PLC",
+      "One Bank Limited",
+      "Premier Bank Limited",
+      "Prime Bank PLC",
+      "Pubali Bank Limited",
+      "Shimanto Bank Limited",
+      "Southeast Bank Limited",
+      "South Bangla Agriculture and Commerce Bank Limited",
+      "Trust Bank PLC",
+      "United Commercial Bank PLC",
+      "Uttara Bank PLC"
+    ],
+    "Qatar":[
+     "Qatar National Bank",
+"Doha Bank",
+"Commercial Bank of Qatar",
+"Qatar International Islamic Bank",
+"Qatar Islamic Bank",
+"Qatar Development Bank",
+"Ahlibank",
+"Masraf Al Rayan",
+"Dukhan Bank"
+    ]
   };
   interface PortsByCountry {
     "United Arab Emirates": string[];
