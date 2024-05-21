@@ -68,10 +68,10 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
                     $arrayElemAt: ['$lcInfo.createdBy', 0]
                 },
                 {
-                    $arrayElemAt: ['$lcInfo.beneficiaryName', 0]
+                    $arrayElemAt: ['$lcInfo.issuingBank', 0]
                 },
                 {
-                    $arrayElemAt: ['$lcInfo.issuingBank', 0]
+                    $arrayElemAt: ['$lcInfo.confirmingBank', 0]
                 }
             ],
             'lc': '$lcInfo._id',

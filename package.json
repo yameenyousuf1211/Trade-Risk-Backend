@@ -8,7 +8,8 @@
     "dev1": "tsc --watch",
     "dev2": "ts-node src/index.ts --watch",
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc & npm run copy-files",
+    "copy-files": "copyfiles -u 1 src/**/*.json dist/"
   },
   "keywords": [],
   "author": "",
@@ -44,6 +45,7 @@
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.5",
     "@types/request-ip": "^0.0.41",
+    "copyfiles": "^2.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   }
