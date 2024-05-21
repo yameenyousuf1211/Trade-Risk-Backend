@@ -80,7 +80,9 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
                 $push: {
                     _id: '$bids._id',
                     bidBy: '$bids.bidBy',
-                    amount: '$bids.amount',
+                    amount: '$bids.confirmationPrice',
+                    discountMargin:'$bids.discountMargin',
+                    discountBaseRate:'$bids.discountBaseRate',
                     createdAt: '$bids.createdAt',
                     status: '$bids.status',
                     userInfo: {
@@ -96,6 +98,18 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             createdBy: { $first: '$createdBy' },
             createdAt: { $first: '$createdAt' },
             updatedAt: { $first: '$updatedAt' }
+        }
+    });
+
+    pipeline.push({
+        $addFields: {
+            bids: {
+                $cond: {
+                    if: { $eq: ['$bidsCount', 0] },
+                    then: [],
+                    else: '$bids'
+                }
+            }
         }
     });
     
