@@ -79,6 +79,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             bids: { 
                 $push: {
                     _id: '$bids._id',
+                    validity:'$bids.bidValidity', 
                     bidBy: '$bids.bidBy',
                     amount: '$bids.confirmationPrice',
                     discountMargin:'$bids.discountMargin',
