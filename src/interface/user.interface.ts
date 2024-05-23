@@ -12,7 +12,9 @@ export interface IUser extends Document {
     _id?: string;
     name?: string;
     email: string;
+    allowNotification?: boolean;
     role: string;
+    gcmTokens: IGcmToken[];
     country?: string;
     phone?: string;
     address?: string;
@@ -47,4 +49,17 @@ export interface IUser extends Document {
     isDeleted?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+}
+
+
+interface IKeys {
+    auth: string;
+    p256dh: string;
+}
+
+// Define the TypeScript interface for GcmToken
+interface IGcmToken {
+    endpoint: string;
+    expirationTime: Date | null;
+    keys: IKeys;
 }

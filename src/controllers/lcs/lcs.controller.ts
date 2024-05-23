@@ -32,13 +32,22 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             as: 'bids'
         }
     });
-    
+    pipeline.push({
+        $lookup: {
+            from: 'users',
+            localField: 'createdBy',
+            foreignField: '_id',
+            as: 'createdBy'
+        }
+    });
+
     pipeline.push({
         $addFields: {
             bidsCount: { $size: "$bids" }
         }
     });
     
+
     // Unwind the bids array to process each bid individually
     pipeline.push({
         $unwind: {
@@ -98,7 +107,8 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             status: { $first: '$status' },
             createdBy: { $first: '$createdBy' },
             createdAt: { $first: '$createdAt' },
-            updatedAt: { $first: '$updatedAt' }
+            updatedAt: { $first: '$updatedAt' },
+            
         }
     });
 
@@ -130,7 +140,8 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             bids: 1,
             importerInfo: 1,
             status: 1,
-            createdBy:1,
+            'createdBy.name':1,
+            'createdBy.accountCountry':1,
             createdAt: 1,
             updatedAt: 1
         }

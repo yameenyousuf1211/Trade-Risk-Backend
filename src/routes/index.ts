@@ -7,6 +7,7 @@ import LcsAPI from "./lcs/lcs.route";
 import BidsAPI from "./bids/bids.route";
 import CountryAPI from "./country/country.route";
 import RiskAPI from "./risk/risk.route";
+import NotificationAPI from "./notification/notification.route";
 
 export default class API {
     router: Router;
@@ -28,6 +29,7 @@ export default class API {
         routeGroups.push(new BidsAPI(router))
         routeGroups.push(new CountryAPI(router))
         routeGroups.push(new RiskAPI(router))
+        routeGroups.push(new NotificationAPI(router))
     }
 
     setContentType(req: Request, res: Response, next: NextFunction) {

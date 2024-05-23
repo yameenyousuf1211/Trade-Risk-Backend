@@ -171,6 +171,10 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
             bid.status = 'Rejected';
             await bid.save();
         });
+
+        const lc = await findLc({_id: bid.lc});
+        lc.status = 'Accepted';
+        await lc.save();
     }
     generateResponse(bid, 'Bids status Updated', res);
 })
