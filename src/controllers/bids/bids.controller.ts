@@ -14,6 +14,8 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const filter = req.query.filter || '';
     const lcOwner = req.query.lcOwner || '';
 
+    console.log(filter);
+    
     let pipeline: PipelineStage[] = [{ $match: { isDeleted: false } }];
 
     if (lc) {
@@ -49,41 +51,51 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             from:'lcs',
             localField:'lc',
             foreignField:'_id',
-            as: 'lcOwner'
+            as: 'lcInfo'
         }
     });
     
     if(lcOwner){
         pipeline.push({
-            $match: { 'lcOwner.createdBy': new mongoose.Types.ObjectId(lcOwner as string) }
+            $match: { 'lcInfo.createdBy': new mongoose.Types.ObjectId(lcOwner as string) }
         })
     }
     
     pipeline.push({
         $project: {
-            'lcOwner': [
+            'lcInfo': [
                 {
-                    $arrayElemAt: ['$lcOwner.createdBy', 0]
+                    $arrayElemAt: ['$lcInfo.createdBy', 0]
+                },
+                {
+                    $arrayElemAt: ['$lcInfo.issuingBank', 0]
+                },
+                {
+                    $arrayElemAt: ['$lcInfo.confirmingBank', 0]
                 }
             ],
-            'lc': '$lcOwner._id',
+            'lc': '$lcInfo._id',
             'bidBy': [
                 { $arrayElemAt: ['$bidBy.name', 0] },
                 { $arrayElemAt: ['$bidBy.email', 0] },
-                { $arrayElemAt: ['$bidBy.country', 0] }
+                { $arrayElemAt: ['$bidBy.accountCountry', 0] },
             ],
             'status': 1,
             'createdAt': 1,
             'updatedAt': 1,
             'isDeleted': 1,
             'bidType': 1,
+            discountBaseRate:1,
+            discountMargin:1,
             'confirmationPrice': 1,
             'discountingPrice': 1,
             'bidValidity': 1,
         }
     });
     
-    
+    pipeline.push({
+        $sort: { createdAt: -1 }
+    });
  
     const fetchedBids = await fetchBids({ limit, page, query: pipeline });
 
@@ -159,6 +171,10 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
             bid.status = 'Rejected';
             await bid.save();
         });
+
+        const lc = await findLc({_id: bid.lc});
+        lc.status = 'Accepted';
+        await lc.save();
     }
     generateResponse(bid, 'Bids status Updated', res);
 })

@@ -24,7 +24,6 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     if (createdBy) {
         pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
     }
-
     pipeline.push({
         $lookup: {
             from: 'bids',
@@ -33,67 +32,120 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             as: 'bids'
         }
     });
-   
+    pipeline.push({
+        $lookup: {
+            from: 'users',
+            localField: 'createdBy',
+            foreignField: '_id',
+            as: 'createdBy'
+        }
+    });
+
     pipeline.push({
         $addFields: {
-            bidsCount: {
-                $size: "$bids"
-            },
-            bids: "$bids"
+            bidsCount: { $size: "$bids" }
         }
     });
     
-    // bids: {
-    //     $filter: {
-    //         input: "$bids",
-    //         as: "bid",
-    //         cond: { $eq: ["$$bid.status", "Pending"] }
-    //     }
-    // }
+
+    // Unwind the bids array to process each bid individually
+    pipeline.push({
+        $unwind: {
+            path: '$bids',
+            preserveNullAndEmptyArrays: true
+        }
+    });
+    
     pipeline.push({
         $lookup: {
             from: 'users',
             localField: 'bids.bidBy',
             foreignField: '_id',
-            as: 'userInfo'
+            as: 'bidUserInfo'
         }
     });
+    
+    pipeline.push({
+        $unwind: {
+            path: '$bidUserInfo',
+            preserveNullAndEmptyArrays: true
+        }
+    });
+    
+    pipeline.push({
+        $group: {
+            _id: '$_id',
+            refId: { $first: '$refId' },
+            lcType: { $first: '$lcType' },
+            issuingBank: { $first: '$issuingBank' },
+            currency: { $first: '$currency' },
+            exporterInfo: { $first: '$exporterInfo' },
+            confirmingBank: { $first: '$confirmingBank' },
+            advisingBank: { $first: '$advisingBank' },
+            amount: { $first: '$amount' },
+            bidsCount: { $first: '$bidsCount' },
+            lcPeriod: { $first: '$lcPeriod' },
+            bids: { 
+                $push: {
+                    _id: '$bids._id',
+                    validity:'$bids.bidValidity', 
+                    bidBy: '$bids.bidBy',
+                    amount: '$bids.confirmationPrice',
+                    discountMargin:'$bids.discountMargin',
+                    discountBaseRate:'$bids.discountBaseRate',
+                    createdAt: '$bids.createdAt',
+                    status: '$bids.status',
+                    userInfo: {
+                        name: '$bidUserInfo.name',
+                        email: '$bidUserInfo.email',
+                        _id: '$bidUserInfo._id',
+                        country: '$bidUserInfo.accountCountry'
+                    }
+                }
+            },
+            importerInfo: { $first: '$importerInfo' },
+            status: { $first: '$status' },
+            createdBy: { $first: '$createdBy' },
+            createdAt: { $first: '$createdAt' },
+            updatedAt: { $first: '$updatedAt' },
+            
+        }
+    });
+
+    pipeline.push({
+        $addFields: {
+            bids: {
+                $cond: {
+                    if: { $eq: ['$bidsCount', 0] },
+                    then: [],
+                    else: '$bids'
+                }
+            }
+        }
+    });
+    
+    // Project the final desired structure
     pipeline.push({
         $project: {
             refId: 1,
             lcType: 1,
             issuingBank: 1,
+            currency: 1,
             exporterInfo: 1,
-            advisingBank:1,
+            confirmingBank: 1,
+            advisingBank: 1,
             amount: 1,
             bidsCount: 1,
             lcPeriod: 1,
-            bids: {
-                $map: {
-                    input: "$bids",
-                    as: "bid",
-                    in: {
-                        $mergeObjects: [
-                            "$$bid",
-                            {
-                                userInfo: {
-                                    name: { $arrayElemAt: ["$userInfo.name", 0] },
-                                    email: { $arrayElemAt: ["$userInfo.email", 0] },
-                                    _id: { $arrayElemAt: ["$userInfo._id", 0] }
-                                }
-                            }
-                        ]
-                    }
-                }
-            },
+            bids: 1,
             importerInfo: 1,
-            status:1,
-            createdBy: 1,
+            status: 1,
+            'createdBy.name':1,
+            'createdBy.accountCountry':1,
             createdAt: 1,
             updatedAt: 1
         }
-    });
-    
+        })
 
     pipeline.push({
         $sort:{
@@ -164,7 +216,7 @@ export const statusCheck = asyncHandler(async (req: Request, res: Response, next
 
     const id = req.user._id
     const lc = req.params.lc    
-    const bid = await findBid({ $and: [{ bidBy: id }, { lc: lc }] });
+    const bid = await findBid({ $and: [{ bidBy: id }, { lc: lc }] }).sort({ createdAt: -1 });
 
     if(!bid) return generateResponse("Add bid", 'Status Fetched successfully', res);
     generateResponse(bid.status, 'Lc status fetched successfully', res);
@@ -243,25 +295,3 @@ export const totalRequestLc = asyncHandler(async (req: Request, res: Response, n
 
     generateResponse(data, 'Lc status count fetched successfully', res);
 })
-// {
-//     $group: {
-//         _id: {
-//             status: "$status",
-//             createdBy: "$createdBy"
-//         },
-//         count: { $sum: 1 },
-//         totalSize: { $sum: 1 } 
-//     }
-// },
-// {
-//     $group: {
-//         _id: "$_id.createdBy", 
-//         countsByStatus: {
-//             $push: {
-//                 status: "$_id.status",
-//                 count: "$count"
-//             }
-//         },
-//         totalSize: { $sum: "$totalSize" }
-//     }
-// }

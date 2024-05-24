@@ -5,7 +5,7 @@ const registerValidator = joi.object({
     role: joi.string().valid('bank','corporate').required(),
     name: joi.string().required(),
     email: joi.string().email({ minDomainSegments: 2 }).required().trim(),
-    address: joi.string().min(6).required(),
+    address: joi.string().min(1).required(),
     constitution: joi.string().when('role', {
         is: 'bank',
         then: joi.forbidden(),

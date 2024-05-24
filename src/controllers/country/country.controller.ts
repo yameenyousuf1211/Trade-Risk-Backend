@@ -1,10 +1,15 @@
 // https://restcountries.com/v3.1/all
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import {  STATUS_CODES,banks as bank } from "../../utils/constants";
+import {  STATUS_CODES,banks as bank, portsData } from "../../utils/constants";
 import { Country, City, ICountry }  from 'country-state-city';
-import fs from 'fs';
-import path from "path";
+// import fs from 'fs';
+// import path from "path";
+// import { PortsData } from "../../types/ports.types";
+
+interface PortsByCountry {
+    [key: string]: any;
+}
 
 export const banks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const country = req.params.country;
@@ -15,7 +20,10 @@ export const banks = asyncHandler(async (req: Request, res: Response, next: Next
             statusCode: STATUS_CODES.BAD_REQUEST
         });
     }   
- 
+    interface BanksByCountry {
+        [key: string]: any;
+    }
+
     if (!(country in bank)) {
         return next({
             statusCode: STATUS_CODES.BAD_REQUEST,
@@ -23,7 +31,8 @@ export const banks = asyncHandler(async (req: Request, res: Response, next: Next
         });
     }
 
-    const banksList = (bank as { [key: string]: { code: string; list: string[] } })[country].list;
+    const banksList = (bank as BanksByCountry)[country];
+
     generateResponse(banksList, 'Banks fetched successfully', res);
 });
 
@@ -42,14 +51,35 @@ export const fetchCities = asyncHandler(async (req: Request, res: Response, next
 }); 
 
 export const portsDetail = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const filePath = path.join(__dirname, './ports_details.json');
+    const country = req.query.country;
 
-    // Read the contents of ports_detail.json
-    const rawData = fs.readFileSync(filePath).toString();
-    const portsData = JSON.parse(rawData );
-    
-    generateResponse(portsData, 'Ports details fetched successfully', res);
+    // const filePath = path.join(__dirname, './ports_details.json');
+
+    // // Read the contents of ports_detail.json
+    // const rawData = fs.readFileSync(filePath).toString();
+    // const portsData = JSON.parse(rawData);
+    // const data = portsData.data;
+    // let filteredPortsData:PortsData = data;
+
+    // if (country) {
+    //     filteredPortsData = data.filter((port: any) => port.COUNTRY === country);
+    // }
+   
+
+  
+
+    // const data = portsData;
+    // if (country) {
+    //     data= data .filter((port: any) => port.country === country);
+    // }
+    // generateResponse({data}, 'Filtered ports details fetched successfully', res);
+    let data = portsData;
+    if(country){
+        data = portsData.filter((port: any) => port.country === country);
+    }
+    generateResponse(data, 'Ports details fetched successfully', res);
 });
+
 
     export const currencies = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const currencies = Country.getAllCountries();

@@ -74,7 +74,6 @@ export const getMongooseAggregatePaginatedData = async ({ model, page = 1, limit
             meta: 'pagination',
         },
     };
-
     const myAggregate = model.aggregate(query);
     const { data, pagination } = await model.aggregatePaginate(myAggregate, options);
 

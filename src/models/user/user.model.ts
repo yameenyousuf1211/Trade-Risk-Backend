@@ -9,6 +9,18 @@ import { QueryWithHelpers } from "mongoose";
 import { sign } from "jsonwebtoken";
 import { IUser } from "../../interface";
 
+const KeysSchema = new Schema({
+    auth: { type: String, required: true },
+    p256dh: { type: String, required: true }
+}, { _id: false });
+
+const GcmTokenSchema = new Schema({
+    endpoint: { type: String, required: true },
+    expirationTime: { type: Date, default: null },
+    keys: { type: KeysSchema, required: true }
+}, { _id: false });
+
+
 // Define the Mongoose schema
 const userSchema = new Schema<IUser>({
     name: { type: String },
@@ -45,7 +57,8 @@ const userSchema = new Schema<IUser>({
     avalizationExportBills: { type: Boolean },
     riskParticipation: { type: Boolean },
     authorizationPocLetter: { type: String },
-    
+    allowNotification: { type: Boolean, default: true },
+    gcmTokens: [GcmTokenSchema],
     isDeleted: { type: Boolean, default: false },
 
 }, { timestamps: true, versionKey: false });
