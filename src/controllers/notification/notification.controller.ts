@@ -3,6 +3,7 @@ import { asyncHandler, generateResponse } from '../../utils/helpers';
 import { NextFunction, Request, Response } from "express";
 import { findUser, getAllUsers } from '../../models';
 import { STATUS_CODES } from '../../utils/constants';
+import { IGcmToken } from '../../interface';
 //  const vapidKeys = webpush.generateVAPIDKeys();
 
  
@@ -16,61 +17,52 @@ webpush.setVapidDetails(
 );
 
 export const notifications = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    try {
       const { title, body } = req.body;
+      const role = req.query.role;
+      const userId = req.query.userId;
+
       const payload = JSON.stringify({ title, body });
       const limit = +(req.query.limit || 1000);
       const page = +(req.query.page || 1); // Ensure page is parsed as an integer
-      const query = {};
-  
-      // Send notification to a specific user if userId is provided
-      if (req.query.userId) {
-        const user = await findUser({ _id: req.query.userId });
-        if (!user) {
-            return next({
-                status: STATUS_CODES.NOT_FOUND,
-                message: 'User not found',
-            });
-        }
-        if (Array.isArray(user.gcmTokens)) {
-          for (const subscription of user.gcmTokens) {
-            await webpush.sendNotification(subscription, payload).catch(err => {
-              console.error('Error sending notification to user:', err);
-            });
-          }
-        } else {
-          console.error('user.gcmTokens is not an array:', user.gcmTokens);
-        }
-        return generateResponse(null, 'Notifications sent', res);
+      let query = {};
+      
+      if(role){
+        query = {...query,role}
       }
-  
-      // Send notifications to all users if userId is not provided
-      const users = await getAllUsers({ limit, page, query });
-      for (const user of users.data) {
-        if (Array.isArray(user.gcmTokens)) {
+      if(userId){
+        query = {...query,_id:userId}
+      }
+
+      const response = await getAllUsers({ limit, page, query });
+      const users = response.data
+
+      for (const user of users) {
+        if (Array.isArray(user.gcmTokens) && user.gcmTokens.length > 0) {
           for (const subscription of user.gcmTokens) {
-            await webpush.sendNotification(subscription, payload).catch(err => {
-              console.error('Error sending notification to user:', err);
-            });
+            await webpush.sendNotification(subscription, payload)
           }
         } else {
-          console.error('user.gcmTokens is not an array:', user.gcmTokens);
+          console.error('user.gcmTokens is not an array:');
         }
       }
       generateResponse(null, 'Notifications sent', res);
-    } catch (error) {
-      console.error('Error in notifications handler:', error);
-      next(error); // Pass the error to the error handling middleware
-    }
   });
 
-export const subscribe = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+
+
+  export const subscribe = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const subscription = req.body;
     
-    const user = await findUser({_id:req.user._id})
-    user.gcmTokens.push(subscription);
-    // gcmTokens
-    await user.save();
-    
-    generateResponse(subscription, 'Subscription stored', res);
+    const user = await findUser({_id: req.user._id});
+
+    // Check if the subscription already exists in gcmTokens
+    const tokenExists = user.gcmTokens.some((token:IGcmToken) => token.endpoint === subscription.endpoint);
+
+    if (!tokenExists) {
+        user.gcmTokens.push(subscription);
+        await user.save();
+        generateResponse(subscription, 'Subscription stored', res);
+    } else {
+        generateResponse(null, 'Subscription already exists', res);
+    }
 });

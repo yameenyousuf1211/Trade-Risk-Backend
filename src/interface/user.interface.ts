@@ -58,7 +58,7 @@ interface IKeys {
 }
 
 // Define the TypeScript interface for GcmToken
-interface IGcmToken {
+export interface IGcmToken {
     endpoint: string;
     expirationTime: Date | null;
     keys: IKeys;
