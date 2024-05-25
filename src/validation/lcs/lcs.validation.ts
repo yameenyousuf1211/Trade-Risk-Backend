@@ -11,10 +11,10 @@ const lcsValidator = joi.object({
     extraInfo: joi.object({
         dats: joi.date().required(),
         other: joi.string().required()
-    }).when('lcType',{
-        is:'LC Discounting',
-        then:joi.required(),
-        otherwise:joi.forbidden()
+    }).when('paymentTerms',{
+        is: 'Usance LC',
+        then: joi.required(),
+        otherwise: joi.forbidden()
     }),
     issuingBank: joi.object({
         bank: joi.string().required(),
@@ -25,9 +25,9 @@ const lcsValidator = joi.object({
         country: joi.string().optional()
     }).optional(),
     confirmingBank: joi.object({
-        bank: joi.string().required(),
-        country: joi.string().required()
-    }).required(),
+        bank: joi.string().optional(),
+        country: joi.string().optional()
+    }).optional(),
     shipmentPort: joi.object({
         country: joi.string().required(),
         port: joi.string().required(),

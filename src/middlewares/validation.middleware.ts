@@ -7,9 +7,9 @@ interface CustomError {
     message: string;
 }
 
-export const validateRequest = (schema: Schema) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const { error }: ValidationResult = schema.validate(req.body);
+export const validateRequest =  (schema: Schema) => {
+    return  async (req: Request, res: Response, next: NextFunction) => {
+        const { error }: ValidationResult = await schema.validateAsync(req.body);
         if (error) {
             const customError: CustomError = {
                 statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
