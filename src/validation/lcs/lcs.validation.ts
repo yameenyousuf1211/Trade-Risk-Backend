@@ -1,7 +1,6 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 
-
 const lcsValidator = joi.object({
     participantRole: joi.string().valid('importer', 'exporter').required(),
     currency: joi.string().required(),
@@ -9,8 +8,8 @@ const lcsValidator = joi.object({
     amount: joi.number().required(),
     paymentTerms: joi.string().required(),
     extraInfo: joi.object({
-        dats: joi.date().required(),
-        other: joi.string().required()
+        dats: joi.date(),
+        other: joi.string()
     }).when('paymentTerms',{
         is: 'Usance LC',
         then: joi.required(),
