@@ -56,7 +56,7 @@ interface ILcs extends Document {
       behalfOf?: string
     }
     discountAtSight?:string
-    pricePerAnnum?:number
+    pricePerAnnum?:string
     refId?:number
     attachments?:string[]
     draft?:boolean,
@@ -179,7 +179,7 @@ const LcsSchema: Schema = new Schema({
             type: String,
         },
         pricePerAnnum: {
-            type: Number,
+            type: String,
         },
     },
     discountingInfo:{
@@ -187,7 +187,7 @@ const LcsSchema: Schema = new Schema({
             type: String,
         },
         pricePerAnnum: {
-            type: Number,
+            type: String,
         },
         behalfOf: {
             type: String,
