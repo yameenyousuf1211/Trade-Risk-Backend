@@ -1,7 +1,7 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 
-const lcsValidator = joi.object({
+export const lcsValidator = joi.object({
     participantRole: joi.string().valid('importer', 'exporter').required(),
     currency: joi.string().required(),
     lcType: joi.string().valid("LC Confirmation","LC Discounting","LC Confirmation & Discounting").required(),
@@ -60,7 +60,7 @@ const lcsValidator = joi.object({
     }),
     discountingInfo:  joi.object({
         behalfOf: joi.string().required(),
-        pricePerAnnum: joi.number().required(),
+        pricePerAnnum: joi.string().required(),
         discountAtSight: joi.string().required()
         }).when('lcType',{
         is: 'LC Confirmation',
@@ -69,14 +69,13 @@ const lcsValidator = joi.object({
     }),
     confirmationInfo: joi.object({
             behalfOf: joi.string().required(),
-            pricePerAnnum: joi.number().required(),
+            pricePerAnnum: joi.string().required(),
     }).when('lcType',{
         is: 'LC Discounting',
         then: joi.forbidden(),
         otherwise: joi.required()
     }),
-
-    isDraft: joi.boolean().optional(),
+    draft:joi.boolean().optional()
 });
 
 const lcsValidation = validateRequest(lcsValidator);
