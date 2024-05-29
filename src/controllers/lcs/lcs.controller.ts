@@ -244,6 +244,17 @@ export const updateLcs = asyncHandler(async (req: Request, res: Response, next: 
     const id = req.params.id;
 
     const draft = req.body.draft === 'true' ? true : false;
+    
+    if(!draft) {
+        const { error }: ValidationResult = lcsValidator.validate(req.body);
+        if (error) {
+            const customError: CustomError = {
+                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+                message: error.details[0].message.replace(/"/g, ''),
+            };
+            return next(customError);
+        }
+    }
 
     req.body.draft = draft;
 

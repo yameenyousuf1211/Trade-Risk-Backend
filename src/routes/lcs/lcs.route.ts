@@ -19,7 +19,7 @@ export default class LcsAPI {
         this.router.post('/create',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),createLcs);
         this.router.delete('/:id',authMiddleware(Object.values(ROLES)),deleteLc);
         this.router.put('/',authMiddleware(Object.values(ROLES)),acceptOrRejectBids)
-        this.router.put('/:id',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),lcsValidation,updateLcs)
+        this.router.put('/:id',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),updateLcs)
         
     }
 
