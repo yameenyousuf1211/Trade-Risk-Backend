@@ -16,7 +16,7 @@ export default class LcsAPI {
         this.router.get('/:id',authMiddleware(Object.values(ROLES)),findLcs);
         this.router.get('/total-request/list',authMiddleware(Object.values(ROLES)),totalRequestLc);
         this.router.get('/status/check/:lc',authMiddleware(Object.values(ROLES)),statusCheck);
-        this.router.post('/create',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),lcsValidation,createLcs);
+        this.router.post('/create',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),createLcs);
         this.router.delete('/:id',authMiddleware(Object.values(ROLES)),deleteLc);
         this.router.put('/',authMiddleware(Object.values(ROLES)),acceptOrRejectBids)
         this.router.put('/:id',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),lcsValidation,updateLcs)

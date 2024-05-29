@@ -3,6 +3,10 @@ import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpe
 import {  STATUS_CODES } from "../../utils/constants";    
 import { createLc, fetchLcs, findBid, findLc,updateLc } from "../../models";
 import mongoose  from 'mongoose';
+import { ValidationResult, Schema } from 'joi'; 
+import { lcsValidator } from "../../validation/lcs/lcs.validation";
+import { CustomError } from "../../middlewares/validation.middleware";
+
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
     const page: number = +(req.query.page || 1);
@@ -176,8 +180,21 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
 
 export const createLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
-    const draft = req.body.isDraft === 'true' ? true : false;
+    const draft = req.body.draft === 'true' ? true : false;
 
+    console.log(draft);
+    
+    if(!draft) {
+        const { error }: ValidationResult = lcsValidator.validate(req.body);
+        if (error) {
+            const customError: CustomError = {
+                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+                message: error.details[0].message.replace(/"/g, ''),
+            };
+            return next(customError);
+        }
+    }
+  
     req.body.draft = draft;
     req.body.refId = generateRefId();
     req.body.createdBy = req.user._id;
@@ -226,7 +243,7 @@ export const statusCheck = asyncHandler(async (req: Request, res: Response, next
 export const updateLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
 
-    const draft = req.body.isDraft === 'true' ? true : false;
+    const draft = req.body.draft === 'true' ? true : false;
 
     req.body.draft = draft;
 
