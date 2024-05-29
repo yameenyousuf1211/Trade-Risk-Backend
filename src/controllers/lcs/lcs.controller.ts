@@ -243,7 +243,7 @@ export const statusCheck = asyncHandler(async (req: Request, res: Response, next
 export const updateLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
 
-    const draft = req.body.isDraft === 'true' ? true : false;
+    const draft = req.body.draft === 'true' ? true : false;
 
     req.body.draft = draft;
 
