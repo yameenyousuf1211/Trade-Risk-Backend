@@ -146,7 +146,7 @@ const RiskSchema: Schema = new Schema({
             type: String,
         },
     },
-    paymentType:{type:String},
+    paymentReceivedType:{type:String},
     attachment:[{type:String}],
     note:{type:String},
     createdBy:{
