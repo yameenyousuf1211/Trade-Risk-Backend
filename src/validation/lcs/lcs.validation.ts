@@ -2,11 +2,27 @@ import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 
 export const lcsValidator = joi.object({
-    participantRole: joi.string().valid('importer', 'exporter').required(),
-    currency: joi.string().required(),
-    lcType: joi.string().valid("LC Confirmation","LC Discounting","LC Confirmation & Discounting").required(),
-    amount: joi.number().required(),
-    paymentTerms: joi.string().required(),
+    participantRole: joi.string().valid('importer', 'exporter').when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
+    currency: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
+    type: joi.string().valid("LC Confirmation","LC Discounting","LC Confirmation & Discounting","LG Issuance").required(),
+    amount: joi.object({
+        price: joi.number().required(),
+        margin: joi.number().optional(),
+        amountPercentage: joi.string().optional()
+    }).required(),
+    paymentTerms: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
     extraInfo: joi.object({
         dats: joi.date(),
         other: joi.string()
@@ -30,52 +46,99 @@ export const lcsValidator = joi.object({
     shipmentPort: joi.object({
         country: joi.string().required(),
         port: joi.string().required(),
-    }).required(),
-    transhipment: joi.boolean().required(),
-    expectedConfirmationDate: joi.date().when('lcType',{
-        is: 'LC Discounting',
+    }).when('type',{
+        is: 'LG Issuance',
         then: joi.forbidden(),
         otherwise: joi.required()
     }),
-    expectedDiscountingDate: joi.date().when('lcType',{
+    transhipment: joi.boolean().when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
+    expectedConfirmationDate: joi.date().when('type',{
+        is: ["LC Discounting","LG Issuance"],
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }),
+    expectedDiscountingDate: joi.date().when('type',{
         is: 'LC Discounting',
         then: joi.required(),
         otherwise: joi.forbidden()
     }),
     productDescription: joi.string().required(),
-    lcPeriod:{
+    period:{
         expectedDate: joi.boolean().required(),
         startDate: joi.date().required(),
         endDate: joi.date().required()
     },
-    importerInfo:{
+    importerInfo:joi.object({
         applicantName: joi.string().required(),
         countryOfImport: joi.string().required()
-    },
+    }).when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
+    }
+    ),
     exporterInfo:joi.object({
         beneficiaryName: joi.string().required(),
         countryOfExport: joi.string().required(),
         beneficiaryCountry: joi.string().required(),
         bank:joi.string().optional()
+    }).when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
     }),
     discountingInfo:  joi.object({
         behalfOf: joi.string().required(),
         pricePerAnnum: joi.string().required(),
         discountAtSight: joi.string().required()
-        }).when('lcType',{
-        is: 'LC Confirmation',
+        }).when('type',{
+        is: ['LC Confirmation','LG Issuance'],
         then: joi.forbidden(),
         otherwise: joi.required()
     }),
     confirmationInfo: joi.object({
             behalfOf: joi.string().required(),
             pricePerAnnum: joi.string().required(),
-    }).when('lcType',{
-        is: 'LC Discounting',
+    }).when('type',{
+        is: ['LC Discounting','LG Issuance'],
         then: joi.forbidden(),
         otherwise: joi.required()
     }),
-    draft:joi.boolean().optional()
+    draft:joi.boolean().optional(),
+    lgIssueAgainst: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    lgType: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    standardSAMA: joi.boolean().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    chargesBehalfOf: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    remarks: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    priceType: joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
 });
 
 const lcsValidation = validateRequest(lcsValidator);

@@ -22,7 +22,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     ];
 
     if(status) pipeline.push({ $match: { status } })
-    if (filter) pipeline.push({ $match: { lcType: filter } });
+    if (filter) pipeline.push({ $match: { type: filter } });
     if (search) pipeline.push({ $match: { refId: Number(search) } });
     
     if (createdBy) {
@@ -80,7 +80,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
         $group: {
             _id: '$_id',
             refId: { $first: '$refId' },
-            lcType: { $first: '$lcType' },
+            type: { $first: '$type' },
             issuingBank: { $first: '$issuingBank' },
             currency: { $first: '$currency' },
             exporterInfo: { $first: '$exporterInfo' },
@@ -88,7 +88,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             advisingBank: { $first: '$advisingBank' },
             amount: { $first: '$amount' },
             bidsCount: { $first: '$bidsCount' },
-            lcPeriod: { $first: '$lcPeriod' },
+            period: { $first: '$period' },
             bids: { 
                 $push: {
                     _id: '$bids._id',
@@ -132,7 +132,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     pipeline.push({
         $project: {
             refId: 1,
-            lcType: 1,
+            type: 1,
             issuingBank: 1,
             currency: 1,
             exporterInfo: 1,
@@ -140,7 +140,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             advisingBank: 1,
             amount: 1,
             bidsCount: 1,
-            lcPeriod: 1,
+            period: 1,
             bids: 1,
             importerInfo: 1,
             status: 1,
@@ -161,7 +161,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
 
     if (data) {
         data.data.forEach(async (lc) => {
-            const endDate = new Date(lc.lcPeriod.endDate);
+            const endDate = new Date(lc.period?.endDate!);
             const today = new Date();
     
             if (endDate < today) {
