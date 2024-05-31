@@ -2,22 +2,35 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { createRisk, fetchRisks, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
+import { ValidationResult } from "joi";
+import { riskValidator } from "../../validation/risk/risk.validation";
+import { CustomError } from "../../middlewares/validation.middleware";
+import { STATUS_CODES } from "../../utils/constants";
 
 export const getRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
-    const page = req.query.page ? parseInt(req.query.page as string) : 1;
+    const limit = Number(req.query.limit) || 10;
+    const page =  Number(req.query.page) || 1;
+    const draft = req.query.draft == 'true' ? true : false;
+
     const createdBy = req.query.createdBy == 'true' ? true : false;
     const filter = req.query.filter;
     
     const query:PipelineStage[] = [];
-    
+
+    query.push({$match: {isDeleted: false}});
+
     if(createdBy) {
         query.push({$match: {createdBy: new mongoose.Types.ObjectId(req.user._id as string)}});
     }
     else{
         query.push({$match: {createdBy: {$ne: new mongoose.Types.ObjectId(req.user._id as string)} }});
     }
-    query.push({$match: {isDeleted: false}});
+    query.push({
+        $match:{
+            draft
+        }
+    })
+    
     query.push({$sort: {createdAt: -1}});
 
 
@@ -26,8 +39,20 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
 });
 
 export const createRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.query.draft == 'true' ? true :false
     
+    const draft = req.body.draft == 'true' ? true :false
+
+    if(!draft) {
+        const { error }: ValidationResult = riskValidator.validate(req.body);
+        if (error) {
+            const customError: CustomError = {
+                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY!,
+                message: error.details[0].message.replace(/"/g, ''),
+            };
+            return next(customError);
+        }
+    }
+
     req.body.createdBy = req.user._id;
     req.body.draft = draft;
 
@@ -36,8 +61,18 @@ export const createRisks = asyncHandler(async (req: Request, res: Response, next
 });
 
 export const riskUpdate = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.query.draft == 'true' ? true :false
+    const draft = req.body.draft == 'true' ? true :false
 
+if(!draft) {
+        const { error }: ValidationResult = riskValidator.validate(req.body);
+        if (error) {
+            const customError: CustomError = {
+                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY!,
+                message: error.details[0].message.replace(/"/g, ''),
+            };
+            return next(customError);
+        }
+    }
     req.body.draft = draft;
     req.body.createdBy = req.user._id;
 

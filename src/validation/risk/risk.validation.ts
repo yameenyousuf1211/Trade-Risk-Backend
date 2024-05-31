@@ -1,10 +1,11 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 
-const riskValidator = joi.object({
+export const riskValidator = joi.object({
     banks:joi.array().items(joi.string()).required(),
     transaction:joi.string().valid("Risk Participation","Outright Sales").required(),
     riskParticipation:joi.string().required(),
+    currency:joi.string().required(),
     outrightSales:joi.string().when('transaction',{
         is:'Outright Sales',
         then:joi.required(),
@@ -15,7 +16,11 @@ const riskValidator = joi.object({
         amount:joi.number().required(),
         returnOffer:joi.string().required(),
         baseRate:joi.string().required(),
-        perAnnum:joi.string().required(),
+        perAnnum:joi.string().when('riskParticipation',{
+            is:'Funded',
+            then:joi.forbidden(),
+            otherwise:joi.required()
+        }),
         participationRate:joi.string().required(),
     }).required(),
     issuingBank: joi.object({
@@ -36,13 +41,17 @@ const riskValidator = joi.object({
     expiryDate: joi.date().required(),
     startDate: joi.date().required(),
     paymentTerms: joi.string().required(),
-    days:joi.number().required(),
+    days:joi.number().when('paymentTerms',{
+        is:'Tenor LC',
+        then:joi.required(),
+        otherwise:joi.forbidden()
+    }),
     shipmentPort: joi.object({
         country: joi.string().required(),
         port: joi.string().required(),
     }).required(),
     transhipment: joi.boolean().required(),
-    expectedDateConfimation: joi.date().required(),
+    expectedDateConfirmation: joi.date().required(),
     description: joi.string().required(),
     importerInfo:joi.object({
         applicantName: joi.string().required(),
@@ -53,7 +62,7 @@ const riskValidator = joi.object({
         countryOfExport: joi.string().required(),
         beneficiaryCountry: joi.string().required(),
     }).required(),
-    paymentType:joi.string().required(),
+    paymentReceviedType :joi.string().required(),
     note:joi.string().required(),
     draft:joi.boolean().optional().default(false),
 })

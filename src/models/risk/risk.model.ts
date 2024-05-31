@@ -44,6 +44,7 @@ interface IRisk extends Document {
         country: string;
         port: string;
     };
+    currency:string;
     transhipment?: boolean;
     expectedDateConfimation?: boolean;
     description?: string;
@@ -56,7 +57,7 @@ interface IRisk extends Document {
         countryOfExport: string;
         beneficiaryCountry: string;
     };
-    paymentType?: string;
+    paymentReceivedType?: string;
     attachment: string[];
     note?: string;
     createdBy: {
@@ -125,6 +126,9 @@ const RiskSchema: Schema = new Schema({
     transhipment: {
         type: Boolean,
     },
+    currency:{
+        type:String
+    },
     expectedDateConfimation:{type:Date},
     description:{type:String},
     importerInfo: {
@@ -146,7 +150,7 @@ const RiskSchema: Schema = new Schema({
             type: String,
         },
     },
-    paymentReceivedType:{type:String},
+    paymentReceviedType:{type:String},
     attachment:[{type:String}],
     note:{type:String},
     createdBy:{
@@ -160,7 +164,7 @@ const RiskSchema: Schema = new Schema({
         type:Boolean,
         default:false
     },
-});
+},{timestamps:true});
 
 RiskSchema.plugin(mongoosePaginate);
 RiskSchema.plugin(aggregatePaginate);
