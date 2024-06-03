@@ -27,7 +27,7 @@ export const lcsValidator = joi.object({
         dats: joi.date(),
         other: joi.string()
     }).when('paymentTerms',{
-        is: 'LG Issuance',
+        is: 'Sight LC',
         then: joi.forbidden(),
         otherwise: joi.required()
     }),
