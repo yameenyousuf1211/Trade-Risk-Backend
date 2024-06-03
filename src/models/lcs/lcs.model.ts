@@ -4,65 +4,9 @@ import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongoosePaginatedData,getMongooseAggregatePaginatedData } from "../../utils/helpers";
 import { QueryWithHelpers } from "mongoose";
+import ILcs from '../../interface/lc.interface';
 
-// Define the interface for your document
-interface ILcs extends Document {
-    _id:string
-    participantRole?:string
-    lcType?:string
-    curreny:string 
-    amount?:number
-    paymentTerms:string
-    createdBy?:string
-    issuingBank:{
-        bank:string
-        country:string
-    }
-    extraInfo:{
-        days:Date
-        other:string
-    }
-    advisingBank:{
-        bank:string
-        country:string
-    }
-    confirmingBank:{
-        bank:string
-        country:string
-    }
-    shipmentPort:{
-        country:string
-        port:string
-    }
-    transhipment:boolean
-    expectedConfirmationDate:Date
-    expectedDiscountingDate:Date
-    productDescription:string
-    lcPeriod:{
-        expectedDate:boolean
-        startDate:Date
-        endDate:Date
-    }
-    importerInfo:{
-        applicantName:string
-        countryOfImport:string
-    }
-    exporterInfo:{
-        beneficiaryName?:string
-        countryOfExport?:string
-        beneficiaryCountry?:string
-    }
-    confirmationCharges:{
-      behalfOf?: string
-    }
-    discountAtSight?:string
-    pricePerAnnum?:string
-    refId?:number
-    attachments?:string[]
-    draft?:boolean,
-    createdAt:Date,
-    updatedAt:Date
-}
+
 
 // Define the schema
 const LcsSchema: Schema = new Schema({
@@ -73,12 +17,14 @@ const LcsSchema: Schema = new Schema({
     currency:{
         type: String, // usd or any other currency
     },
-    lcType:{
+    type:{
         type: String, // LC type
-        enum:["LC Confirmation","LC Discounting","LC Confirmation & Discounting"]
+        enum:["LC Confirmation","LC Discounting","LC Confirmation & Discounting","LG Issuance"]
     },
     amount: {
-        type: Number,
+        price:{type:Number},
+       margin:{type:Number},
+       amountPercentage:{type:String}
     },
     refId:{
         type:Number
@@ -141,7 +87,7 @@ const LcsSchema: Schema = new Schema({
     productDescription: {
         type: String,
     },
-    lcPeriod: {
+    period: {
         expectedDate:{
             type: Boolean,
         },
@@ -192,6 +138,10 @@ const LcsSchema: Schema = new Schema({
         behalfOf: {
             type: String,
         },
+       
+    },
+    baseRate:{
+        type:String
     },
     createdBy:{
         type:Schema.Types.ObjectId,
@@ -213,6 +163,24 @@ const LcsSchema: Schema = new Schema({
         enum:['Pending','Expired','Rejected','Accepted','Add bid'],
         default:'Add bid'
     },
+    lgIssueAgainst:{
+        type:String,
+    },
+    lgType:{
+        type:String,
+    },
+    // purpose:{type:String},
+    standardSAMA:{type:Boolean,default:false},
+    chargesBehalfOf: {type: String},
+    remarks:{type:String},
+    priceType:{type:String}
+    // margin:{type:Number},
+    // amountPercentage:{type:String},
+    // lgType:{type:String},
+    // purpose:{type:String},
+    // lgDetail:{
+
+    // }
 },{timestamps:true,versionKey:false});
 
 LcsSchema.plugin(mongoosePaginate);

@@ -3,8 +3,6 @@ import { Router } from "express";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLES } from "../../utils/constants";
 import { upload } from "../../utils/multer";
-import { validateRisk } from "../../validation/risk/risk.validation";
-import { updateRisk } from "../../models";
 
 export default class RiskAPI {
     constructor(private readonly router: Router) {
@@ -14,9 +12,9 @@ export default class RiskAPI {
     
     setupRoutes() {
         this.router.get('/',authMiddleware(Object.values(ROLES)),getRisks);
-        this.router.post('/',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),validateRisk ,createRisks);
+        this.router.post('/',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),createRisks);
         this.router.delete('/:id',authMiddleware(Object.values(ROLES)),deleteRisks);
-        this.router.put('/:id',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),validateRisk ,riskUpdate);
+        this.router.put('/:id',upload("authorization").fields([{name:'authorization-letter',maxCount:3}]),authMiddleware(Object.values(ROLES)),riskUpdate);
     }
     
     
