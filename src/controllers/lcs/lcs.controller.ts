@@ -89,6 +89,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             amount: { $first: '$amount' },
             bidsCount: { $first: '$bidsCount' },
             period: { $first: '$period' },
+            baseRate:{ $first: '$baseRate' },
             bids: { 
                 $push: {
                     _id: '$bids._id',
@@ -142,6 +143,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             bidsCount: 1,
             period: 1,
             bids: 1,
+            baseRate:1,
             importerInfo: 1,
             status: 1,
             'createdBy.name':1,

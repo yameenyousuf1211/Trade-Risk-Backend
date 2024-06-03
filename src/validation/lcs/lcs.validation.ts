@@ -22,14 +22,14 @@ export const lcsValidator = joi.object({
         is: 'LG Issuance',
         then: joi.forbidden(),
         otherwise: joi.required()
-    }),
+    }), 
     extraInfo: joi.object({
         dats: joi.date(),
         other: joi.string()
     }).when('paymentTerms',{
-        is: 'Usance LC',
-        then: joi.required(),
-        otherwise: joi.forbidden()
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
     }),
     issuingBank: joi.object({
         bank: joi.string().required(),
@@ -138,6 +138,11 @@ export const lcsValidator = joi.object({
         is: 'LG Issuance',
         then: joi.required(),
         otherwise: joi.forbidden()
+    }),
+    baseRate:joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.forbidden(),
+        otherwise: joi.required()
     }),
 });
 
