@@ -34,6 +34,7 @@ interface IRisk extends Document {
         bank: string;
         country: string;
     };
+    days: number;
     isLcDiscounting?: boolean;
     expectedDiscounting?: boolean;
     expectedDateDiscounting?: Date;
@@ -46,7 +47,7 @@ interface IRisk extends Document {
     };
     currency:string;
     transhipment?: boolean;
-    expectedDateConfimation?: boolean;
+    expectedDateConfirmation?: boolean;
     description?: string;
     importerInfo: {
         applicantName: string;
@@ -109,6 +110,7 @@ const RiskSchema: Schema = new Schema({
             type: String,
         },
     },
+    days:{type:Number},
     isLcDiscounting:{type:Boolean},
     expectedDiscounting:{type:Boolean},
     expectedDateDiscounting:{type:Date},
