@@ -191,4 +191,3 @@ export const createRisk = (payload:IRisk) => RiskModel.create(payload);
 export const findRisk = (query: Record<string, any>) => RiskModel.findOne(query);
 export const updateRisk = (query: Record<string, any>, payload: Record<string, any>) => RiskModel.updateOne(query, payload);
 
-

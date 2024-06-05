@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import { createRisk, fetchRisks, updateRisk } from "../../models";
+import { createRisk, fetchRisks, findRisk, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
 import { ValidationResult } from "joi";
 import { riskValidator } from "../../validation/risk/risk.validation";
@@ -175,3 +175,14 @@ export const deleteRisks = asyncHandler(async (req: Request, res: Response, next
     generateResponse(data, "Risk deleted successfully", res);
 });
 
+export const findSingleRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const data = await findRisk({ _id: req.params.id } );
+
+    if(!data){
+        return next({
+            statusCode: STATUS_CODES.NOT_FOUND,
+            message: "Risk not found"
+        })
+    }
+    generateResponse(data, "Risk fetched successfully", res);
+});
