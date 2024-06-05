@@ -11,6 +11,7 @@ interface IRisk extends Document {
         agreement: string;
         signCopy: string;
     };
+    status:string;
     transaction: "Risk Participation" | "Outright Sales";
     riskParticipation?: string;
     outrightSales?: string;
@@ -165,6 +166,11 @@ const RiskSchema: Schema = new Schema({
     isDeleted:{
         type:Boolean,
         default:false
+    },
+    status:{
+        type:String,
+        enum:['Pending','Expired','Rejected','Accepted','Add bid'],
+        default:'Add bid'
     },
 },{timestamps:true});
 

@@ -15,6 +15,7 @@ export interface IBid extends Document {
     bidBy:string
     status: string;
     updatedAt: Date;
+    risk:string
 }
 
 // Define the bid schema
@@ -22,11 +23,15 @@ const bidSchema: Schema = new Schema({
     
     bidType:{
         type: String,
-        enum: ['LC Confirmation', 'LC Confirmation & Discounting', 'LC Discounting'],
+        enum: ['LC Confirmation', 'LC Confirmation & Discounting', 'LC Discounting','Risk'],
     },
     lc:{
         type: Schema.Types.ObjectId,
         ref: 'lcs'
+    },
+    risk:{
+        type: Schema.Types.ObjectId,
+        ref: 'risks'
     },
     bidValidity:{
         type:Date
