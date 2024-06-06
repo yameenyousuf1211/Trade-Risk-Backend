@@ -75,6 +75,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
             confirmingBank: { $first: '$confirmingBank' },
             advisingBank: { $first: '$advisingBank' },
             bidsCount: { $first: '$bidsCount' },
+            refId: { $first: '$refId' },
             transaction: { $first: '$transaction' },
             riskParticipation: { $first: '$riskParticipation' },
             outrightSales: { $first: '$outrightSales' },
