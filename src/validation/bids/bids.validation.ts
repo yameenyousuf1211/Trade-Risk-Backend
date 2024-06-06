@@ -5,7 +5,7 @@ const bidsValidator = joi.object({
   bidType: joi.string().required(),
   bidValidity: joi.date().required(),
   confirmationPrice: joi.number().required(),
-  lc: joi.string().when('risk', { is: joi.exist(), then: joi.forbidden(),otherwise: joi.required}),
+  lc: joi.string().optional(),
   risk: joi.string().optional(),
   discountMargin:joi.number().optional(),
   discountBaseRate:joi.number().optional()
