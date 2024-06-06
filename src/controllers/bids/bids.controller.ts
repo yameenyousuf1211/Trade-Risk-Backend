@@ -149,14 +149,14 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     })
 
     if(req.body.lc){
-        const lc= await findLc({_id: req.body.lc});
+        console.log("Lc body called");
+        const lc = await findLc({_id: req.body.lc});
         
         if(!lc) return next({
             message: 'Lc not found',
             statusCode: STATUS_CODES.NOT_FOUND
         })
     
-    // we can only bid to those lc again if they dont have a bid with status accepted
     const isbidExist = await findBid({lc: req.body.lc, status:'Accepted'}); 
     
     if(isbidExist) return next({
@@ -168,6 +168,8 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     await lc.save();
     
     } else{
+        console.log("Risk body called");
+        
         const risk = await findRisk({_id: req.body.risk});
         if(!risk) return next({
             message: 'Risk not found',

@@ -234,17 +234,21 @@ export const findLcs = asyncHandler(async (req: Request, res: Response, next: Ne
 
 export const statusCheck = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.user._id;
-    const requiestId = req.params.requestId;
+    const requestId = req.params.requestId;
     const key = req.query.key ? req.query.key : 'lc';
-  
-    const bidQuery = {
-      bidBy: id,
-      $or: [{ lc: requiestId }, { risk: requiestId }],
-    };
-  
-    const bid = await findBid(bidQuery).sort({ createdAt: -1 });
-  
-    if (!bid) return generateResponse("Add bid", 'Status Fetched successfully', res);
+    
+    console.log("testing",requestId);
+    
+    let bid;
+    
+    if(key == 'lc') {
+        console.log("LC key called");
+        bid = await findBid({ $and: [{ bidBy: id }, {lc:requestId }] }).sort({ createdAt: -1 });
+    }
+    else{
+        bid = await findBid({ $and: [{ bidBy: id }, {risk:requestId }] }).sort({ createdAt: -1 });
+    }
+    if(!bid) return generateResponse("Add bid", 'Status Fetched successfully', res);
   
     generateResponse(bid.status, 'LC status fetched successfully', res);
   });
