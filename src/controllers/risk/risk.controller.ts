@@ -82,6 +82,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
             isLcDiscounting: { $first: '$isLcDiscounting' },
             expectedDiscounting: { $first: '$expectedDiscounting' },
             expectedDateDiscounting: { $first: '$expectedDateDiscounting' },
+            expectedDateConfirmation: { $first: '$expectedDateConfirmation' },
             expiryDate: { $first: '$expiryDate' },
             startDate: { $first: '$startDate' },
             paymentTerms: { $first: '$paymentTerms' },

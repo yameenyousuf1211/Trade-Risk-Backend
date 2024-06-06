@@ -48,7 +48,7 @@ interface IRisk extends Document {
     };
     currency:string;
     transhipment?: boolean;
-    expectedDateConfirmation?: boolean;
+    expectedDateConfirmation?: Date;
     description?: string;
     importerInfo: {
         applicantName: string;
@@ -132,7 +132,7 @@ const RiskSchema: Schema = new Schema({
     currency:{
         type:String
     },
-    expectedDateConfimation:{type:Date},
+    expectedDateConfirmation:{type:Date},
     description:{type:String},
     importerInfo: {
         applicantName: {
