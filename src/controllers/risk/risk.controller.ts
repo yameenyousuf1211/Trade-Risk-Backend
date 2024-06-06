@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler, generateResponse } from "../../utils/helpers";
+import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpers";
 import { createRisk, fetchRisks, findRisk, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
 import { ValidationResult } from "joi";
@@ -132,7 +132,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
 export const createRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
     const draft = req.body.draft == 'true' ? true : false
-
+    
     if (!draft) {
         const { error }: ValidationResult = riskValidator.validate(req.body);
         if (error) {
@@ -143,7 +143,7 @@ export const createRisks = asyncHandler(async (req: Request, res: Response, next
             return next(customError);
         }
     }
-
+    req.body.refId = generateRefId();
     req.body.createdBy = req.user._id;
     req.body.draft = draft;
 

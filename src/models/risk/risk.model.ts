@@ -76,6 +76,7 @@ const RiskSchema: Schema = new Schema({
         agreement: { type: String },
         signCopy:{type:String}
     },
+    refId:{type:Number},
     transaction:{type:String,enum:["Risk Participation","Outright Sales"]} ,
     riskParticipation:{type:String},
     outrightSales:{type:String},
