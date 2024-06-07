@@ -94,7 +94,8 @@ export const lcsValidator = joi.object({
     discountingInfo:  joi.object({
         behalfOf: joi.string().required(),
         pricePerAnnum: joi.string().required(),
-        discountAtSight: joi.string().required()
+        discountAtSight: joi.string().required(),
+        basePerRate: joi.string().optional()
         }).when('type',{
         is: ['LC Confirmation','LG Issuance'],
         then: joi.forbidden(),

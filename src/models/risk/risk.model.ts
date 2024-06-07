@@ -11,6 +11,7 @@ interface IRisk extends Document {
         agreement: string;
         signCopy: string;
     };
+    status:string;
     transaction: "Risk Participation" | "Outright Sales";
     riskParticipation?: string;
     outrightSales?: string;
@@ -34,6 +35,7 @@ interface IRisk extends Document {
         bank: string;
         country: string;
     };
+    days: number;
     isLcDiscounting?: boolean;
     expectedDiscounting?: boolean;
     expectedDateDiscounting?: Date;
@@ -46,7 +48,7 @@ interface IRisk extends Document {
     };
     currency:string;
     transhipment?: boolean;
-    expectedDateConfimation?: boolean;
+    expectedDateConfirmation?: Date;
     description?: string;
     importerInfo: {
         applicantName: string;
@@ -74,6 +76,7 @@ const RiskSchema: Schema = new Schema({
         agreement: { type: String },
         signCopy:{type:String}
     },
+    refId:{type:Number},
     transaction:{type:String,enum:["Risk Participation","Outright Sales"]} ,
     riskParticipation:{type:String},
     outrightSales:{type:String},
@@ -109,6 +112,7 @@ const RiskSchema: Schema = new Schema({
             type: String,
         },
     },
+    days:{type:Number},
     isLcDiscounting:{type:Boolean},
     expectedDiscounting:{type:Boolean},
     expectedDateDiscounting:{type:Date},
@@ -129,7 +133,7 @@ const RiskSchema: Schema = new Schema({
     currency:{
         type:String
     },
-    expectedDateConfimation:{type:Date},
+    expectedDateConfirmation:{type:Date},
     description:{type:String},
     importerInfo: {
         applicantName: {
@@ -164,6 +168,11 @@ const RiskSchema: Schema = new Schema({
         type:Boolean,
         default:false
     },
+    status:{
+        type:String,
+        enum:['Pending','Expired','Rejected','Accepted','Add bid'],
+        default:'Add bid'
+    },
 },{timestamps:true});
 
 RiskSchema.plugin(mongoosePaginate);
@@ -182,5 +191,4 @@ export const fetchRisks = async ({ query, page, limit, populate }: IPaginationFu
 export const createRisk = (payload:IRisk) => RiskModel.create(payload);
 export const findRisk = (query: Record<string, any>) => RiskModel.findOne(query);
 export const updateRisk = (query: Record<string, any>, payload: Record<string, any>) => RiskModel.updateOne(query, payload);
-
 

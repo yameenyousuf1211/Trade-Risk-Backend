@@ -3,6 +3,11 @@ import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail 
 import {  createBanks, createUser, findUser } from "../../models";
 import { ROLES, STATUS_CODES } from "../../utils/constants";
 import { IBank } from "../../interface";
+import uploadOnCloudinary from "../../utils/cloundinary";
+
+interface FileArray {
+    image: Express.Multer.File[];
+  }
 
 export const register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 // register user
@@ -19,8 +24,17 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
         const banks = await createBanks(body?.currentBanks);
         req.body.password = generatePassword(); // password will be generate and send to user via email later he can change
 
-        // send password to user  via email later 
-
+        
+        // if(!(req.files as unknown as FileArray).image){
+        // return next({
+        //     statusCode: STATUS_CODES.BAD_REQUEST,
+        //     message: 'PDF is required'
+        // });
+        // }
+        // const filePath = (req.files as unknown as FileArray).image[0]?.path ?? '';
+        
+        // req.body.authorizationPocLetter = (await uploadOnCloudinary(filePath))?.secure_url;
+        
         const user = await createUser({ ...body, currentBanks: banks.map((bank: IBank) => bank._id) });
         // const email = await sendEmail({ to: 'aliusaid55@gmail.com', subject: 'Welcome to our platform', html: `Your password is ${req.body.password}` });
         // console.log(email);

@@ -138,6 +138,9 @@ const LcsSchema: Schema = new Schema({
         behalfOf: {
             type: String,
         },
+        basePerRate:{
+            type:String
+        }
        
     },
     baseRate:{

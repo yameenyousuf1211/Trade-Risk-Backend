@@ -36,6 +36,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             as: 'bids'
         }
     });
+    
     pipeline.push({
         $lookup: {
             from: 'users',
@@ -232,14 +233,25 @@ export const findLcs = asyncHandler(async (req: Request, res: Response, next: Ne
 })
 
 export const statusCheck = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-
-    const id = req.user._id
-    const lc = req.params.lc    
-    const bid = await findBid({ $and: [{ bidBy: id }, { lc: lc }] }).sort({ createdAt: -1 });
-
+    const id = req.user._id;
+    const requestId = req.params.requestId;
+    const key = req.query.key ? req.query.key : 'lc';
+    
+    console.log("testing",requestId);
+    
+    let bid;
+    
+    if(key == 'lc') {
+        console.log("LC key called");
+        bid = await findBid({ $and: [{ bidBy: id }, {lc:requestId }] }).sort({ createdAt: -1 });
+    }
+    else{
+        bid = await findBid({ $and: [{ bidBy: id }, {risk:requestId }] }).sort({ createdAt: -1 });
+    }
     if(!bid) return generateResponse("Add bid", 'Status Fetched successfully', res);
-    generateResponse(bid.status, 'Lc status fetched successfully', res);
-})
+  
+    generateResponse(bid.status, 'LC status fetched successfully', res);
+  });
 
 
 export const updateLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

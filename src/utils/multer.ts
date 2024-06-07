@@ -8,11 +8,13 @@ const generateFilename = (req: Request, file: Express.Multer.File, cb: (error: E
 };
 
 const filterImageOrDocsOrPDF = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    if (!file.mimetype.match(/image\/(jpg|JPG|webp|jpeg|JPEG|png|PNG|gif|GIF|jfif|JFIF|svg|SVG|bmp|BMP|ico|ICO|tiff|TIFF|psd|PSD|pdf|PDF|doc|DOC|docx|DOCX|xls|XLS|xlsx|XLSX|ppt|PPT|pptx|PPTX)/)) {
-        req.fileValidationError = 'Only image, docs and pdf files are allowed!';
-        return cb(null, false);
+    if (!file.mimetype.match(/image\/(jpg|JPG|webp|jpeg|JPEG|png|PNG|gif|GIF|jfif|JFIF|svg|SVG|bmp|BMP|ico|ICO|tiff|TIFF|psd|PSD)/)) {
+        // Allow any file type that is not an image
+        cb(null, true);
+    } else {
+        req.fileValidationError = 'Only PDF files are allowed!';
+        cb(null, false);
     }
-    cb(null, true);
 };
 
 export const upload = (folderName: string) => {
