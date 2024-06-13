@@ -54,7 +54,10 @@ const bidSchema: Schema = new Schema({
         type:Number
     },
     discountBaseRate:{
-        type:Number
+        type:String
+    },
+    perAnnum:{
+        type:Boolean
     },
     status:{
         type:String,
