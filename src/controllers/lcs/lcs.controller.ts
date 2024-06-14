@@ -98,6 +98,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
                     validity:'$bids.bidValidity', 
                     bidBy: '$bids.bidBy',
                     amount: '$bids.confirmationPrice',
+                    perAnnum: '$bids.perAnnum',
                     discountMargin:'$bids.discountMargin',
                     discountBaseRate:'$bids.discountBaseRate',
                     createdAt: '$bids.createdAt',
