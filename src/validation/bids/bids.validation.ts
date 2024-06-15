@@ -6,9 +6,10 @@ const bidsValidator = joi.object({
   bidValidity: joi.date().required(),
   confirmationPrice: joi.number().required(),
   lc: joi.string().optional(),
+  perAnnum: joi.boolean().optional(),
   risk: joi.string().optional(),
   discountMargin:joi.number().optional(),
-  discountBaseRate:joi.number().optional()
+  discountBaseRate:joi.string().optional()
 });
 
 export const bidsValidation = validateRequest(bidsValidator);

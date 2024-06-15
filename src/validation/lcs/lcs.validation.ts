@@ -26,11 +26,7 @@ export const lcsValidator = joi.object({
     extraInfo: joi.object({
         dats: joi.date(),
         other: joi.string()
-    }).when('paymentTerms',{
-        is: 'Sight LC',
-        then: joi.forbidden(),
-        otherwise: joi.required()
-    }),
+    }).optional(),
     issuingBank: joi.object({
         bank: joi.string().required(),
         country: joi.string().required()
@@ -141,9 +137,40 @@ export const lcsValidator = joi.object({
         otherwise: joi.forbidden()
     }),
     baseRate:joi.string().when('type',{
-        is: 'LG Issuance',
+        is: ['LG Issuance','LC Confirmation','LC Confirmation & Discounting'],
         then: joi.forbidden(),
         otherwise: joi.required()
+    }),
+    priceCurrency:joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    marginCurrency:joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    benificiaryBankName:joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    instrument:joi.string().when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
+    }),
+    lgDetail:joi.object({
+        lgIssueBehalfOf:joi.string().required(),
+        applicantCountry:joi.string().required(),
+        lgIssueFavorOf:joi.string().required(),
+        address:joi.string().required(),
+        benficiaryCountry:joi.string().required()
+    }).when('type',{
+        is: 'LG Issuance',
+        then: joi.required(),
+        otherwise: joi.forbidden()
     }),
 });
 

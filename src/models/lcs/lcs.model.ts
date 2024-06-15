@@ -23,7 +23,9 @@ const LcsSchema: Schema = new Schema({
     },
     amount: {
         price:{type:Number},
+        priceCurrency:{type:String},
        margin:{type:Number},
+       marginCurrency:{type:String},
        amountPercentage:{type:String}
     },
     refId:{
@@ -174,9 +176,18 @@ const LcsSchema: Schema = new Schema({
     },
     // purpose:{type:String},
     standardSAMA:{type:Boolean,default:false},
+    benificiaryBankName:{type:String},
     chargesBehalfOf: {type: String},
     remarks:{type:String},
-    priceType:{type:String}
+    priceType:{type:String},
+    Instrument:{type:String},
+    lgDetail:{
+        lgIssueBehalfOf:{type:String},
+        applicantCountry:{type:String},
+        lgIssueFavorOf:{type:String},
+        address:{type:String},
+        benficiaryCountry:{type:String},
+    },
     // margin:{type:Number},
     // amountPercentage:{type:String},
     // lgType:{type:String},
