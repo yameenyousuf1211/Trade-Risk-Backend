@@ -2,8 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
-import { getMongoosePaginatedData,getMongooseAggregatePaginatedData } from "../../utils/helpers";
-import { QueryWithHelpers } from "mongoose";
+import { getMongooseAggregatePaginatedData } from "../../utils/helpers";
 
 interface IRisk extends Document {
     banks: string[];

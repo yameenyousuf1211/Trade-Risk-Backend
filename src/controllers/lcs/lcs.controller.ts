@@ -24,10 +24,8 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     if(status) pipeline.push({ $match: { status } })
     if (filter) pipeline.push({ $match: { type: filter } });
     if (search) pipeline.push({ $match: { refId: Number(search) } });
-    
-    if (createdBy) {
-        pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
-    }
+    if (createdBy) pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
+ 
     pipeline.push({
         $lookup: {
             from: 'bids',
