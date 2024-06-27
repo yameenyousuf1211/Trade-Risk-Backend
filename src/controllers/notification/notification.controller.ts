@@ -36,11 +36,13 @@ export const notifications = asyncHandler(
     const users = response.data;
 
     for (const user of users) {
+      console.log(user._id);
+      const userNotification = await createNotification({title,message:body,user:user._id!})
+      console.log(userNotification);
       if (Array.isArray(user.gcmTokens) && user.gcmTokens.length > 0) {
         for (const subscription of user.gcmTokens) {
           try {
             await webpush.sendNotification(subscription, payload);
-            if(user._id) await createNotification({title,message:body,user:user._id})
           } catch (error: any) {
             console.log(error);
 
@@ -93,7 +95,6 @@ export const fetchNotifications = asyncHandler(
 
     const pipeline:PipelineStage[] = []
   
-    pipeline.push({$match:{isDeleted:false}})
     pipeline.push({$match:{user:new mongoose.Types.ObjectId(req.user._id as string)}})
     pipeline.push({$sort:{createdAt:-1}})
 
@@ -107,8 +108,6 @@ export const updateNotifications = asyncHandler( async (req: Request, res: Respo
   const id = req.query.id; // notification id 
 
   if(id) {
-    console.log(id);
-    console.log("asdsad");
     await updateNotification(id as string,{isRead:true});
     return generateResponse(null, "Notification updated", res);
   } 
