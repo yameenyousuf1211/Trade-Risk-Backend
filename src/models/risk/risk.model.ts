@@ -186,8 +186,9 @@ export const fetchRisks = async ({ query, page, limit, populate }: IPaginationFu
     });
     return { data, pagination };
 };
-
 export const createRisk = (payload:IRisk) => RiskModel.create(payload);
 export const findRisk = (query: Record<string, any>) => RiskModel.findOne(query);
-export const updateRisk = (query: Record<string, any>, payload: Record<string, any>) => RiskModel.updateOne(query, payload);
+export const updateRisk = async (query: Record<string, any>, payload: Record<string, any>) => RiskModel.findOneAndUpdate(query, payload, { new: true });
+
+
 

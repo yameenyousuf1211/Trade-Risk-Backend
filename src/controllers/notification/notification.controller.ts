@@ -31,12 +31,11 @@ export const notifications = asyncHandler(
     if (userId) {
       query = { ...query, _id: userId };
     }
-
+    
     const response = await getAllUsers({ limit, page, query });
     const users = response.data;
 
     for (const user of users) {
-      console.log(user._id);
       const userNotification = await createNotification({title,message:body,user:user._id!})
       console.log(userNotification);
       if (Array.isArray(user.gcmTokens) && user.gcmTokens.length > 0) {
