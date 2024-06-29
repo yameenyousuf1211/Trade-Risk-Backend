@@ -15,12 +15,16 @@ export interface CreateNotificationInput {
     title: string;
     message: string;
     user: string;
+    requestId:string
 }
 
 const notificationSchema: Schema = new Schema({
     title: {
         type: String,
         required: true,
+    },
+    requestId:{
+        type:String,
     },
     message: {
         type: String,
