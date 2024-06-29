@@ -15,8 +15,8 @@ webpush.setVapidDetails("mailto:aliusaid55@gmail.com", publicKey, privateKey);
 
 export const notifications = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { title, body } = req.body;
-    
+    const { title, body,requestId } = req.body;
+      
     const role = req.query.role;
     const userId = req.query.userId;
 
@@ -31,12 +31,12 @@ export const notifications = asyncHandler(
     if (userId) {
       query = { ...query, _id: userId };
     }
-    
+
     const response = await getAllUsers({ limit, page, query });
     const users = response.data;
 
     for (const user of users) {
-      const userNotification = await createNotification({title,message:body,user:user._id!})
+      const userNotification = await createNotification({title,message:body,user:user._id!,requestId:requestId})
       console.log(userNotification);
       if (Array.isArray(user.gcmTokens) && user.gcmTokens.length > 0) {
         for (const subscription of user.gcmTokens) {
