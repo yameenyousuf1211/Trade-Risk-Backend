@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler, generateRefId, generateResponse } from "../../utils/helpers";
+import { asyncHandler, generateRefId, generateResponse, parseBody } from "../../utils/helpers";
 import { createRisk, fetchRisks, findRisk, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
 import { ValidationResult } from "joi";
@@ -11,7 +11,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
     const limit = Number(req.query.limit) || 10;
     const page = Number(req.query.page) || 1;
     const draft = req.query.draft == 'true' ? true : false;
-
+    const risk = req.query.risk;
     const createdBy = req.query.createdBy == 'true' ? true : false;
     const filter = req.query.filter;
 
@@ -19,12 +19,14 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
 
     query.push({ $match: { isDeleted: false } });
 
+    if(risk) query.push({ $match: { _id: new mongoose.Types.ObjectId(risk as string) }} )
     if (createdBy) {
         query.push({ $match: { createdBy: new mongoose.Types.ObjectId(req.user._id as string) } });
     }
     else {
         query.push({ $match: { createdBy: { $ne: new mongoose.Types.ObjectId(req.user._id as string) } } });
     }
+
     query.push({
         $match: {
             draft
@@ -133,9 +135,10 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
 export const createRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
     const draft = req.body.draft == 'true' ? true : false
-    
+    const body = parseBody(req.body);
+
     if (!draft) {
-        const { error }: ValidationResult = riskValidator.validate(req.body);
+        const { error }: ValidationResult = riskValidator.validate(body);
         if (error) {
             const customError: CustomError = {
                 statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY!,
@@ -148,7 +151,8 @@ export const createRisks = asyncHandler(async (req: Request, res: Response, next
     req.body.createdBy = req.user._id;
     req.body.draft = draft;
 
-    const data = await createRisk(req.body);
+    const data = await createRisk(body);
+
     generateResponse(data, "Risk created successfully", res);
 });
 
@@ -169,6 +173,7 @@ export const riskUpdate = asyncHandler(async (req: Request, res: Response, next:
     req.body.createdBy = req.user._id;
 
     const data = await updateRisk({ _id: req.params.id }, req.body);
+
     generateResponse(data, "Risk updated successfully", res);
 });
 

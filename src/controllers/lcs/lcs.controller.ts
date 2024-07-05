@@ -16,18 +16,17 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
     const filter = req.query.filter || '';
     const search = req.query.search;
     const status = req.query.status;
+    const lc = req.query.lc 
 
     let pipeline: any = [
         { $match: { isDeleted: false, draft }}
     ];
-
+    
+    if(lc) pipeline.push({ $match: { _id: new mongoose.Types.ObjectId(lc as string) } });
     if(status) pipeline.push({ $match: { status } })
     if (filter) pipeline.push({ $match: { type: filter } });
     if (search) pipeline.push({ $match: { refId: Number(search) } });
-    
-    if (createdBy) {
-        pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
-    }
+    if (createdBy) pipeline.push({ $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) } });
     pipeline.push({
         $lookup: {
             from: 'bids',

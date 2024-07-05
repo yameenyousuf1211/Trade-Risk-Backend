@@ -3,7 +3,8 @@ import { validateRequest } from '../../middlewares/validation.middleware';
 
 const notificationValidator = joi.object({
     title: joi.string().required(),
-    body: joi.string().required()
+    body: joi.string().required(),
+    requestId:joi.string().optional()
 });
 
 const subscriptionValidator = joi.object({

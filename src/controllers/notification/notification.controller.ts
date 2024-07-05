@@ -1,9 +1,10 @@
 import webpush from "web-push";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { NextFunction, Request, Response } from "express";
-import { findUser, getAllUsers } from "../../models";
+import { createNotification, deleteNotification, fetchNotification, findNotification, findUser, getAllUsers, updateNotification } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 import { IGcmToken } from "../../interface";
+import mongoose, { PipelineStage } from "mongoose";
 //  const vapidKeys = webpush.generateVAPIDKeys();
 
 const publicKey =
@@ -14,12 +15,13 @@ webpush.setVapidDetails("mailto:aliusaid55@gmail.com", publicKey, privateKey);
 
 export const notifications = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { title, body } = req.body;
+    const { title, body,requestId } = req.body;
+      
     const role = req.query.role;
     const userId = req.query.userId;
 
     const payload = JSON.stringify({ title, body });
-    const limit = +(req.query.limit || 1000);
+    const limit = +(req.query.limit || 10000);
     const page = +(req.query.page || 1); 
     let query: any = {};
 
@@ -34,6 +36,8 @@ export const notifications = asyncHandler(
     const users = response.data;
 
     for (const user of users) {
+      const userNotification = await createNotification({title,message:body,user:user._id!,requestId:requestId})
+      console.log(userNotification);
       if (Array.isArray(user.gcmTokens) && user.gcmTokens.length > 0) {
         for (const subscription of user.gcmTokens) {
           try {
@@ -81,3 +85,42 @@ export const subscribe = asyncHandler(
     }
   }
 );
+
+
+export const fetchNotifications = asyncHandler(
+  async (req: Request, res: Response, next: NextFunction) => {
+   const limit = +(req.query.limit || 10);
+   const page = +(req.query.page || 1);
+
+    const pipeline:PipelineStage[] = []
+  
+    pipeline.push({$match:{user:new mongoose.Types.ObjectId(req.user._id as string)}})
+    pipeline.push({$sort:{createdAt:-1}})
+
+    const notification = await fetchNotification({ limit, page,query:pipeline });
+    generateResponse(notification, "Notifications fetched", res);
+  }
+);
+
+export const updateNotifications = asyncHandler( async (req: Request, res: Response, next: NextFunction) => {
+
+  const id = req.query.id; // notification id 
+
+  if(id) {
+    await updateNotification(id as string,{isRead:true});
+    return generateResponse(null, "Notification updated", res);
+  } 
+
+  const notification = await findNotification({user:req.user._id});
+  notification.map(async (item:any) => {
+    await updateNotification(item._id,{isRead:true});
+  })
+
+  generateResponse(null, "Notification updated", res);
+})
+
+export const deleteNotifications = asyncHandler( async (req: Request, res: Response, next: NextFunction) => {
+  const id = req.params.id; 
+  const notification = await deleteNotification(id as string);
+  generateResponse(notification, "Notification deleted", res);
+})
