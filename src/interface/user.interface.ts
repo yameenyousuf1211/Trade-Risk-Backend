@@ -14,6 +14,8 @@ export interface IUser extends Document {
     email: string;
     allowNotification?: boolean;
     role: string;
+    allowBidsNotification?: boolean;
+    allowNewRequestNotification?: boolean;
     gcmTokens: IGcmToken[];
     country?: string;
     phone?: string;

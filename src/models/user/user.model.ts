@@ -58,6 +58,8 @@ const userSchema = new Schema<IUser>({
     riskParticipation: { type: Boolean },
     authorizationPocLetter: { type: String },
     allowNotification: { type: Boolean, default: true },
+    allowBidsNotification: { type: Boolean, default: true },
+    allowNewRequestNotification: { type: Boolean, default: true },
     gcmTokens: [GcmTokenSchema],
     isDeleted: { type: Boolean, default: false },
 
@@ -116,3 +118,5 @@ export const getAllUsers = async ({ query, page, limit, populate }: IPaginationF
 
     return { data, pagination };
 };
+
+export const updateUser = (id: string, obj: Record<string, any>): Promise<any> => UserModel.findByIdAndUpdate(id,obj,{new:true});
