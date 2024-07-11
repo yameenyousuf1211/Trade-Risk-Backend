@@ -11,6 +11,7 @@ export default class UserAPI {
 
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
+        this.router.put('/',authMiddleware(Object.values(ROLES)),updateUsers);
         this.router.put('/bank',authMiddleware(Object.values(ROLES)),updateUserBank);
         
     }

@@ -74,7 +74,7 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
 
 
 export const currentUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-   const user = await findUser({ _id: req.user._id }).populate('currentBanks');
+   const user = await findUser({ _id: req.user._id }).populate('currentBanks').select('password');
     generateResponse(user, 'User fetched successfully', res);
 });
 
