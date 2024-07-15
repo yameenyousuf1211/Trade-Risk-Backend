@@ -5,6 +5,14 @@ import { createRole, deleteRole, getAllRoles, getRole, updateRole } from "../../
 
 export const createRoles =  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     req.body.creator = req.user._id;
+
+    const findRole = await getRole({name:req.body.name});
+    
+    if(findRole) return next({
+        message: 'Role already exists',
+        statusCode: STATUS_CODES.BAD_REQUEST
+    })
+
     const role = await createRole(req.body);
     generateResponse(role, 'Role created successfully', res);
 });
