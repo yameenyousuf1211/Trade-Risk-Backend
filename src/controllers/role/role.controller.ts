@@ -29,7 +29,8 @@ export const deleteRoles = asyncHandler(async (req: Request, res: Response, next
 })
 
 export const fetchRole = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const role = await getRole({_id:req.params.id});
+   
+    const role = await getRole({name:req.params.role,creator:req.user._id});
     
     if(!role) return next({
         message: 'Role not found',
