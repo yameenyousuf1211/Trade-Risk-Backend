@@ -18,7 +18,6 @@ interface IRole extends Document {
 const RoleSchema = new Schema<IRole>({
     name: {
         type: String,
-        required: true,
     },
     creator:{
         type: Schema.Types.ObjectId,

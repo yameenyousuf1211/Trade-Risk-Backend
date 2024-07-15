@@ -13,7 +13,7 @@ export default class RoleAPI {
     
     setupRoutes() {
         this.router.get('/',authMiddleware(Object.values(ROLES)),fetchAllRoles);
-        this.router.get('/:id',authMiddleware(Object.values(ROLES)),fetchRole);
+        this.router.get('/:role',authMiddleware(Object.values(ROLES)),fetchRole);
         this.router.post('/',authMiddleware(Object.values(ROLES)),validateCreateRole,createRoles);
         this.router.put('/:id',authMiddleware(Object.values(ROLES)),validateUpdateRole,updateRoles);
         this.router.delete('/:id',authMiddleware(Object.values(ROLES)),deleteRoles);
