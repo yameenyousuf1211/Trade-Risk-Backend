@@ -131,7 +131,6 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
         }
     });
     
-    // Project the final desired structure
     pipeline.push({
         $project: {
             refId: 1,
@@ -244,7 +243,6 @@ export const statusCheck = asyncHandler(async (req: Request, res: Response, next
     let bid;
     
     if(key == 'lc') {
-        console.log("LC key called");
         bid = await findBid({ $and: [{ bidBy: id }, {lc:requestId }] }).sort({ createdAt: -1 });
     }
     else{
