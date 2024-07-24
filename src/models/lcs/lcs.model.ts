@@ -6,7 +6,37 @@ import { getMongoosePaginatedData,getMongooseAggregatePaginatedData } from "../.
 import { QueryWithHelpers } from "mongoose";
 import ILcs from '../../interface/lc.interface';
 
-
+const bondSchema = new Schema({
+    Contract: {
+      type: String,
+    },
+    currencyType: {
+      type: String,
+    },
+    cashMargin:{
+        type: Number,
+    },
+    valueInPercentage: {
+      type: Number,
+    },
+    expectedDate: {
+      type: Date,
+    },
+    lgExpiryDate: {
+      type: Date,
+    },
+    lgTenor: {
+      lgTenorType: {
+        type: String,
+      },
+      lgTenorValue: {
+        type: Number,
+      },
+    },
+    draft: {
+      type: String,
+    },
+  });
 
 // Define the schema
 const LcsSchema: Schema = new Schema({
@@ -32,7 +62,7 @@ const LcsSchema: Schema = new Schema({
         type:Number
     },
     extraInfo:{
-        dats:{
+        date:{
             type:Date
         },
         other:{
@@ -49,6 +79,9 @@ const LcsSchema: Schema = new Schema({
         country: {
             type: String,
         },
+        swiftCode: {
+            type: String,
+        }
     },
     advisingBank: {
         bank: {
@@ -143,7 +176,6 @@ const LcsSchema: Schema = new Schema({
         basePerRate:{
             type:String
         }
-       
     },
     baseRate:{
         type:String
@@ -168,31 +200,104 @@ const LcsSchema: Schema = new Schema({
         enum:['Pending','Expired','Rejected','Accepted','Add bid'],
         default:'Add bid'
     },
-    lgIssueAgainst:{
+    lgIssuance:{
+        type: String,
+    },
+    applicantDetails:{
+        country:{
+            type:String
+        },
+        company:{
+            type:String
+        },
+        crNumber:{
+            type:String
+        }
+    },
+    beneficiaryDetails:{
+        country:{
+            type:String
+        },
+        name:{
+            type:String
+        },
+        address:{
+            type:String
+        },
+        phoneNumber:{
+            type:String
+        }
+    },
+    lgDetailsType:{
         type:String,
+        enum:['Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)','Choose any other type of LGs']
     },
-    lgType:{
+    bidBond:bondSchema,
+    advancePaymentBond:bondSchema,
+    performanceBond:bondSchema,
+    retentionMoneyBond:bondSchema,
+    otherBond:bondSchema,
+    beneficiaryBanksDetails:{
+        bank:{
+            type:String
+        },
+        swiftCode:{
+            type:String
+        }
+    },
+    purpose:{
+        type:String
+    },
+    remarks:{
+        type:String
+    },
+    priceQuotes:{
+        type:String
+    },
+    expectedPrice:{
+        expectedPrice:{
+            type:Boolean,
+        },
+        pricePerAnnum:{
+            type:String
+        }
+    },
+    typeOfLg:{
         type:String,
+        enum:['Bid Bond','Advance Payment Bond','Performance Bond','Retention Money Bond','Payment LG','Zakat','Custom','SBLC','Other']
     },
-    // purpose:{type:String},
-    standardSAMA:{type:Boolean,default:false},
-    benificiaryBankName:{type:String},
-    chargesBehalfOf: {type: String},
-    remarks:{type:String},
-    priceType:{type:String},
-    Instrument:{type:String},
-    lgDetail:{
-        lgIssueBehalfOf:{type:String},
-        applicantCountry:{type:String},
-        lgIssueFavorOf:{type:String},
-        address:{type:String},
-        benficiaryCountry:{type:String},
+    issueLgWithStandardText:{
+        type:Boolean
     },
-    // margin:{type:Number},
-    // amountPercentage:{type:String},
-    // lgType:{type:String},
-    // purpose:{type:String},
+    lgStandardText:{
+        type:String
+    }
+  
+    // lgIssueAgainst:{
+    //     type:String,
+    // },
+    // lgType:{
+    //     type:String,
+    // },
+    // // purpose:{type:String},
+    // standardSAMA:{type:Boolean,default:false},
+    // benificiaryBankName:{type:String},
+    // chargesBehalfOf: {type: String},
+    // remarks:{type:String},
+    // priceType:{type:String},
+    // Instrument:{type:String},
     // lgDetail:{
+    //     lgIssueBehalfOf:{type:String},
+    //     applicantCountry:{type:String},
+    //     lgIssueFavorOf:{type:String},
+    //     address:{type:String},
+    //     benficiaryCountry:{type:String},
+    // },
+    // // margin:{type:Number},
+    // // amountPercentage:{type:String},
+    // // lgType:{type:String},
+    // // purpose:{type:String},
+    // // lgDetail:{
 
     // }
 },{timestamps:true,versionKey:false});

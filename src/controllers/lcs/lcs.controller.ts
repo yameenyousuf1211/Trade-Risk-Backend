@@ -6,6 +6,7 @@ import mongoose  from 'mongoose';
 import { ValidationResult, Schema } from 'joi'; 
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
+import { lgValidator } from "../../validation/lcs/lg.validation";
 
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 
@@ -186,8 +187,6 @@ export const createLcs = asyncHandler(async (req: Request, res: Response, next: 
 
     const draft = req.body.draft === 'true' ? true : false;
 
-    console.log(draft);
-    
     if(!draft) {
         const { error }: ValidationResult = lcsValidator.validate(req.body);
         if (error) {
@@ -198,7 +197,7 @@ export const createLcs = asyncHandler(async (req: Request, res: Response, next: 
             return next(customError);
         }
     }
-  
+    
     req.body.draft = draft;
     req.body.refId = generateRefId();
     req.body.createdBy = req.user._id;
@@ -207,7 +206,28 @@ export const createLcs = asyncHandler(async (req: Request, res: Response, next: 
 
     generateResponse(lcs, 'Lcs created successfully', res);
 }); 
+
+export const createLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     
+        const draft = req.body.draft 
+
+        req.body.refId = generateRefId();
+        req.body.createdBy = req.user._id;
+
+        if(!draft) {
+            const { error }: ValidationResult = lgValidator.validate(req.body);
+            if (error) {
+                const customError: CustomError = {
+                    statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+                    message: error.details[0].message.replace(/"/g, ''),
+                };
+                return next(customError);
+            }
+        }
+        const lg = await createLc(req.body);
+        generateResponse(lg, 'Lcs created successfully', res);
+})
+
 export const deleteLc = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const lc = await findLc({_id:req.params.id});
 
