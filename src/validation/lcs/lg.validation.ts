@@ -75,7 +75,7 @@ export const lgValidator = joi.object({
   
   expectedPrice: joi.object({
     expectedPrice: joi.boolean().required(),
-    pricePerAnnum: joi.string().required(),
+    pricePerAnnum: joi.string().optional(),
   }).required(),
   
   typeOfLg: joi.string().valid(
