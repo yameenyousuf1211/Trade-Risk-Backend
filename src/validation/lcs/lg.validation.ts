@@ -41,27 +41,28 @@ export const lgValidator = joi.object({
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     then: joi.required(),
     otherwise: joi.forbidden(),
-  }),
+  }).optional(),
   advancePaymentBond: bondSchema.when('lgDetailsType', {
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     then: joi.required(),
     otherwise: joi.forbidden(),
-  }),
+  }).optional(),
   performanceBond: bondSchema.when('lgDetailsType', {
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     then: joi.required(),
     otherwise: joi.forbidden(),
-  }),
+  }).optional(),
   retentionMoneyBond: bondSchema.when('lgDetailsType', {
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     then: joi.required(),
     otherwise: joi.forbidden(),
-  }),
+  }).optional(),
   otherBond: bondSchema.when("lgDetailsType",{
     is: 'Choose any other type of LGs',
     then: joi.required(),
     otherwise: joi.forbidden(),
-  }),
+  }).optional(),
+  
   issuingBank: joi.object({
     bank: joi.string().required(),
     country: joi.string().required(),
