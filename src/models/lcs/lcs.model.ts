@@ -280,6 +280,7 @@ const LcsSchema: Schema = new Schema({
     physicalLgSwiftCode:{
         type:String
     }
+ 
 },{timestamps:true,versionKey:false});
 
 LcsSchema.plugin(mongoosePaginate);

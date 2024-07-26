@@ -4,17 +4,17 @@ import { validateRequest } from '../../middlewares/validation.middleware';
 const bondSchema = joi.object({
   Contract: joi.boolean(),
   lgDetailAmount: joi.number(),
-  lgDetailCurrency: joi.string(),
-  currencyType: joi.string(),
+  lgDetailCurrency: joi.string().allow(''),
+  currencyType: joi.string().allow(''),
   cashMargin: joi.number(),
-  valueInPercentage: joi.string(),
+  valueInPercentage: joi.string().allow(''),
   expectedDate: joi.date(),
   lgExpiryDate: joi.date(),
   lgTenor: joi.object({
-    lgTenorType: joi.string(),
-    lgTenorValue: joi.string(),
-  }),
-  draft: joi.string(),
+    lgTenorType: joi.string().allow(''),
+    lgTenorValue: joi.string().allow(''),
+  }).optional(),
+  draft: joi.string().allow(''),
 });
 
 export const lgValidator = joi.object({
