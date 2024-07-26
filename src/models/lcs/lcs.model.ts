@@ -271,8 +271,16 @@ const LcsSchema: Schema = new Schema({
     },
     lgStandardText:{
         type:String
+    },
+    physicalLg:{
+        type:Boolean
+    },
+    physicalLgCountry:{
+        type:String
+    },
+    physicalLgSwiftCode:{
+        type:String
     }
-  
     // lgIssueAgainst:{
     //     type:String,
     // },
