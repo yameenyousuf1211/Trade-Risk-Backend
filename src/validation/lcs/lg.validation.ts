@@ -35,7 +35,7 @@ export const lgValidator = joi.object({
   lgDetailsType: joi.string().valid(
     'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     'Choose any other type of LGs'
-  ).required(),
+  ).optional(),
   
   bidBond: bondSchema.when('lgDetailsType', {
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
