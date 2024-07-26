@@ -89,7 +89,7 @@ export const lgValidator = joi.object({
   }
   ),
   
-  issueLgWithStandardText: joi.boolean().required(),
+  issueLgWithStandardText: joi.boolean().optional(),
   lgStandardText: joi.string().optional(),
   draft: joi.boolean().optional(),
   createdBy: joi.string().required(),
