@@ -93,9 +93,9 @@ export const lgValidator = joi.object({
   draft: joi.boolean().optional(),
   createdBy: joi.string().required(),
   refId: joi.number().required(),
-  physicalLg: joi.boolean().optional(),
-  physicalLgBank: joi.string().optional(),
-  physicalLgCountry: joi.string().optional(),
-  physicalLgSwiftCode: joi.string().optional(),
+  physicalLg: joi.boolean().optional().allow(null),
+  physicalLgBank: joi.string().optional().allow(null),
+  physicalLgCountry: joi.string().optional().allow(null),
+  physicalLgSwiftCode: joi.string().optional().allow(null),
 });
 
