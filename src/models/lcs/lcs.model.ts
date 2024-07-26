@@ -230,7 +230,6 @@ const LcsSchema: Schema = new Schema({
     },
     lgDetailsType:{
         type:String,
-        enum:['Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)','Choose any other type of LGs']
     },
     bidBond:bondSchema,
     advancePaymentBond:bondSchema,

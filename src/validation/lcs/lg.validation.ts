@@ -32,11 +32,7 @@ export const lgValidator = joi.object({
     phoneNumber: joi.string().required(),
   }).required(),
   
-  lgDetailsType: joi.string().valid(
-    'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
-    'Choose any other type of LGs'
-  ).optional(),
-  
+  lgDetailsType: joi.string().optional(),
   bidBond: bondSchema.when('lgDetailsType', {
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     then: joi.required(),
@@ -62,7 +58,7 @@ export const lgValidator = joi.object({
     then: joi.required(),
     otherwise: joi.forbidden(),
   }).optional(),
-  
+
   issuingBank: joi.object({
     bank: joi.string().required(),
     country: joi.string().required(),
