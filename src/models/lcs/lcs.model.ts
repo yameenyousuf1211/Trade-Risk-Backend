@@ -280,33 +280,6 @@ const LcsSchema: Schema = new Schema({
     physicalLgSwiftCode:{
         type:String
     }
-    // lgIssueAgainst:{
-    //     type:String,
-    // },
-    // lgType:{
-    //     type:String,
-    // },
-    // // purpose:{type:String},
-    // standardSAMA:{type:Boolean,default:false},
-    // benificiaryBankName:{type:String},
-    // chargesBehalfOf: {type: String},
-    // remarks:{type:String},
-    // priceType:{type:String},
-    // Instrument:{type:String},
-    // lgDetail:{
-    //     lgIssueBehalfOf:{type:String},
-    //     applicantCountry:{type:String},
-    //     lgIssueFavorOf:{type:String},
-    //     address:{type:String},
-    //     benficiaryCountry:{type:String},
-    // },
-    // // margin:{type:Number},
-    // // amountPercentage:{type:String},
-    // // lgType:{type:String},
-    // // purpose:{type:String},
-    // // lgDetail:{
-
-    // }
 },{timestamps:true,versionKey:false});
 
 LcsSchema.plugin(mongoosePaginate);
