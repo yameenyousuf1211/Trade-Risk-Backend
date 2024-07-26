@@ -3,6 +3,8 @@ import { validateRequest } from '../../middlewares/validation.middleware';
 
 const bondSchema = joi.object({
   Contract: joi.boolean(),
+  lgDetailAmount: joi.number(),
+  lgDetailCurrency: joi.string(),
   currencyType: joi.string(),
   cashMargin: joi.number(),
   valueInPercentage: joi.number(),
@@ -40,9 +42,21 @@ export const lgValidator = joi.object({
     then: joi.required(),
     otherwise: joi.forbidden(),
   }),
-  advancePaymentBond: bondSchema,
-  performanceBond: bondSchema,
-  retentionMoneyBond: bondSchema,
+  advancePaymentBond: bondSchema.when('lgDetailsType', {
+    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
+    then: joi.required(),
+    otherwise: joi.forbidden(),
+  }),
+  performanceBond: bondSchema.when('lgDetailsType', {
+    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
+    then: joi.required(),
+    otherwise: joi.forbidden(),
+  }),
+  retentionMoneyBond: bondSchema.when('lgDetailsType', {
+    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
+    then: joi.required(),
+    otherwise: joi.forbidden(),
+  }),
   otherBond: bondSchema.when("lgDetailsType",{
     is: 'Choose any other type of LGs',
     then: joi.required(),
@@ -56,11 +70,11 @@ export const lgValidator = joi.object({
   beneficiaryBanksDetails: joi.object({
     bank: joi.string().required(),
     swiftCode: joi.string().required(),
-  }).required(),
+  }).optional(),
   
-  purpose: joi.string().required(),
+  purpose: joi.string().optional(),
   remarks: joi.string().optional(),
-  priceQuotes: joi.string().optional(),
+  priceQuotes: joi.string().required(),
   
   expectedPrice: joi.object({
     expectedPrice: joi.boolean().required(),
@@ -70,7 +84,12 @@ export const lgValidator = joi.object({
   typeOfLg: joi.string().valid(
     'Bid Bond', 'Advance Payment Bond', 'Performance Bond', 'Retention Money Bond', 
     'Payment LG', 'Zakat', 'Custom', 'SBLC', 'Other'
-  ).required(),
+  ).when('lgIssuance', {
+    is: 'LG 100% Cash Margin',
+    then: joi.required(),
+    otherwise: joi.forbidden(),
+  }
+  ),
   
   issueLgWithStandardText: joi.boolean().required(),
   lgStandardText: joi.string().optional(),
