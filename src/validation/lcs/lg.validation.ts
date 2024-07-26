@@ -19,6 +19,7 @@ const bondSchema = joi.object({
 
 export const lgValidator = joi.object({
   lgIssuance: joi.string().required(),
+  type: joi.string().required(),
   applicantDetails: joi.object({
     country: joi.string().required(),
     company: joi.string().required(),
