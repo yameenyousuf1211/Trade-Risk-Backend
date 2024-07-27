@@ -66,8 +66,8 @@ export const lgValidator = joi.object({
     swiftCode: joi.string().required(),
   }).required(),
   beneficiaryBanksDetails: joi.object({
-    bank: joi.string(). optional(),
-    swiftCode: joi.string().optional(),
+    bank: joi.string(). optional().allow('').allow(null),
+    swiftCode: joi.string().optional().allow('').allow(null),
   }).optional(),
   
   purpose: joi.string().optional(),
