@@ -92,6 +92,14 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             bidsCount: { $first: '$bidsCount' },
             period: { $first: '$period' },
             baseRate:{ $first: '$baseRate' },
+            beneficiaryDetails: { $first: '$beneficiaryDetails' },
+            applicantDetails:{ $first: '$applicantDetails' },
+            bidBone:{ $first: '$bidBone' },
+            advancePaymentBond:{ $first: '$advancePaymentBond' },
+            performanceBond:{ $first: '$performanceBond' },
+            retentionMoneyBond:{ $first: '$retentionMoneyBond' },
+            otherBond:{ $first: '$otherBond' },
+            
             bids: { 
                 $push: {
                     _id: '$bids._id',
