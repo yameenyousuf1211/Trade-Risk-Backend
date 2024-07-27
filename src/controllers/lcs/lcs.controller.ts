@@ -99,7 +99,7 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             performanceBond:{ $first: '$performanceBond' },
             retentionMoneyBond:{ $first: '$retentionMoneyBond' },
             otherBond:{ $first: '$otherBond' },
-            
+
             bids: { 
                 $push: {
                     _id: '$bids._id',
@@ -160,7 +160,14 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
             'createdBy.name':1,
             'createdBy.accountCountry':1,
             createdAt: 1,
-            updatedAt: 1
+            updatedAt: 1,
+            beneficiaryDetails: 1,
+            applicantDetails:1,
+            bidBone:1,
+            advancePaymentBond:1,
+            performanceBond:1,
+            retentionMoneyBond:1,
+            otherBond:1,
         }
         })
 
