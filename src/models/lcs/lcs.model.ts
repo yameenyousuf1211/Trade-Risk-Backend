@@ -36,7 +36,7 @@ const bondSchema = new Schema({
     draft: {
       type: String,
     },
-  });
+  },{id:false});
 
 // Define the schema
 const LcsSchema: Schema = new Schema({
