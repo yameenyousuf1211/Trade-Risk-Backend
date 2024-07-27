@@ -311,7 +311,28 @@ export const updateLcs = asyncHandler(async (req: Request, res: Response, next: 
 
     generateResponse(updatedLc, 'Lc updated successfully', res);
 });
+export const updateLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
 
+    const draft = req.body.draft === 'true' ? true : false;
+    
+    if(!draft) {
+        const { error }: ValidationResult = lgValidator.validate(req.body);
+        if (error) {
+            const customError: CustomError = {
+                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+                message: error.details[0].message.replace(/"/g, ''),
+            };
+            return next(customError);
+        }
+    }
+
+    req.body.draft = draft;
+
+    const updatedLc = await updateLc({ _id: id }, req.body); 
+
+    generateResponse(updatedLc, 'Lc updated successfully', res);
+});
 
 export const totalRequestLc = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
    
