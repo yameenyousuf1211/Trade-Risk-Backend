@@ -3,8 +3,8 @@ import { validateRequest } from '../../middlewares/validation.middleware';
 
 const bondSchema = joi.object({
   Contract: joi.boolean(),
-  lgDetailAmount: joi.number(),
-  lgDetailCurrency: joi.string().allow(''),
+  lgDetailAmount: joi.number().default(0),
+  lgDetailCurrency: joi.string().allow('').allow(null).optional(),
   currencyType: joi.string().allow(''),
   cashMargin: joi.number(),
   valueInPercentage: joi.string().allow(''),
