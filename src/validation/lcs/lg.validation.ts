@@ -29,11 +29,11 @@ export const lgValidator = joi.object({
   beneficiaryDetails: joi.object({
     country: joi.string().required(),
     name: joi.string().required(),
-    address: joi.string().required(),
-    phoneNumber: joi.string().required(),
+    address: joi.string().optional(),
+    phoneNumber: joi.string().optional(),
   }).required(),
   
-  lgDetailsType: joi.string().optional(),
+  lgDetailsType: joi.string().optional().allow(null).allow(''),
   bidBond: bondSchema.when('lgDetailsType', {
     is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
     then: joi.required(),
@@ -88,10 +88,9 @@ export const lgValidator = joi.object({
     otherwise: joi.forbidden(),
   }
   ),
-  
   issueLgWithStandardText: joi.boolean().optional(),
   lgStandardText: joi.string().optional(),
-  draft: joi.boolean().optional(),
+  draft: joi.boolean().optional(), 
   createdBy: joi.string().required(),
   refId: joi.number().required(),
   physicalLg: joi.boolean().optional().allow(null),
