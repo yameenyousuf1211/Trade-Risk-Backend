@@ -268,7 +268,7 @@ export const deleteLc = asyncHandler(
 export const findLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const lc = await findLc({ _id: id }, "createdBy");
+    const lc = await findLc({ _id: id });
 
     if (!lc)
       return next({
