@@ -334,7 +334,8 @@ export const updateLg = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
 
-    const draft = req.body.draft === "true" ? true : false;
+    const draft =
+      req.body.draft === "true" || req.body.draft === true ? true : false;
 
     if (!draft) {
       const { error }: ValidationResult = lgValidator.validate(req.body);
