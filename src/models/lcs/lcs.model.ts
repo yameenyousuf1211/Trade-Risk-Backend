@@ -36,7 +36,7 @@ const bondSchema = new Schema(
       type: String,
       required: false
     },
-    amount: {
+    lgDetailAmount: {
       type: Number,
       required: false
     },
