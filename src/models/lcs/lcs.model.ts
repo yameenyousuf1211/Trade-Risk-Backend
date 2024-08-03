@@ -32,6 +32,14 @@ const bondSchema = new Schema(
     lgExpiryDate: {
       type: Date,
     },
+    name: {
+      type: String,
+      required: false
+    },
+    amount: {
+      type: Number,
+      required: false
+    },
     lgTenor: {
       lgTenorType: {
         type: String,
