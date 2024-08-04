@@ -33,7 +33,7 @@ const userSchema = new Schema<IUser>({
     businessType: { type: String },
     role: { type: String, enum: Object.values(ROLES), default: "user", required: true },
     productInfo: {
-        product: [{ type: String }],
+        products: [{ type: String }],
         annualSalary: { type: Number },
         annualValueExports: { type: Number },
         annualValueImports: { type: Number }
@@ -46,6 +46,7 @@ const userSchema = new Schema<IUser>({
     accountCountry: { type: String },
     accountCity: { type: String},
     pocName: { type: String },
+    businessNature: { type: String },
     pocEmail: { type: String },
     pocPhone: { type: String },
     poc: { type: String },

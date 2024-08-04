@@ -12,6 +12,7 @@ export interface IUser extends Document {
     _id?: string;
     name?: string;
     email: string;
+    businessNature?: string;
     allowNotification?: boolean;
     role: string;
     allowBidsNotification?: boolean;
