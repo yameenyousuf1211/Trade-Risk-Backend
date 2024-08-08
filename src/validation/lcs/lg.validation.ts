@@ -8,6 +8,7 @@ const bondSchema = joi.object({
   currencyType: joi.string().allow(''),
   cashMargin: joi.number(),
   valueInPercentage: joi.string().allow(''),
+  name: joi.string().allow(''),
   expectedDate: joi.date(),
   lgExpiryDate: joi.date(),
   lgTenor: joi.object({
