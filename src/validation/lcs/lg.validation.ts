@@ -17,6 +17,8 @@ const bondSchema = joi.object({
   draft: joi.string().allow(''),
 });
 
+const contractRelatedLGsCondition = 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)';
+
 export const lgValidator = joi.object({
   lgIssuance: joi.string().required(),
   type: joi.string().required(),
@@ -34,29 +36,32 @@ export const lgValidator = joi.object({
   }).required(),
   
   lgDetailsType: joi.string().optional().default('Choose any other type of LGs'),
-  bidBond: bondSchema.when('lgDetailsType', {
-    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
-    then: joi.required(),
+  
+
+  bidBond: joi.when('lgDetailsType', {
+    is: contractRelatedLGsCondition,
+    then: joi.any(),
     otherwise: joi.forbidden(),
   }).optional(),
-  advancePaymentBond: bondSchema.when('lgDetailsType', {
-    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
-    then: joi.required(),
+  advancePaymentBond: joi.when('lgDetailsType', {
+    is: contractRelatedLGsCondition,
+    then: joi.any(),
     otherwise: joi.forbidden(),
   }).optional(),
-  performanceBond: bondSchema.when('lgDetailsType', {
-    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
-    then: joi.required(),
+  performanceBond: joi.when('lgDetailsType', {
+    is: contractRelatedLGsCondition,
+    then: joi.any(),
     otherwise: joi.forbidden(),
   }).optional(),
-  retentionMoneyBond: bondSchema.when('lgDetailsType', {
-    is: 'Contract Related LGs (Bid Bond, Advance Payment Bond, Performance Bond etc)',
-    then: joi.required(),
+  retentionMoneyBond: joi.when('lgDetailsType', {
+    is: contractRelatedLGsCondition,
+    then: joi.any(),
     otherwise: joi.forbidden(),
   }).optional(),
+
   otherBond: bondSchema.when("lgDetailsType",{
     is: 'Choose any other type of LGs',
-    then: joi.required(),
+    then: joi.any(),
     otherwise: joi.forbidden(),
   }).optional(),
 
@@ -97,5 +102,13 @@ export const lgValidator = joi.object({
   physicalLgBank: joi.string().optional().allow(null).allow(''),
   physicalLgCountry: joi.string().optional().allow(null).allow(''),
   physicalLgSwiftCode: joi.string().optional().allow(null).allow(''),
-});
+}).custom((value, helpers) => {
+  if (value.lgDetailsType === contractRelatedLGsCondition) {
+    const { bidBond, advancePaymentBond, performanceBond, retentionMoneyBond } = value;
+    if (!bidBond && !advancePaymentBond && !performanceBond && !retentionMoneyBond) {
+      return helpers.error('any.required', { label: 'At least one of the bond fields' });
+    }
+  }
+  return value;
+}, 'At least one bond field required validation');
 
