@@ -67,7 +67,9 @@ export const riskValidator = joi.object({
     period: joi.object({
         expectedDate: joi.boolean().required(),
         startDate: joi.date().optional()
-    }).required()
+    }).required(),
+    country:joi.string().required(),
+    swiftCode:joi.string().optional(),
 })
 
 export const validateRisk = validateRequest(riskValidator);

@@ -70,6 +70,8 @@ interface IRisk extends Document {
         expectedDate: boolean;
         startDate?: Date; 
     };
+    country: string;
+    swiftCode: string;
 }
 
 const RiskSchema: Schema = new Schema({
@@ -183,6 +185,8 @@ const RiskSchema: Schema = new Schema({
             type: Date
         }
     },
+    country: { type: String },
+    swiftCode: { type: String },
 },{timestamps:true});
 
 RiskSchema.plugin(mongoosePaginate);
