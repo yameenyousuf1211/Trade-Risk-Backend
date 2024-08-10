@@ -39,7 +39,6 @@ export const riskValidator = joi.object({
     expectedDiscounting: joi.boolean().required(),
     expectedDateDiscounting: joi.date().required(),
     expiryDate: joi.date().required(),
-    startDate: joi.date().required(),
     paymentTerms: joi.string().required(),
     days:joi.number().when('paymentTerms',{
         is:'Tenor LC',
@@ -65,6 +64,12 @@ export const riskValidator = joi.object({
     paymentReceviedType :joi.string().required(),
     note:joi.string().required(),
     draft:joi.boolean().optional().default(false),
+    period: joi.object({
+        expectedDate: joi.boolean().required(),
+        startDate: joi.date().optional()
+    }).required(),
+    country:joi.string().required(),
+    swiftCode:joi.string().optional(),
 })
 
 export const validateRisk = validateRequest(riskValidator);

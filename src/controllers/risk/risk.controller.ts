@@ -14,6 +14,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
     const risk = req.query.risk;
     const createdBy = req.query.createdBy == 'true' ? true : false;
     const filter = req.query.filter;
+    const search = req.query.search 
 
     const query: PipelineStage[] = [];
 
@@ -32,7 +33,33 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
             draft
         }
     })
-
+    if (search) {
+        query.push({
+            $lookup: {
+                from: 'users',
+                localField: 'createdBy',
+                foreignField: '_id',
+                as: 'userInfo'
+            }
+        });
+    
+        query.push({
+            $unwind: {
+                path: '$userInfo',
+                preserveNullAndEmptyArrays: true
+            }
+        });
+    
+        query.push({
+            $match: {
+                $or: [
+                    { 'userInfo.swiftCode': { $regex: search, $options: 'i' } },
+                    { refId: Number(search) || -1 }
+                ]
+            }
+        });
+    }
+    
     query.push({
         $lookup: {
             from: 'bids',
