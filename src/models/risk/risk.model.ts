@@ -39,7 +39,6 @@ interface IRisk extends Document {
     expectedDiscounting?: boolean;
     expectedDateDiscounting?: Date;
     expiryDate?: Date;
-    startDate?: Date;
     paymentTerms?: string;
     shipmentPort: {
         country: string;
@@ -67,6 +66,10 @@ interface IRisk extends Document {
     };
     draft?: boolean;
     isDeleted: boolean;
+    period: {
+        expectedDate: boolean;
+        startDate?: Date; 
+    };
 }
 
 const RiskSchema: Schema = new Schema({
@@ -116,7 +119,6 @@ const RiskSchema: Schema = new Schema({
     expectedDiscounting:{type:Boolean},
     expectedDateDiscounting:{type:Date},
     expiryDate:{type:Date},
-    startDate:{type:Date},
     paymentTerms:{type:String},
     shipmentPort: {
         country: {
@@ -171,6 +173,15 @@ const RiskSchema: Schema = new Schema({
         type:String,
         enum:['Pending','Expired','Rejected','Accepted','Add bid'],
         default:'Add bid'
+    },
+    period: {
+        expectedDate: {
+            type: Boolean,
+            default: false
+        },
+        startDate: {
+            type: Date
+        }
     },
 },{timestamps:true});
 
