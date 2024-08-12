@@ -37,8 +37,8 @@ export const notifications = asyncHandler(
     for (const user of users) {
       const userNotification = await createNotification({title,message:body,user:user._id!,requestId:requestId})
       console.log(userNotification);
-      if (Array.isArray(user.fcmToken) && user.fcmToken.length > 0) {
-        for (const subscription of user.fcmToken) {
+      if (Array.isArray(user.fcmTokens) && user.fcmTokens.length > 0) {
+        for (const subscription of user.fcmTokens) {
           try {
             await webpush.sendNotification(subscription, payload);
           } catch (error: any) {
