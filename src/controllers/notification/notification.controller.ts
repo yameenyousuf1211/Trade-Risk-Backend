@@ -3,7 +3,6 @@ import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { NextFunction, Request, Response } from "express";
 import { createNotification, deleteNotification, fetchNotification, findNotification, findUser, getAllUsers, updateNotification } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
-import { IGcmToken } from "../../interface";
 import mongoose, { PipelineStage } from "mongoose";
 //  const vapidKeys = webpush.generateVAPIDKeys();
 
@@ -38,8 +37,8 @@ export const notifications = asyncHandler(
     for (const user of users) {
       const userNotification = await createNotification({title,message:body,user:user._id!,requestId:requestId})
       console.log(userNotification);
-      if (Array.isArray(user.gcmTokens) && user.gcmTokens.length > 0) {
-        for (const subscription of user.gcmTokens) {
+      if (Array.isArray(user.fcmToken) && user.fcmToken.length > 0) {
+        for (const subscription of user.fcmToken) {
           try {
             await webpush.sendNotification(subscription, payload);
           } catch (error: any) {
@@ -51,7 +50,7 @@ export const notifications = asyncHandler(
               });
               findUserWithFalseSubscription.gcmTokens =
                 findUserWithFalseSubscription.gcmTokens.filter(
-                  (token: IGcmToken) => token.endpoint !== subscription.endpoint
+                  (token:any) => token.endpoint !== subscription.endpoint
                 );
               await findUserWithFalseSubscription.save();
             } else {
@@ -73,7 +72,7 @@ export const subscribe = asyncHandler(
 
     // Check if the subscription already exists in gcmTokens
     const tokenExists = user.gcmTokens.some(
-      (token: IGcmToken) => token.endpoint === subscription.endpoint
+      (token: any) => token.endpoint === subscription.endpoint
     );
 
     if (!tokenExists) {
