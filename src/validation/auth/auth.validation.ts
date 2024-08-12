@@ -115,7 +115,8 @@ const registerValidator = joi.object({
         is: 'bank',
         then: joi.forbidden(),
         otherwise: joi.string().required(),
-    })
+    }),
+    fcmToken: joi.string().required(),
 });
 
 const loginValidator = joi.object({
