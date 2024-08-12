@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateRefId, generateResponse, parseBody } from "../../utils/helpers";
-import { createRisk, fetchRisks, findRisk, updateRisk } from "../../models";
+import { createRisk, fetchRisks, findRisk, getAllUsers, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
 import { ValidationResult } from "joi";
 import { riskValidator } from "../../validation/risk/risk.validation";
@@ -34,32 +34,40 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
         }
     })
     if (search) {
-        query.push({
-            $lookup: {
-                from: 'users',
-                localField: 'createdBy',
-                foreignField: '_id',
-                as: 'userInfo'
-            }
-        });
-    
-        query.push({
-            $unwind: {
-                path: '$userInfo',
-                preserveNullAndEmptyArrays: true
-            }
-        });
-    
-        query.push({
-            $match: {
-                $or: [
-                    { 'userInfo.swiftCode': { $regex: search, $options: 'i' } },
-                    { refId: Number(search) || -1 }
-                ]
-            }
-        });
+        const isNumeric = !isNaN(Number(search));
+        if (isNumeric) {
+            query.push({ $match: { refId: Number(search) } });
+        } else {
+            const userQuery = { swiftCode: { $regex: search, $options: 'i' } };
+
+            const { data: users } = await getAllUsers({
+                query: userQuery,
+            });
+
+            const ids = users.map((user:any) => user._id);
+
+            query.push({
+                $match: {
+                    createdBy: { $in: ids }
+                }
+            });
+        }
     }
-    
+    query.push({
+        $lookup: {
+            from: 'users',
+            localField: 'createdBy',
+            foreignField: '_id',
+            as: 'userCreatedRisk'
+        }
+    });
+
+    query.push({
+        $unwind: {
+            path: '$userCreatedRisk',
+            preserveNullAndEmptyArrays: true
+        }
+    });
     query.push({
         $lookup: {
             from: 'bids',
@@ -99,6 +107,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
     query.push({
         $group: {
             _id: '$_id',
+            swiftCode: { $first: '$swiftCode' },
             issuingBank: { $first: '$issuingBank' },
             exporterInfo: { $first: '$exporterInfo' },
             confirmingBank: { $first: '$confirmingBank' },
@@ -134,7 +143,17 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
             },
             importerInfo: { $first: '$importerInfo' },
             status: { $first: '$status' },
-            createdBy: { $first: '$createdBy' },
+            createdBy: {
+                $first: {
+                    _id: '$userCreatedRisk._id',
+                    name: '$userCreatedRisk.name',
+                    firstname: '$userCreatedRisk.firstname',
+                    lastname: '$userCreatedRisk.lastname',
+                    email: '$userCreatedRisk.email',
+                    swiftCode: '$userCreatedRisk.swiftCode',
+                    country: '$userCreatedRisk.accountCountry',
+                }
+            },
             createdAt: { $first: '$createdAt' },
             updatedAt: { $first: '$updatedAt' },
 
