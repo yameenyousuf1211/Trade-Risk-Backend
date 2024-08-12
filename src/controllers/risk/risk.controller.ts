@@ -108,6 +108,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
         $group: {
             _id: '$_id',
             swiftCode: { $first: '$swiftCode' },
+            country: { $first: '$country' },
             issuingBank: { $first: '$issuingBank' },
             exporterInfo: { $first: '$exporterInfo' },
             confirmingBank: { $first: '$confirmingBank' },
