@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail } from "../../utils/helpers";
-import {  createBanks, createUser, findUser } from "../../models";
+import {  createBanks, createUser, findUser, updateUser } from "../../models";
 import { ROLES, STATUS_CODES } from "../../utils/constants";
 import { IBank } from "../../interface";
 import uploadOnCloudinary from "../../utils/cloundinary";
@@ -63,7 +63,9 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
 
     const accessToken = await user.generateAccessToken();
     req.session = { accessToken };
-
+    if (body.fcmToken) {
+            user=await updateUser(user._id, { $addToSet: { fcmTokens: body.fcmToken } });
+    }
     // remove password
     user = user.toObject();
     delete user.password;
