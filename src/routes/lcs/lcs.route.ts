@@ -13,7 +13,7 @@ export default class LcsAPI {
 
     setupRoutes() {
         this.router.get('/', authMiddleware(Object.values(ROLES)), fetchAllLcs);
-        this.router.get('/:id', authMiddleware(Object.values(ROLES)), findLcs);
+        this.router.get('/:lcId', authMiddleware(Object.values(ROLES)), findLcs);
         this.router.get('/total-request/list', authMiddleware(Object.values(ROLES)), totalRequestLc);
         this.router.get('/status/check/:requestId', authMiddleware(Object.values(ROLES)), statusCheck);
 

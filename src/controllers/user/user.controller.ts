@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { createBank, findBank, getAllUsers, updateUser } from "../../models";
-import {  ROLES,STATUS_CODES,banks as bank } from "../../utils/constants";
+import { ROLES, STATUS_CODES, banks as bank } from "../../utils/constants";
+import { updateBusiness } from "../../models/business/business.model";
 
 // get all users
 export const fetchAllUsers = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
-    const limit = +(req.query.limit || 10);
-    const query: object = { role: { $ne: ROLES.ADMIN }, isDeleted: false};
+    const limit: number = +(req.query.limit || 10);
+    const query: object = { role: { $ne: ROLES.ADMIN } };
 
     const usersData = await getAllUsers({ query, page, limit });
 
@@ -25,56 +26,66 @@ export const updateUsers = asyncHandler(async (req: Request, res: Response, next
     generateResponse(user, 'User updated successfully', res);
 });
 
-export const updateUserBank = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.user._id;
-    const { action, bankId,name,country,city} = req.body;
+export const updateBusinessCurrentBanks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body;
 
-    if (action === 'add') {
-        const bank = await createBank({ name,country,city });
+    const business = await updateBusiness({ _id: req.user.business }, { $set: { currentBanks: body } });
 
-        if (!bank) {
-            return next({
-                message: 'Bank not created',
-                statusCode: STATUS_CODES.BAD_REQUEST
-            });
-        }
+    if (!business) return next({
+        message: 'Business not found',
+        statusCode: STATUS_CODES.NOT_FOUND
+    });
 
-        const user = await updateUser(id, { $push: { currentBanks: bank._id } });
+    generateResponse(business, 'Business updated successfully', res);
 
-        if (!user) {
-            return next({
-                message: 'User not found',
-                statusCode: STATUS_CODES.NOT_FOUND
-            });
-        }
 
-        generateResponse(user, 'Bank added and user updated successfully', res);
-    }  else if (action === 'remove') {
-        if (!bankId) {
-            return next({
-                message: 'Bank ID is required to remove a bank',
-                statusCode: STATUS_CODES.BAD_REQUEST
-            });
-        }
 
-        const user = await updateUser(id, { $pull: { currentBanks: bankId } });
 
-        if (!user) {
-            return next({
-                message: 'User not found',
-                statusCode: STATUS_CODES.NOT_FOUND
-            });
-        }
 
-        const bank = await findBank({ _id: bankId });
-        bank.isDeleted = true;
-        await bank.save();
+    // if (action === 'add') {
+    //     const bank = await createBank({ name, country, city });
 
-        generateResponse(user, 'Bank removed and user updated successfully', res);
-    } else {
-        return next({
-            message: 'Invalid action',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
-    }
+    //     if (!bank) return next({
+    //         message: 'Bank not created',
+    //         statusCode: STATUS_CODES.BAD_REQUEST
+    //     });
+
+    //     const user = await updateUser(id, { $push: { currentBanks: bank._id } });
+
+    //     if (!user) {
+    //         return next({
+    //             message: 'User not found',
+    //             statusCode: STATUS_CODES.NOT_FOUND
+    //         });
+    //     }
+
+    //     generateResponse(user, 'Bank added and user updated successfully', res);
+    // } else if (action === 'remove') {
+    //     if (!bankId) {
+    //         return next({
+    //             message: 'Bank ID is required to remove a bank',
+    //             statusCode: STATUS_CODES.BAD_REQUEST
+    //         });
+    //     }
+
+    //     const user = await updateUser(id, { $pull: { currentBanks: bankId } });
+
+    //     if (!user) {
+    //         return next({
+    //             message: 'User not found',
+    //             statusCode: STATUS_CODES.NOT_FOUND
+    //         });
+    //     }
+
+    //     const bank = await findBank({ _id: bankId });
+    //     bank.isDeleted = true;
+    //     await bank.save();
+
+    //     generateResponse(user, 'Bank removed and user updated successfully', res);
+    // } else {
+    //     return next({
+    //         message: 'Invalid action',
+    //         statusCode: STATUS_CODES.BAD_REQUEST
+    //     });
+    // }
 });

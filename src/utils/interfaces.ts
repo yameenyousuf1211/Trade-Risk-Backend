@@ -16,7 +16,7 @@ export interface IPaginationFunctionParams {
     query?: any, //Record<string, any>,
     page?: number,
     limit?: number,
-    populate?: string | any[],
+    populate?: any,
     select?: string,
     sort?: Record<string, any>,
 }

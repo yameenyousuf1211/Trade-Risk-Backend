@@ -162,13 +162,15 @@ export const fetchLcs = async ({
   query,
   page,
   limit,
+  populate,
 }: IPaginationFunctionParams): Promise<IPaginationResult<ILcs>> => {
   const { data, pagination }: IPaginationResult<ILcs> =
-    await getMongooseAggregatePaginatedData({
+    await getMongoosePaginatedData({
       model: LcsModel,
       query,
       page,
       limit,
+      populate,
     });
   return { data, pagination };
 };
