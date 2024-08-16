@@ -22,8 +22,6 @@ export const fetchAllLcs = asyncHandler(
     if (req.query.refId) filters.push({ refId: req.query.refId });
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
 
-
-
     const query = filters.length > 0 ? { $and: filters } : {};
     const populate = {
       path: "bids",
@@ -32,194 +30,6 @@ export const fetchAllLcs = asyncHandler(
 
     const data = await fetchLcs({ limit, page, query, populate });
     generateResponse(data, "List fetched successfully", res);
-
-    // const page: number = +(req.query.page || 1);
-    // const limit = +(req.query.limit || 10);
-    // const draft = req.query.draft === "true" ? true : false;
-    // const createdBy = req.query.createdBy || "";
-    // const filter = req.query.filter || "";
-    // const search = req.query.search;
-    // const status = req.query.status;
-    // const lc = req.query.lc;
-
-    // let pipeline: any = [
-    //   { $match: { isDeleted: false, draft } }
-    // ];
-
-    // if (lc)
-    //   pipeline.push({
-    //     $match: { _id: new mongoose.Types.ObjectId(lc as string) },
-    //   });
-    // if (status) pipeline.push({ $match: { status } });
-    // if (filter) pipeline.push({ $match: { type: filter } });
-    // if (search) pipeline.push({ $match: { refId: Number(search) } });
-    // if (createdBy)
-    //   pipeline.push({
-    //     $match: { createdBy: new mongoose.Types.ObjectId(createdBy as string) },
-    //   });
-    // pipeline.push({
-    //   $lookup: {
-    //     from: "bids",
-    //     localField: "_id",
-    //     foreignField: "lc",
-    //     as: "bids",
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $lookup: {
-    //     from: "users",
-    //     localField: "createdBy",
-    //     foreignField: "_id",
-    //     as: "createdBy",
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $addFields: {
-    //     bidsCount: { $size: "$bids" },
-    //   },
-    // });
-
-    // // Unwind the bids array to process each bid individually
-    // pipeline.push({
-    //   $unwind: {
-    //     path: "$bids",
-    //     preserveNullAndEmptyArrays: true,
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $lookup: {
-    //     from: "users",
-    //     localField: "bids.bidBy",
-    //     foreignField: "_id",
-    //     as: "bidUserInfo",
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $unwind: {
-    //     path: "$bidUserInfo",
-    //     preserveNullAndEmptyArrays: true,
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $group: {
-    //     _id: "$_id",
-    //     refId: { $first: "$refId" },
-    //     type: { $first: "$type" },
-    //     issuingBank: { $first: "$issuingBank" },
-    //     currency: { $first: "$currency" },
-    //     lgDetails: { $first: "$lgDetail" },
-    //     exporterInfo: { $first: "$exporterInfo" },
-    //     confirmingBank: { $first: "$confirmingBank" },
-    //     advisingBank: { $first: "$advisingBank" },
-    //     amount: { $first: "$amount" },
-    //     bidsCount: { $first: "$bidsCount" },
-    //     period: { $first: "$period" },
-    //     baseRate: { $first: "$baseRate" },
-    //     beneficiaryDetails: { $first: "$beneficiaryDetails" },
-    //     applicantDetails: { $first: "$applicantDetails" },
-    //     bidBone: { $first: "$bidBone" },
-    //     advancePaymentBond: { $first: "$advancePaymentBond" },
-    //     performanceBond: { $first: "$performanceBond" },
-    //     retentionMoneyBond: { $first: "$retentionMoneyBond" },
-    //     otherBond: { $first: "$otherBond" },
-
-    //     bids: {
-    //       $push: {
-    //         _id: "$bids._id",
-    //         validity: "$bids.bidValidity",
-    //         bidBy: "$bids.bidBy",
-    //         amount: "$bids.confirmationPrice",
-    //         perAnnum: "$bids.perAnnum",
-    //         discountMargin: "$bids.discountMargin",
-    //         discountBaseRate: "$bids.discountBaseRate",
-    //         createdAt: "$bids.createdAt",
-    //         status: "$bids.status",
-    //         userInfo: {
-    //           name: "$bidUserInfo.name",
-    //           email: "$bidUserInfo.email",
-    //           _id: "$bidUserInfo._id",
-    //           country: "$bidUserInfo.accountCountry",
-    //         },
-    //       },
-    //     },
-    //     importerInfo: { $first: "$importerInfo" },
-    //     status: { $first: "$status" },
-    //     createdBy: { $first: "$createdBy" },
-    //     createdAt: { $first: "$createdAt" },
-    //     updatedAt: { $first: "$updatedAt" },
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $addFields: {
-    //     bids: {
-    //       $cond: {
-    //         if: { $eq: ["$bidsCount", 0] },
-    //         then: [],
-    //         else: "$bids",
-    //       },
-    //     },
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $project: {
-    //     refId: 1,
-    //     type: 1,
-    //     issuingBank: 1,
-    //     currency: 1,
-    //     exporterInfo: 1,
-    //     confirmingBank: 1,
-    //     advisingBank: 1,
-    //     amount: 1,
-    //     lgDetails: 1,
-    //     bidsCount: 1,
-    //     period: 1,
-    //     bids: 1,
-    //     baseRate: 1,
-    //     importerInfo: 1,
-    //     status: 1,
-    //     "createdBy.name": 1,
-    //     "createdBy.accountCountry": 1,
-    //     createdAt: 1,
-    //     updatedAt: 1,
-    //     beneficiaryDetails: 1,
-    //     applicantDetails: 1,
-    //     bidBone: 1,
-    //     advancePaymentBond: 1,
-    //     performanceBond: 1,
-    //     retentionMoneyBond: 1,
-    //     otherBond: 1,
-    //   },
-    // });
-
-    // pipeline.push({
-    //   $sort: {
-    //     createdAt: -1,
-    //   },
-    // });
-
-    // const data = await fetchLcs({ limit, page, query: pipeline });
-
-    // if (data) {
-    //   data.data.forEach(async (lc) => {
-    //     const endDate = new Date(lc.period?.endDate!);
-    //     const today = new Date();
-
-    //     if (endDate < today) {
-    //       await updateLc({ _id: lc._id }, { status: "Expired" });
-    //     }
-    //   });
-    // }
-
-    // const updatedData = await fetchLcs({ limit, page, query: pipeline });
-
-    // generateResponse({ updatedData }, "List fetched successfully", res);
   });
 
 export const createLcs = asyncHandler(
@@ -245,7 +55,6 @@ export const createLg = asyncHandler(
     const draft = req.body.draft;
 
     req.body.createdBy = req.user.business;
-
 
     if (!draft) {
       const countLcs = await lcsCount({ draft: false });
@@ -346,6 +155,7 @@ export const updateLcs = asyncHandler(
     generateResponse(updatedLc, "Lc updated successfully", res);
   }
 );
+
 export const updateLg = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
