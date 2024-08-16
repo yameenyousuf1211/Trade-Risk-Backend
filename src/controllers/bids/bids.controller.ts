@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler, generateResponse } from "../../utils/helpers";
-import {  BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, IBid, updateBid } from "../../models";
+import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
+import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, IBid, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 import mongoose, { PipelineStage } from "mongoose";
@@ -10,30 +10,30 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const limit = +(req.query.limit || 10);
     const lc = req.query.lc || '';
     const bidBy = req.query.bidBy === 'true' ? req.user._id : null;
-    const search = req.query.search || ''; 
+    const search = req.query.search || '';
     const filter = req.query.filter || '';
     const lcOwner = req.query.lcOwner || '';
     const riskOwner = req.query.riskOwner || '';
     const risk = req.query.risk || '';
-    
+
     let pipeline: PipelineStage[] = [{ $match: { isDeleted: false } }];
 
     if (lc) {
         pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string), status: 'Pending' } });
     }
 
-    if(risk){
+    if (risk) {
         pipeline.push({ $match: { risk: new mongoose.Types.ObjectId(risk as string) } });
     }
 
     if (bidBy) {
-        pipeline.push({ $match: { bidBy:new mongoose.Types.ObjectId(bidBy as string) } });
+        pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(bidBy as string) } });
     }
 
     if (filter) {
-        pipeline.push({ $match: { $or: [{ bidType: filter },{status:filter}]}});
+        pipeline.push({ $match: { $or: [{ bidType: filter }, { status: filter }] } });
     }
-  
+
     pipeline.push({
         $lookup: {
             from: 'users',
@@ -43,40 +43,40 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
         }
     })
     pipeline.push({
-        $lookup:{
-            from:'lcs',
-            localField:'lc',
-            foreignField:'_id',
+        $lookup: {
+            from: 'lcs',
+            localField: 'lc',
+            foreignField: '_id',
             as: 'lcInfo'
         }
     });
 
     pipeline.push({
-        $lookup:{
-            from:'risks',
-            localField:'risk',
-            foreignField:'_id',
+        $lookup: {
+            from: 'risks',
+            localField: 'risk',
+            foreignField: '_id',
             as: 'risk'
         }
     });
-    
-    if(lcOwner){
+
+    if (lcOwner) {
         pipeline.push({
             $match: { 'lcInfo.createdBy': new mongoose.Types.ObjectId(lcOwner as string) }
         })
     }
 
-    if(riskOwner){
+    if (riskOwner) {
         pipeline.push({
             $match: { 'risk.createdBy': new mongoose.Types.ObjectId(riskOwner as string) }
         })
     }
-    
+
     pipeline.push({
         $project: {
             'lcInfo': [
                 {
-                    $arrayElemAt: ['$lcInfo.createdBy', 0 ]
+                    $arrayElemAt: ['$lcInfo.createdBy', 0]
                 },
                 {
                     $arrayElemAt: ['$lcInfo.issuingBank', 0]
@@ -96,7 +96,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             'updatedAt': 1,
             'isDeleted': 1,
             'bidType': 1,
-            "risk":[
+            "risk": [
                 {
                     $arrayElemAt: ['$risk._id', 0]
                 },
@@ -116,18 +116,18 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
                     $arrayElemAt: ['$risk.createdBy', 0]
                 }
             ],
-            discountBaseRate:1,
-            discountMargin:1,
+            discountBaseRate: 1,
+            discountMargin: 1,
             'confirmationPrice': 1,
             'discountingPrice': 1,
             'bidValidity': 1,
         }
     });
-    
+
     pipeline.push({
         $sort: { createdAt: -1 }
     });
- 
+
     const fetchedBids = await fetchBids({ limit, page, query: pipeline });
 
     // Iterate through fetched bids
@@ -142,78 +142,79 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-
-    if(!req.body.lc && !req.body.risk) return next({
+    if (!req.body.lc && !req.body.risk) return next({
         message: 'lc or risk is required',
         statusCode: STATUS_CODES.BAD_REQUEST
-    })
+    });
 
-    if(req.body.lc){
+    const newBidId = getMongoId();
+
+    if (req.body.lc) {
         console.log("Lc body called");
-        const lc = await findLc({_id: req.body.lc});
-        
-        if(!lc) return next({
+        const lc = await findLc({ _id: req.body.lc });
+        if (!lc) return next({
             message: 'Lc not found',
             statusCode: STATUS_CODES.NOT_FOUND
-        })
-    
-    const isbidExist = await findBid({lc: req.body.lc, status:'Accepted'}); 
-    
-    if(isbidExist) return next({
-        message: 'Lc already accepted a bid',
-        statusCode: STATUS_CODES.BAD_REQUEST
-    })
+        });
 
-    lc.status = 'Pending'
-    await lc.save();
-    
-    } else{
+        const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
+        if (isBidAlreadyAccepted) return next({
+            message: 'Lc already accepted a bid',
+            statusCode: STATUS_CODES.BAD_REQUEST
+        });
+
+        await updateLc({ _id: req.body.lc }, {
+            $set: { status: 'Pending' },
+            $addToSet: { bids: newBidId }
+        });
+    } else {
         console.log("Risk body called");
-        
-        const risk = await findRisk({_id: req.body.risk});
-        if(!risk) return next({
+
+        const risk = await findRisk({ _id: req.body.risk });
+        if (!risk) return next({
             message: 'Risk not found',
             statusCode: STATUS_CODES.NOT_FOUND
         })
 
-        const isbidExist = await findBid({risk: req.body.risk, status:'Accepted'});
+        const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
 
-        if(isbidExist) return next({
+        if (isbidExist) return next({
             message: 'Risk already accepted a bid',
             statusCode: STATUS_CODES.BAD_REQUEST
         })
         risk.status = 'Pending'
         await risk.save();
     }
-    req.body.bidBy = req.user._id;
-    const bid = await createBid(req.body);
+    req.body.bidBy = req.user.business;
+    req.body.createdBy = req.user._id;
+
+    const bid = await createBid({ ...req.body, _id: newBidId });
     generateResponse(bid, 'Bids created successfully', res);
 })
 
 export const deleteBid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const bid = await findBid({_id:req.params.id});
+    const bid = await findBid({ _id: req.params.id });
 
-    if(!bid) return next({
+    if (!bid) return next({
         message: 'Bid not found',
         statusCode: STATUS_CODES.NOT_FOUND
     })
-    bid.isDeleted= true;
+    bid.isDeleted = true;
     await bid.save();
     generateResponse(bid, 'Bids deleted successfully', res);
 })
 
 export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-
-    const bid = await findBid({_id:req.body.id});
+    const bid = await findBid({ _id: req.body.id });
     const key = req.query.key ? req.query.key : 'lc';
-    const status = req.query.status as string; 
+    const status = req.query.status as string;
 
-    if(!req.query.status) return next({
+    if (!req.query.status) return next({
         message: 'status is required in query params',
         statusCode: STATUS_CODES.BAD_REQUEST
     })
 
-    if(!bid) return next({
+    if (!bid) return next({
         message: 'bid not found',
         statusCode: STATUS_CODES.NOT_FOUND
     })
@@ -221,48 +222,47 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
     bid.status = status;
     await bid.save();
 
-    if(bid.status === 'Accepted'){
-        if(key === 'lc'){
-        const bids = await findBids({ _id: { $ne: bid._id }, lc: bid.lc });
+    if (bid.status === 'Accepted') {
+        if (key === 'lc') {
+            await updateBids({
+                $and: [
+                    { _id: { $ne: bid._id } },
+                    { lc: bid.lc }
+                ]
+            }, { status: 'Rejected' });
 
-        bids.forEach(async (bid) => {
-            bid.status = 'Rejected';
-            await bid.save();
-        });
+            const lc = await findLc({ _id: bid.lc }).select('status');
+            lc.status = 'Accepted';
+            await lc.save();
+        } else {
+            await updateBids({
+                $and: [
+                    { _id: { $ne: bid._id } },
+                    { risk: bid.risk }
+                ]
+            }, { status: 'Rejected' });
 
-        const lc = await findLc({_id: bid.lc});
-        lc.status = 'Accepted';
-        await lc.save();
-    }else{
-        const bids = await findBids({ _id: { $ne: bid._id }, risk: bid.risk });
-
-        bids.forEach(async (bid) => {
-            bid.status = 'Rejected';
-            await bid.save();
-        });
-    
-        const risk = await findRisk({_id: bid.risk});
-    
-        if (risk) {
-            risk.status = 'Accepted';
-            await risk.save();
+            const risk = await findRisk({ _id: bid.risk }).select('status');
+            if (risk) {
+                risk.status = 'Accepted';
+                await risk.save();
+            }
         }
     }
-    
-}
+
     generateResponse(bid, 'Bids status Updated', res);
-})
+});
 
 export const findBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user._id;
-    
+
     const data = await BidsStatusCount(userId);
     generateResponse(data, 'Bids count fetched successfully', res);
 })
 
 export const fetchbid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
-    const data = await findBid({_id:id});
+    const data = await findBid({ _id: id });
     generateResponse(data, 'Bid fetched successfully', res);
 })
 

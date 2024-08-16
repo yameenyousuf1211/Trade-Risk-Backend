@@ -3,7 +3,13 @@ import { Document } from "mongoose";
 declare global {
     namespace Express {
         interface Request {
-            user: { _id: string, role: string, email: string, socialId: string };
+            user: {
+                _id: string,
+                role: string,
+                email: string,
+                type: string,
+                business: string
+            };
         }
     }
 }
@@ -17,7 +23,7 @@ export interface IUser extends Document {
     role: string;
     allowBidsNotification?: boolean;
     allowNewRequestNotification?: boolean;
-    fcmTokens:string;
+    fcmTokens: string;
     country?: string;
     phone?: string;
     address?: string;
@@ -43,12 +49,12 @@ export interface IUser extends Document {
     pocDesignation?: string;
     currentBanks?: string[];
     authorizationPocLetter?: string;
-    confirmationLcs?:boolean;
-    discountingLcs?:boolean
-    guaranteesCounterGuarantees?:boolean
-    discountingAvalizedBills?:boolean
-    avalizationExportBills?:boolean
-    riskParticipation:boolean
+    confirmationLcs?: boolean;
+    discountingLcs?: boolean
+    guaranteesCounterGuarantees?: boolean
+    discountingAvalizedBills?: boolean
+    avalizationExportBills?: boolean
+    riskParticipation: boolean
     isDeleted?: boolean;
     createdAt?: Date;
     updatedAt?: Date;

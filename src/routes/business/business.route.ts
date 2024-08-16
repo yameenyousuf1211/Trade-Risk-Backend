@@ -1,17 +1,16 @@
+import { updateBusinessCurrentBanks } from "../../controllers";
 import { Router } from "express";
-import { fetchAllUsers, updateUsers } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLES } from "../../utils/constants";
 
-export default class UserAPI {
+export default class BusinessAPI {
     constructor(private readonly router: Router) {
         this.router = Router();
         this.setupRoutes();
     }
 
     setupRoutes() {
-        this.router.get('/', fetchAllUsers);
-        this.router.put('/', authMiddleware(Object.values(ROLES)), updateUsers);
+        this.router.put('/update-bank', authMiddleware(Object.values(ROLES)), updateBusinessCurrentBanks);
     }
 
     getRouter() {
@@ -19,6 +18,6 @@ export default class UserAPI {
     }
 
     getRouterGroup() {
-        return '/user';
+        return '/business';
     }
 }
