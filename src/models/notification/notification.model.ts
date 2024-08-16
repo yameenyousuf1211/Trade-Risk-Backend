@@ -14,7 +14,6 @@ export interface INotification extends Document {
 export interface CreateNotificationInput {
     title: string;
     message: string;
-    user: string;
     requestId:string;
     senderId:string;
     receiverId:string;

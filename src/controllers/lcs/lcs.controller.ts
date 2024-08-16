@@ -11,6 +11,7 @@ import { ValidationResult, Schema } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
 import { lgValidator } from "../../validation/lcs/lg.validation";
+import { createAndSendNotifications } from "../../utils/notification";
 
 export const fetchAllLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -220,8 +221,13 @@ export const createLcs = asyncHandler(
     req.body.draft = draft;
     req.body.refId = generateRefId();
     req.body.createdBy = req.user._id;
-
     const lcs = await createLc(req.body);
+    const notification={
+      users:req.user._id,title:"New LC Confirmation Request",
+      message:`Ref no ${lcs.refId} from ${lcs?.issuingBank?.bank}`,
+      requestId:null,senderId:req.user._id,receiverId:req.user._id
+    }
+    await createAndSendNotifications(notification,true)
 
     generateResponse(lcs, "Lcs created successfully", res);
   }
@@ -245,6 +251,12 @@ export const createLg = asyncHandler(
       }
     }
     const lg = await createLc(req.body);
+    const notification={
+      users:req.user._id,title:"New LG Confirmation Request",
+      message:`Ref no ${lg.refId} from ${lg?.issuingBank?.bank}`,
+      requestId:null,senderId:req.user._id,receiverId:req.user._id
+    }
+    await createAndSendNotifications(notification,true)
     generateResponse(lg, "Lcs created successfully", res);
   }
 );
