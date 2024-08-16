@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler, generateResponse } from "../../utils/helpers";
+import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, IBid, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
@@ -147,6 +147,8 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         statusCode: STATUS_CODES.BAD_REQUEST
     });
 
+    const newBidId = getMongoId();
+
     if (req.body.lc) {
         console.log("Lc body called");
         const lc = await findLc({ _id: req.body.lc });
@@ -163,7 +165,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
 
         await updateLc({ _id: req.body.lc }, {
             $set: { status: 'Pending' },
-            $addToSet: { bids: req.body._id }
+            $addToSet: { bids: newBidId }
         });
     } else {
         console.log("Risk body called");
@@ -183,8 +185,10 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         risk.status = 'Pending'
         await risk.save();
     }
-    req.body.bidBy = req.user._id;
-    const bid = await createBid(req.body);
+    req.body.bidBy = req.user.business;
+    req.body.createdBy = req.user._id;
+
+    const bid = await createBid({ ...req.body, _id: newBidId });
     generateResponse(bid, 'Bids created successfully', res);
 })
 

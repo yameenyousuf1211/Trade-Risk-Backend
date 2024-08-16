@@ -30,6 +30,7 @@ const bidSchema: Schema = new Schema({
     confirmationPrice: Number,
     discountingPrice: Number,
     bidBy: { type: Schema.Types.ObjectId, ref: 'Business' },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     discountMargin: Number,
     discountBaseRate: String,
     perAnnum: Boolean,
