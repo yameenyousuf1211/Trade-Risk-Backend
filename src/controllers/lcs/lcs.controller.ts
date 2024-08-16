@@ -244,10 +244,13 @@ export const createLg = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const draft = req.body.draft;
 
-    req.body.refId = generateRefId();
-    req.body.createdBy = req.user._id;
+    req.body.createdBy = req.user.business;
+
 
     if (!draft) {
+      const countLcs = await lcsCount({ draft: false });
+      req.body.refId = countLcs + 1;
+
       const { error }: ValidationResult = lgValidator.validate(req.body);
       if (error) return next({
         statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
