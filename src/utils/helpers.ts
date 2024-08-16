@@ -36,7 +36,7 @@ export const getMongoosePaginatedData = async (
       page?: number,
       limit?: number,
       query?: Record<string, any>,
-      populate?: string | any[],
+      populate?: any,
       select?: string,
       sort?: Record<string, any>,
     }) => {

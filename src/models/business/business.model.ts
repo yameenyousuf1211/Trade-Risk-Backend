@@ -30,9 +30,7 @@ const BusinessSchema: Schema = new Schema({
         annualValueExports: Number,
         annualValueImports: Number
     },
-    currentBanks: {
-        type: [{ name: String, country: String, city: String }]
-    },
+    currentBanks: { type: [{ name: String, country: String, city: String }], _id: false },
     bank: { type: String, },
     accountNumber: { type: Number },
     accountHolderName: { type: String },
@@ -48,6 +46,7 @@ const BusinessSchema: Schema = new Schema({
 const BusinessModel = model('Business', BusinessSchema);
 
 export const createBusiness = (obj: any): Promise<any> => BusinessModel.create(obj);
+export const updateBusiness = (query: any, obj: any) => BusinessModel.findOneAndUpdate(query, obj, { new: true });
 // export const createBank = (obj:any): Promise<any> => BusinessModel.create(obj);
 // export const findBank = (query: Record<string, any>): any => BusinessModel.findOne(query);
 // // export const findBank = (query: Record<string, any>): QueryWithHelpers<any, Document<any, any, any>> => BankModel.findOne(query);
