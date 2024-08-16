@@ -48,11 +48,11 @@ const LcsSchema: Schema = new Schema({
     other: String,
   },
   paymentTerms: String,
-  issuingBank: {
+  issuingBanks: [{
     bank: String,
     country: String,
     swiftCode: String,
-  },
+  }],
   advisingBank: {
     bank: String,
     country: String,
@@ -101,7 +101,7 @@ const LcsSchema: Schema = new Schema({
   // Assuming an array of strings for attachment URLs
   attachments: [String],
   draft: Boolean,
-  status: { type: String, enum: ["Expired", "Accepted", "Add bid"], default: "Add bid" },
+  status: { type: String, enum: ["Pending", "Expired", "Accepted", "Add bid"], default: "Add bid" },
   lgIssuance: String,
   applicantDetails: {
     country: String,
@@ -114,7 +114,7 @@ const LcsSchema: Schema = new Schema({
     address: String,
     phoneNumber: String,
   },
-  lgDetailsType: String,
+  lgDetailsType: String,  //
   bidBond: bondSchema,
   advancePaymentBond: bondSchema,
   performanceBond: bondSchema,
@@ -149,6 +149,8 @@ const LcsSchema: Schema = new Schema({
   physicalLg: Boolean,
   physicalLgCountry: String,
   physicalLgSwiftCode: String,
+
+  bids: { type: [Schema.Types.ObjectId], ref: "Bid", default: [] },
 }, { timestamps: true, versionKey: false });
 
 LcsSchema.plugin(mongoosePaginate);
@@ -160,12 +162,11 @@ export const fetchLcs = async ({
   query,
   page,
   limit,
-  populate,
 }: IPaginationFunctionParams): Promise<IPaginationResult<ILcs>> => {
   const { data, pagination }: IPaginationResult<ILcs> =
     await getMongooseAggregatePaginatedData({
       model: LcsModel,
-      query: [query],
+      query,
       page,
       limit,
     });
@@ -184,7 +185,6 @@ export const findLc = (
   }
   return queryBuilder;
 };
-export const updateLc = (
-  query: Record<string, any>,
-  update: Record<string, any>
-): QueryWithHelpers<any, Document> => LcsModel.findOneAndUpdate(query, update);
+export const updateLc = (query: any, update: any) => LcsModel.findOneAndUpdate(query, update, { new: true });
+
+export const lcsCount = (query?: any) => LcsModel.countDocuments(query);
