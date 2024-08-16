@@ -5,7 +5,7 @@ import {
   generateResponse,
 } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
-import { createLc, fetchLcs, findBid, findLc, updateLc } from "../../models";
+import { createLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
 import mongoose from "mongoose";
 import { ValidationResult, Schema } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
@@ -23,7 +23,9 @@ export const fetchAllLcs = asyncHandler(
     const status = req.query.status;
     const lc = req.query.lc;
 
-    let pipeline: any = [{ $match: { isDeleted: false, draft } }];
+    let pipeline: any = [
+      { $match: { isDeleted: false, draft } }
+    ];
 
     if (lc)
       pipeline.push({
@@ -204,25 +206,18 @@ export const fetchAllLcs = asyncHandler(
 
 export const createLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.body.draft === "true" ? true : false;
-
-    if (!draft) {
+    if (!req.body.draft) {
       const { error }: ValidationResult = lcsValidator.validate(req.body);
-      if (error) {
-        const customError: CustomError = {
-          statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-          message: error.details[0].message.replace(/"/g, ""),
-        };
-        return next(customError);
-      }
+      if (error) return next({
+        statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+        message: error.details[0].message,
+      });
     }
-
-    req.body.draft = draft;
-    req.body.refId = generateRefId();
-    req.body.createdBy = req.user._id;
+    const countLcs = await lcsCount({ draft: false });
+    req.body.refId = countLcs + 1;
+    req.body.createdBy = req.user.business;
 
     const lcs = await createLc(req.body);
-
     generateResponse(lcs, "Lcs created successfully", res);
   }
 );
