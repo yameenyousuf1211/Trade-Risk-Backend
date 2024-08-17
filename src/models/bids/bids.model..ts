@@ -41,6 +41,12 @@ const bidSchema: Schema = new Schema({
         default: 'Pending'
     },
     approvalStatus: { type: String, enum: ['Pending', 'Approved', 'Rejected'] },
+    bids: [{
+        bank: String,
+        bidType: { type: String, enum: ['Bid Bond', 'Advance Payment Bond', 'Performance Bond', 'Retention Money Bond', 'Other Bond'] },
+        price: Number,
+        status: { type: String, enum: ['Pending', 'Rejected', 'Accepted'] },
+    }],
 }, { timestamps: true, versionKey: false });
 
 bidSchema.plugin(mongoosePaginate);

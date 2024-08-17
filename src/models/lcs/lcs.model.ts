@@ -120,6 +120,7 @@ const LcsSchema: Schema = new Schema({
   performanceBond: bondSchema,
   retentionMoneyBond: bondSchema,
   otherBond: bondSchema,
+  
   beneficiaryBanksDetails: {
     bank: String,
     swiftCode: String,
