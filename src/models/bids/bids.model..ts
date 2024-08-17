@@ -39,6 +39,7 @@ const bidSchema: Schema = new Schema({
         enum: ['Pending', 'Expired', 'Rejected', 'Accepted'],
         default: 'Pending'
     },
+    isApproved: { type: Boolean, default: false },
 }, { timestamps: true, versionKey: false });
 
 bidSchema.plugin(mongoosePaginate);

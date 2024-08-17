@@ -140,12 +140,13 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
-
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.lc && !req.body.risk) return next({
         message: 'lc or risk is required',
         statusCode: STATUS_CODES.BAD_REQUEST
     });
+
+    const role = req.user.role;
 
     const newBidId = getMongoId();
 
@@ -163,10 +164,12 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-        await updateLc({ _id: req.body.lc }, {
-            $set: { status: 'Pending' },
-            $addToSet: { bids: newBidId }
-        });
+        if (role === 'admin') {
+            await updateLc({ _id: req.body.lc }, {
+                $set: { status: 'Pending' },
+                $addToSet: { bids: newBidId }
+            });
+        }
     } else {
         console.log("Risk body called");
 
@@ -188,7 +191,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     req.body.bidBy = req.user.business;
     req.body.createdBy = req.user._id;
 
-    const bid = await createBid({ ...req.body, _id: newBidId });
+    const bid = await createBid({ ...req.body, _id: newBidId, isApproved: role === 'admin' });
     generateResponse(bid, 'Bids created successfully', res);
 })
 
