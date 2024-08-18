@@ -47,10 +47,11 @@ export const createLcs = asyncHandler(
     req.body.createdBy = req.user.business;
 
     const lcs = await createLc(req.body);
+    let issuingBankNames = req.body.issuingBanks.map((x: any) => `${x.bank}, ${x.country}`).join(' & ');
     const notification={
       users:req.user._id,title:"New LC Confirmation Request",
-      message:`Ref no ${lcs.refId} from ${lcs?.issuingBank?.bank}`,
-      requestId:null,senderId:req.user._id,receiverId:req.user._id
+      message:`Ref no ${lcs.refId} from ${issuingBankNames}`,
+      requestId:null,senderId:req.user._id,receiverId:[]
     }
     await createAndSendNotifications(notification,true)
     generateResponse(lcs, "Lcs created successfully", res);
@@ -75,10 +76,11 @@ export const createLg = asyncHandler(
     }
 
     const lg = await createLc(req.body);
+    let issuingBankNames = req.body.issuingBanks.map((x: any) => `${x.bank}, ${x.country}`).join(' & ');
     const notification={
       users:req.user._id,title:"New LG Confirmation Request",
-      message:`Ref no ${lg.refId} from ${lg?.issuingBank?.bank}`,
-      requestId:null,senderId:req.user._id,receiverId:req.user._id
+      message:`Ref no ${lg.refId} from ${issuingBankNames}`,
+      requestId:null,senderId:req.user._id,receiverId:[]
     }
     await createAndSendNotifications(notification,true)
     generateResponse(lg, "Lcs created successfully", res);

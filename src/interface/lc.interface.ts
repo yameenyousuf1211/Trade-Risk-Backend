@@ -16,10 +16,10 @@ interface ILcs extends Document {
         other?: string;
     };
     paymentTerms?: string;
-    issuingBank?: {
+    issuingBank?: [{
         bank?: string;
         country?: string;
-    };
+    }];
     advisingBank?: {
         bank?: string;
         country?: string;
