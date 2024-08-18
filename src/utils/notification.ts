@@ -16,9 +16,10 @@ interface NotificationParams {
 
 export const createAndSendNotifications = async ({  users, title,message, requestId,senderId,receiverId }:any,sendToAll:any) => {
   if(sendToAll){
-    const query: object = { role: { $ne: ROLES.ADMIN }, isDeleted: false};
+    const query: object = { role: ROLES.BANK, isDeleted: false,allowNotification:true};
     const usersData = await getAllUsers({query,page:1,limit:10000})  //TODO how to find all users without passing limit ?
     users = usersData.data.map((user:any) => user._id);
+    receiverId = users;  
   }
     let fcmTokens = await getFcmTokens(users);
     fcmTokens = fcmTokens.flat();
