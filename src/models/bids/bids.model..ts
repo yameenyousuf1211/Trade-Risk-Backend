@@ -15,7 +15,8 @@ export interface IBid extends Document {
     bidBy: string
     status: string;
     updatedAt: Date;
-    risk: string
+    risk: string;
+    approvalStatus: string;
 }
 
 // Define the bid schema
@@ -39,6 +40,13 @@ const bidSchema: Schema = new Schema({
         enum: ['Pending', 'Expired', 'Rejected', 'Accepted'],
         default: 'Pending'
     },
+    approvalStatus: { type: String, enum: ['Pending', 'Approved', 'Rejected'] },
+    bids: [{
+        bank: String,
+        bidType: { type: String, enum: ['Bid Bond', 'Advance Payment Bond', 'Performance Bond', 'Retention Money Bond', 'Other Bond'] },
+        price: Number,
+        status: { type: String, enum: ['Pending', 'Rejected', 'Accepted'] },
+    }],
 }, { timestamps: true, versionKey: false });
 
 bidSchema.plugin(mongoosePaginate);

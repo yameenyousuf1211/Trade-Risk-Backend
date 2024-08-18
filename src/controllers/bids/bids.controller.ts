@@ -140,12 +140,13 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
-
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.lc && !req.body.risk) return next({
         message: 'lc or risk is required',
         statusCode: STATUS_CODES.BAD_REQUEST
     });
+
+    const role = req.user.role;
 
     const newBidId = getMongoId();
 
@@ -163,10 +164,13 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-        await updateLc({ _id: req.body.lc }, {
-            $set: { status: 'Pending' },
-            $addToSet: { bids: newBidId }
-        });
+        if (role === 'admin') {
+            const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: newBidId } });
+            if (!updatedLc) return next({
+                message: 'Lc not found',
+                statusCode: STATUS_CODES.NOT_FOUND
+            });
+        }
     } else {
         console.log("Risk body called");
 
@@ -188,7 +192,9 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     req.body.bidBy = req.user.business;
     req.body.createdBy = req.user._id;
 
-    const bid = await createBid({ ...req.body, _id: newBidId });
+    const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
+
+    const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
     generateResponse(bid, 'Bids created successfully', res);
 })
 
@@ -266,3 +272,20 @@ export const fetchbid = asyncHandler(async (req: Request, res: Response, next: N
     generateResponse(data, 'Bid fetched successfully', res);
 })
 
+export const approvedOrRejectBidsByBankAdmin = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { bidId } = req.params;
+    const { status } = req.body;
+
+    const bid = await findBid({ _id: bidId, approvalStatus: 'Pending' });
+    if (!bid) return next({
+        message: 'Bid not found',
+        statusCode: STATUS_CODES.NOT_FOUND
+    });
+
+    bid.approvalStatus = status;
+    await bid.save();
+
+
+    await updateLc({ _id: bid.lc, status: 'Add bid' }, { $addToSet: { bids: bidId } });
+    generateResponse(bid, 'Bids created successfully', res);
+})

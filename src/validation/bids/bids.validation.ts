@@ -3,13 +3,14 @@ import { validateRequest } from '../../middlewares/validation.middleware';
 
 const bidsValidator = joi.object({
   bidType: joi.string().required(),
-  bidValidity: joi.date().required(),
-  confirmationPrice: joi.number().required(),
+  bidValidity: joi.date(),
+  confirmationPrice: joi.number(),
   lc: joi.string().optional(),
   perAnnum: joi.boolean().optional(),
   risk: joi.string().optional(),
-  discountMargin:joi.number().optional(),
-  discountBaseRate:joi.string().optional()
+  discountMargin: joi.number().optional(),
+  discountBaseRate: joi.string().optional(),
+  bids: joi.array().items().optional(),
 });
 
 export const bidsValidation = validateRequest(bidsValidator);
