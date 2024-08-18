@@ -2,7 +2,7 @@ import { createNotification, getAllUsers, getFcmTokens } from "../models";
 import { ROLES } from "./constants";
 
 const admin = require('firebase-admin');
-const serviceAccount = require('path-to-json');
+const serviceAccount = require('../../traderisk-463ed-firebase-adminsdk-g2ow6-9cdef4d862.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
