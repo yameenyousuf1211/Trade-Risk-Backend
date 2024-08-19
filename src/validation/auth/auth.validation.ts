@@ -39,11 +39,17 @@ const registerValidator = joi.object({
                 'any.custom': 'Invalid phone number'
             }), otherwise: joi.forbidden()
         }),
-        commercialRegistrationNumber: joi.string().when('type', {
-            is: 'corporate',
-            then: joi.required(),
-            otherwise: joi.forbidden()
-        }),
+        commercialRegistrationNumber: joi.string()
+            .pattern(/^\d{4,}$/) // Ensures at least 4 digits
+            .when('type', {
+                is: 'corporate',
+                then: joi.required(),
+                otherwise: joi.forbidden()
+            })
+            .messages({
+                'string.pattern.base': 'Commercial Registration Number must contain at least 4 digits'
+            }),
+
         constitution: joi.string().valid('partnership', 'public_limited_co', 'limited_liability_co', 'individual_proprietorship_co').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         businessType: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         productInfo: joi.object({
