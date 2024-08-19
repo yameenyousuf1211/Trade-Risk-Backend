@@ -1,6 +1,6 @@
 import { currentUser, login, logout, register } from "../../controllers";
 import { Router } from "express";
-// import { loginValidation, registerValidation } from "../../validation/auth/auth.validation";
+import { loginValidation, registerValidation } from "../../validation/auth/auth.validation";
 import { upload } from "../../utils/multer";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLES } from "../../utils/constants";
@@ -12,8 +12,8 @@ export default class AuthAPI {
     }
 
     setupRoutes() {
-        this.router.post('/register', register);
-        this.router.post('/login', login);
+        this.router.post('/register', registerValidation, register);
+        this.router.post('/login', loginValidation, login);
         this.router.get('/current-user', authMiddleware(Object.values(ROLES)), currentUser)
         this.router.post('/logout', authMiddleware(Object.values(ROLES)), logout);
     }
