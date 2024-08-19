@@ -2,7 +2,7 @@ import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 
 const registerValidator = joi.object({
-    role: joi.string().valid('bank','corporate').required(),
+    role: joi.string().valid('bank', 'corporate').required(),
     name: joi.string().required(),
     email: joi.string().email({ minDomainSegments: 2 }).required().trim(),
     address: joi.string().min(1).required(),
@@ -17,6 +17,11 @@ const registerValidator = joi.object({
         otherwise: joi.required(),
     }),
     phone: joi.string().max(15).when('role', {
+        is: 'bank',
+        then: joi.forbidden(),
+        otherwise: joi.required(),
+    }),
+    commercialRegistrationNumber: joi.string().when('role', {
         is: 'bank',
         then: joi.forbidden(),
         otherwise: joi.required(),
@@ -111,7 +116,7 @@ const registerValidator = joi.object({
         then: joi.boolean().required(),
         otherwise: joi.forbidden(),
     }),
-    businessNature:joi.when('role', {
+    businessNature: joi.when('role', {
         is: 'bank',
         then: joi.forbidden(),
         otherwise: joi.string().required(),
@@ -120,7 +125,7 @@ const registerValidator = joi.object({
 });
 
 const loginValidator = joi.object({
-    email: joi.string().email({minDomainSegments:2}).required().trim(),
+    email: joi.string().email({ minDomainSegments: 2 }).required().trim(),
     password: joi.string().min(6).required(),
     fcmToken: joi.string().optional(),
 });
@@ -129,4 +134,4 @@ const registerValidation = [validateRequest(registerValidator)];
 const loginValidation = validateRequest(loginValidator);
 
 
-export {registerValidation,loginValidation}
+export { registerValidation, loginValidation }

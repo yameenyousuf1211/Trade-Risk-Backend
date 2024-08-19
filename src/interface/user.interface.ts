@@ -27,6 +27,7 @@ export interface IUser extends Document {
     country?: string;
     phone?: string;
     address?: string;
+    commercialRegistrationNumber?: string;
     constitution?: string;
     password?: string;
     bank?: string;
