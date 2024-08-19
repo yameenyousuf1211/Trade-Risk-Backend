@@ -36,7 +36,7 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 export const login = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const body = parseBody(req.body);
 
-    let user = await findUser({ email: body?.email }).select('+password');
+    let user = await findUser({ email: body?.email }).populate('business').select('+password');
     if (!user) return next({
         statusCode: STATUS_CODES.BAD_REQUEST,
         message: 'Invalid email or password'
