@@ -16,12 +16,13 @@ export const fetchAllLcs = asyncHandler(
     const page = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
 
-    const filters: any[] = [{ draft: false }];
+    const filters: any[] = [];
+    if (req.query.draft) filters.push({ draft: true });
     if (req.query.type) filters.push({ type: req.query.type });
     if (req.query.refId) filters.push({ refId: req.query.refId });
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
 
-    const query = { $and: filters };
+    const query = filters.length > 0 ? { $and: filters } : {};
     const populate = {
       path: "bids",
       populate: { 'path': 'bidBy' }
