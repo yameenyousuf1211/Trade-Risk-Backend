@@ -45,7 +45,8 @@ const bidSchema: Schema = new Schema({
         bank: String,
         bidType: { type: String, enum: ['Bid Bond', 'Advance Payment Bond', 'Performance Bond', 'Retention Money Bond', 'Other Bond'] },
         price: Number,
-        status: { type: String, enum: ['Pending', 'Rejected', 'Accepted'] },
+        perAnnum: Boolean,
+        status: { type: String, enum: ['Pending', 'Rejected', 'Accepted'], default: 'Pending' },
     }],
 }, { timestamps: true, versionKey: false });
 
