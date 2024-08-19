@@ -8,6 +8,7 @@ import BidsAPI from "./bids/bids.route";
 import CountryAPI from "./country/country.route";
 import RiskAPI from "./risk/risk.route";
 import NotificationAPI from "./notification/notification.route";
+import FIREBASESTORAGEAPI from "./firebaseStorage/firebaseStorage.route";
 import RoleAPI from "./role/role.route";
 import BusinessAPI from "./business/business.route";
 
@@ -32,6 +33,7 @@ export default class API {
         routeGroups.push(new CountryAPI(router));
         routeGroups.push(new RiskAPI(router));
         routeGroups.push(new NotificationAPI(router));
+        routeGroups.push(new FIREBASESTORAGEAPI(router));
         routeGroups.push(new RoleAPI(router));
         routeGroups.push(new BusinessAPI(router));
     }

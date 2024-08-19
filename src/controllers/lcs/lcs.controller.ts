@@ -11,7 +11,7 @@ import { ValidationResult, Schema } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
 import { lgValidator } from "../../validation/lcs/lg.validation";
-import { createAndSendNotifications } from "../../utils/notification";
+import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
 
 export const fetchAllLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

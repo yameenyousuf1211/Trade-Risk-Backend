@@ -3,7 +3,6 @@ import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail 
 import { createBanks, createUser, findUser, updateUser } from "../../models";
 import { ROLES, STATUS_CODES } from "../../utils/constants";
 import { IBank } from "../../interface";
-import uploadOnCloudinary from "../../utils/cloundinary";
 import { createBusiness } from "../../models/business/business.model";
 
 interface FileArray {

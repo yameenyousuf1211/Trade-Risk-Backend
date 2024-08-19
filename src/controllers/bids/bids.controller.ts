@@ -4,7 +4,7 @@ import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findR
 import { STATUS_CODES } from "../../utils/constants";
 
 import mongoose, { PipelineStage } from "mongoose";
-import { createAndSendNotifications } from "../../utils/notification";
+import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
