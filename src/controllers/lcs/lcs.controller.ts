@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
   asyncHandler,
-  generateRefId,
   generateResponse,
 } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
@@ -17,12 +16,12 @@ export const fetchAllLcs = asyncHandler(
     const page = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
 
-    const filters: any[] = [];
+    const filters: any[] = [{ draft: false }];
     if (req.query.type) filters.push({ type: req.query.type });
     if (req.query.refId) filters.push({ refId: req.query.refId });
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
 
-    const query = filters.length > 0 ? { $and: filters } : {};
+    const query = { $and: filters };
     const populate = {
       path: "bids",
       populate: { 'path': 'bidBy' }
