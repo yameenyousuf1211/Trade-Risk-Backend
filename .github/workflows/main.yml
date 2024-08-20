@@ -26,6 +26,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
+    - run: echo '${{secrets.PROD_ENV}}' > .env
     - run: npm run build
     - run: pm2 restart apis-trade-risk-prod
   
