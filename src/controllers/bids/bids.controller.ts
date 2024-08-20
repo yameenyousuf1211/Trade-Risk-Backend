@@ -16,7 +16,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const filter = [];
     if (bidBy) filter.push({ bidBy: bidBy });
     if (lc) filter.push({ lc: lc });
-    // If the filter array is empty, remove $and from the query
+    
     const query: { [key: string]: any } = filter.length > 0 ? { $and: filter } : {};
     
     const populate = [
