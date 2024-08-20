@@ -34,6 +34,7 @@ export const fetchAllLcs = asyncHandler(
   });
 
 export const createLcOrLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  
   if (!req.body.type) return next({
     statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
     message: "Type is required",
@@ -41,8 +42,6 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
 
   const isLc = req.body.type.toLowerCase().includes("lc");
   const lcOrLgValidation = isLc ? lcsValidator : lgValidator;
-
-  console.log('isLc >>>>>>>>>>> ', isLc);
 
   if (!req.body.draft) {
     const { error }: ValidationResult = lcOrLgValidation.validate(req.body);
@@ -101,11 +100,11 @@ export const fetchLc = asyncHandler(async (req: Request, res: Response, next: Ne
 
 export const statusCheck = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.user._id;
+    const id = req.user.business;
+    console.log("id", id);
+    
     const requestId = req.params.requestId;
     const key = req.query.key ? req.query.key : "lc";
-
-    console.log("testing", requestId);
 
     let bid;
 

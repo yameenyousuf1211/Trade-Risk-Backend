@@ -3,6 +3,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongooseAggregatePaginatedData, getMongoosePaginatedData } from "../../utils/helpers";
+import { get } from 'axios';
 
 export interface IBid extends Document {
     bidType: string;
@@ -64,8 +65,8 @@ export const updateBid = (query: Record<string, any>, update: Record<string, any
 
 export const fetchBids = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<IBid>> => {
-    const { data, pagination }: IPaginationResult<IBid> = await getMongooseAggregatePaginatedData({
-        model: BidModel, query: [query], page, limit,
+    const { data, pagination }: IPaginationResult<IBid> = await getMongoosePaginatedData({
+        model: BidModel, query, page, limit,populate
     });
 
     return { data, pagination };
