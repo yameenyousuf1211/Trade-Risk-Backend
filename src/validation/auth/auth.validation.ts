@@ -1,125 +1,79 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
+import phone from 'phone';
 
 const registerValidator = joi.object({
-    role: joi.string().valid('bank','corporate').required(),
     name: joi.string().required(),
     email: joi.string().email({ minDomainSegments: 2 }).required().trim(),
-    address: joi.string().min(1).required(),
-    constitution: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }).valid('partnership', 'public_limited_co', 'limited_liability_co', 'individual_proprietorship_co'),
-    businessType: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    phone: joi.string().max(15).when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    bank: joi.string().required().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    swiftCode: joi.string().required(),
-    accountNumber: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    accountHolderName: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    accountCountry: joi.string().required(),
-    accountCity: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    productInfo: joi.object({
-        products: joi.array().items(joi.string()).required(),
-        annualSalary: joi.number().required(),
-        annualValueExports: joi.number().required(),
-        annualValueImports: joi.number().required(),
-    }).when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    pocEmail: joi.string().email({ minDomainSegments: 2 }).required().trim(),
-    pocPhone: joi.string().required(),
-    pocName: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    poc: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    pocDesignation: joi.string().when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    currentBanks: joi.array().items(
-        joi.object({
-            name: joi.string().required(),
-            country: joi.string().required(),
-            city: joi.string().required(),
-        })
-    ).when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.required(),
-    }),
-    confirmationLcs: joi.when('role', {
-        is: 'bank',
-        then: joi.boolean().required(),
-        otherwise: joi.forbidden(),
-    }),
-    discountingLcs: joi.when('role', {
-        is: 'bank',
-        then: joi.boolean().required(),
-        otherwise: joi.forbidden(),
-    }),
-    guaranteesCounterGuarantees: joi.when('role', {
-        is: 'bank',
-        then: joi.boolean().required(),
-        otherwise: joi.forbidden(),
-    }),
-    discountingAvalizedBills: joi.when('role', {
-        is: 'bank',
-        then: joi.boolean().required(),
-        otherwise: joi.forbidden(),
-    }),
-    avalizationExportBills: joi.when('role', {
-        is: 'bank',
-        then: joi.boolean().required(),
-        otherwise: joi.forbidden(),
-    }),
-    riskParticipation: joi.when('role', {
-        is: 'bank',
-        then: joi.boolean().required(),
-        otherwise: joi.forbidden(),
-    }),
-    businessNature:joi.when('role', {
-        is: 'bank',
-        then: joi.forbidden(),
-        otherwise: joi.string().required(),
-    })
+    role: joi.string().valid('admin', 'user').required(),
+    type: joi.string().valid('corporate', 'bank').required(),
+    fcmTokens: joi.array().items(joi.string()).required(),
+
+    businessData: joi.object({
+        name: joi.string().required(),
+        email: joi.string().email({ minDomainSegments: 2 }).required().trim(),
+        type: joi.string().valid('corporate', 'bank').required(),
+        address: joi.string().required(),
+        country: joi.string().required(),
+        swiftCode: joi.string().required(),
+        pocEmail: joi.string().email({ minDomainSegments: 2 }).required().trim(),
+        pocPhone: joi.string().required(),
+        pocName: joi.string().required(),
+
+        // Bank specific fields
+        confirmationLcs: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
+        discountingLcs: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
+        guaranteesCounterGuarantees: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
+        discountingAvalizedBills: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
+        avalizationExportBills: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
+        riskParticipation: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
+
+        // Corporate specific fields
+        phone: joi.string().when('type', {
+            is: 'corporate',
+            then: joi.string().required().custom((value, helpers) => {
+                const { isValid } = phone(value);
+                if (!isValid) {
+                    return helpers.error('any.custom', { message: 'Invalid phone number' });
+                } return value;
+            }).messages({
+                'any.custom': 'Invalid phone number'
+            }), otherwise: joi.forbidden()
+        }),
+        commercialRegistrationNumber: joi.string().min(4)
+            .when('type', {
+                is: 'corporate',
+                then: joi.required(),
+                otherwise: joi.forbidden()
+            }),
+        constitution: joi.string().valid('partnership', 'public_limited_co', 'limited_liability_co', 'individual_proprietorship_co').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        businessType: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        productInfo: joi.object({
+            products: joi.array().items(joi.string()).required(),
+            annualSalary: joi.number().required(),
+            annualValueExports: joi.number().required(),
+            annualValueImports: joi.number().required(),
+        }).when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        currentBanks: joi.array().items(
+            joi.object({
+                name: joi.string().required(),
+                country: joi.string().required(),
+                city: joi.string().required(),
+            })
+        ).when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        bank: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        accountNumber: joi.number().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        accountHolderName: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        accountCountry: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        accountCity: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        businessNature: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        poc: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        pocDesignation: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+    }).required(),
 });
 
 const loginValidator = joi.object({
-    email: joi.string().email({minDomainSegments:2}).required().trim(),
+    email: joi.string().email({ minDomainSegments: 2 }).required().trim(),
     password: joi.string().min(6).required(),
     fcmToken: joi.string().optional(),
 });
@@ -128,4 +82,4 @@ const registerValidation = [validateRequest(registerValidator)];
 const loginValidation = validateRequest(loginValidator);
 
 
-export {registerValidation,loginValidation}
+export { registerValidation, loginValidation }

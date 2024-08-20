@@ -3,7 +3,13 @@ import { Document } from "mongoose";
 declare global {
     namespace Express {
         interface Request {
-            user: { _id: string, role: string, email: string, socialId: string };
+            user: {
+                _id: string,
+                role: string,
+                email: string,
+                type: string,
+                business: string
+            };
         }
     }
 }
@@ -17,10 +23,11 @@ export interface IUser extends Document {
     role: string;
     allowBidsNotification?: boolean;
     allowNewRequestNotification?: boolean;
-    gcmTokens: IGcmToken[];
+    fcmTokens: string;
     country?: string;
     phone?: string;
     address?: string;
+    commercialRegistrationNumber?: string;
     constitution?: string;
     password?: string;
     bank?: string;
@@ -43,26 +50,13 @@ export interface IUser extends Document {
     pocDesignation?: string;
     currentBanks?: string[];
     authorizationPocLetter?: string;
-    confirmationLcs?:boolean;
-    discountingLcs?:boolean
-    guaranteesCounterGuarantees?:boolean
-    discountingAvalizedBills?:boolean
-    avalizationExportBills?:boolean
-    riskParticipation:boolean
+    confirmationLcs?: boolean;
+    discountingLcs?: boolean
+    guaranteesCounterGuarantees?: boolean
+    discountingAvalizedBills?: boolean
+    avalizationExportBills?: boolean
+    riskParticipation: boolean
     isDeleted?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
-}
-
-
-interface IKeys {
-    auth: string;
-    p256dh: string;
-}
-
-// Define the TypeScript interface for GcmToken
-export interface IGcmToken {
-    endpoint: string;
-    expirationTime: Date | null;
-    keys: IKeys;
 }

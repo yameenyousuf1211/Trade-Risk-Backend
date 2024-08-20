@@ -13,10 +13,10 @@ export interface IPaginationResult<T> {
 }
 
 export interface IPaginationFunctionParams {
-    query?: Record<string, any>,
+    query?: any, //Record<string, any>,
     page?: number,
     limit?: number,
-    populate?: string | any[],
+    populate?: any,
     select?: string,
     sort?: Record<string, any>,
 }
