@@ -161,12 +161,11 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Lc not found',
             statusCode: STATUS_CODES.NOT_FOUND
         });
-        const bidder=await findUser({_id:req.user._id});
         notification={
             users:lc.createdBy,
-            title:`${bidder.name}`,
+            title:`${req.user.name}`,
             message:` has added a bid on your LC refId ${lc.refId}`,
-            requestId:null,senderId:bidder._id,receiverId:lc.createdBy
+            requestId:lc._id,senderId:req.user._id,receiverId:lc.createdBy
         }
 
         const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
@@ -190,12 +189,11 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Risk not found',
             statusCode: STATUS_CODES.NOT_FOUND
         })
-        const bidder=await findUser({_id:req.user._id});
         notification={
             users:risk.createdBy,
-            title:`${bidder.name}`,
+            title:`${req.user.name}`,
             message:` has added a bid on your RISK ${risk.transaction}`,
-            requestId:null,senderId:bidder._id,receiverId:risk.createdBy
+            requestId:null,senderId:req.user._id,receiverId:risk.createdBy
         }
 
         const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
@@ -213,7 +211,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
 
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
-    await createAndSendNotifications(notification, false);
+    await createAndSendNotifications(notification, false,req.user.type);
     generateResponse(bid, 'Bids created successfully', res);
 })
 

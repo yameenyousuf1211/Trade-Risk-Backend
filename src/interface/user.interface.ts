@@ -9,7 +9,7 @@ declare global {
                 role: string,
                 email: string,
                 type: string,
-                business: string
+                business: any
             };
         }
     }

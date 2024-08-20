@@ -1,7 +1,7 @@
-import { createNotification, getAllUsers, getFcmTokens } from "../models";
+import { createNotification, findUser, getAllUsers, getFcmTokens } from "../models";
 import { ROLES } from "./constants";
 const admin = require('firebase-admin');
-const serviceAccount = require('path-to-json');
+const serviceAccount = require('../../traderisk-463ed-firebase-adminsdk-g2ow6-9cdef4d862.json');
 require('dotenv').config()
 
 admin.initializeApp({
@@ -15,20 +15,32 @@ interface NotificationParams {
     token: any;
 }
 
-export const createAndSendNotifications = async ({  users, title,message, requestId,senderId,receiverId }:any,sendToAll:any) => {
+export const createAndSendNotifications = async ({  users, title,message, requestId,senderId,receiverId }:any,sendToAll:boolean,userType:string) => {
   if(sendToAll){
-    const query: object = { role: ROLES.BANK, isDeleted: false,allowNotification:true};
-    const usersData = await getAllUsers({query,page:1,limit:10000})  //TODO how to find all users without passing limit ?
-    users = usersData.data.map((user:any) => user._id);
-    receiverId = users;  
+    users=[];
+    const query: object = { type: userType};
+    const usersData = await getAllUsers({query,page:1,limit:10000})  
+      await Promise.all(usersData.data.map(async (user: any) => {
+      const notification = await createNotification({
+          title,
+          message,
+          requestId,
+          senderId,
+          receiverId: user._id || '',
+      });
+
+      users.push(user._id);
+      return notification;
+  }));
   }
-    let fcmTokens = await getFcmTokens(users);
-    fcmTokens = fcmTokens.flat();
-    const notification = await createNotification({ title, message,requestId,senderId,receiverId  });
+  else{
+    users=await findUser({'business':users});
+    await createNotification({title, message, requestId,senderId,receiverId: receiverId});
+  }
+  let fcmTokens = await getFcmTokens(users);
+  fcmTokens = fcmTokens.flat();
 
-    sendFirebaseNotification({ title,body:message, token:fcmTokens });
-
-    return notification;
+  sendFirebaseNotification({ title,body:message, token:fcmTokens });
 }
 
 export const sendFirebaseNotification = async ({ title, body, token }:NotificationParams) => {
