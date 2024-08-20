@@ -18,6 +18,7 @@ const registerValidator = joi.object({
         swiftCode: joi.string().required(),
         pocEmail: joi.string().email({ minDomainSegments: 2 }).required().trim(),
         pocPhone: joi.string().required(),
+        pocName: joi.string().required(),
 
         // Bank specific fields
         confirmationLcs: joi.boolean().when('type', { is: 'bank', then: joi.required(), otherwise: joi.forbidden() }),
@@ -70,7 +71,6 @@ const registerValidator = joi.object({
         accountHolderName: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountCountry: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountCity: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
-        pocName: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         businessNature: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         poc: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         pocDesignation: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
