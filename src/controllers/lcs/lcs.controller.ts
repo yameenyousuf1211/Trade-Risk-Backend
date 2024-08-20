@@ -60,26 +60,6 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   generateResponse(lcs, "Lcs created successfully", res);
 });
 
-export const createLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  const draft = req.body.draft;
-
-  if (!draft) {
-    const countLcs = await lcsCount({ draft: false });
-    req.body.refId = countLcs + 1;
-
-    const { error }: ValidationResult = lgValidator.validate(req.body);
-    if (error) return next({
-      statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-      message: error.details[0].message,
-    });
-  }
-
-  req.body.createdBy = req.user.business;
-
-  const lg = await createLc(req.body);
-  generateResponse(lg, "Lcs created successfully", res);
-});
-
 export const deleteLc = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const lc = await findLc({ _id: req.params.id });
@@ -96,22 +76,21 @@ export const deleteLc = asyncHandler(
   }
 );
 
-export const findLcs = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { lcId } = req.params;
-    const lc = await findLc({ _id: lcId }).populate({
-      path: "bids",
-      populate: { 'path': 'bidBy' }
-    });
+export const fetchLc = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const { lcId } = req.params;
 
-    if (!lc) return next({
-      message: "Lc not found",
-      statusCode: STATUS_CODES.NOT_FOUND,
-    });
+  const lc = await findLc({ _id: lcId }).populate({
+    path: "bids",
+    populate: { 'path': 'bidBy' }
+  });
 
-    generateResponse(lc, "Lc fetched successfully", res);
-  }
-);
+  if (!lc) return next({
+    message: "Lc not found",
+    statusCode: STATUS_CODES.NOT_FOUND,
+  });
+
+  generateResponse(lc, "Lc fetched successfully", res);
+});
 
 export const statusCheck = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
