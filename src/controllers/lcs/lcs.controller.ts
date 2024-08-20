@@ -101,7 +101,6 @@ export const fetchLc = asyncHandler(async (req: Request, res: Response, next: Ne
 export const statusCheck = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.user.business;
-    console.log("id", id);
     
     const requestId = req.params.requestId;
     const key = req.query.key ? req.query.key : "lc";
