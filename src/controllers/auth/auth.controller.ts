@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail } from "../../utils/helpers";
 import { createBanks, createUser, findUser, updateUser } from "../../models";
 import { ROLES, STATUS_CODES } from "../../utils/constants";
+import phone from "phone";
 import { IBank } from "../../interface";
 import { createBusiness } from "../../models/business/business.model";
 
@@ -74,3 +75,20 @@ export const logout = asyncHandler(async (req: Request, res: Response, next: Nex
     generateResponse(null, 'Logout successful', res);
 });
 
+export const phoneVerification = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { phoneNo } = req.body;
+
+    const { countryCode, isValid } = phone(phoneNo, {
+        validateMobilePrefix: true, // Validate if the mobile prefix is correct
+        strictDetection: true, // Strictly check for valid phone number formats
+    });
+
+    if (isValid) {
+        generateResponse(null, 'Phone number verified successfully', res);
+    } else {
+            return next({
+                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+                message: 'Invalid phone number'
+            })
+    }
+});
