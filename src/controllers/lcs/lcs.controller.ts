@@ -32,45 +32,53 @@ export const fetchAllLcs = asyncHandler(
     generateResponse(data, "List fetched successfully", res);
   });
 
-export const createLcs = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.draft) {
-      const { error }: ValidationResult = lcsValidator.validate(req.body);
-      if (error) return next({
-        statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-        message: error.details[0].message,
-      });
-    }
+export const createLcOrLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.type) return next({
+    statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+    message: "Type is required",
+  });
+
+  const isLc = req.body.type.toLowerCase().includes("lc");
+  const lcOrLgValidation = isLc ? lcsValidator : lgValidator;
+
+  console.log('isLc >>>>>>>>>>> ', isLc);
+
+  if (!req.body.draft) {
+    const { error }: ValidationResult = lcOrLgValidation.validate(req.body);
+    if (error) return next({
+      statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+      message: error.details[0].message,
+    });
+
     const countLcs = await lcsCount({ draft: false });
     req.body.refId = countLcs + 1;
-    req.body.createdBy = req.user.business;
-
-    const lcs = await createLc(req.body);
-    generateResponse(lcs, "Lcs created successfully", res);
   }
-);
 
-export const createLg = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.body.draft;
+  req.body.createdBy = req.user.business;
 
-    req.body.createdBy = req.user.business;
+  const lcs = await createLc(req.body);
+  generateResponse(lcs, "Lcs created successfully", res);
+});
 
-    if (!draft) {
-      const countLcs = await lcsCount({ draft: false });
-      req.body.refId = countLcs + 1;
+export const createLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const draft = req.body.draft;
 
-      const { error }: ValidationResult = lgValidator.validate(req.body);
-      if (error) return next({
-        statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-        message: error.details[0].message,
-      });
-    }
+  if (!draft) {
+    const countLcs = await lcsCount({ draft: false });
+    req.body.refId = countLcs + 1;
 
-    const lg = await createLc(req.body);
-    generateResponse(lg, "Lcs created successfully", res);
+    const { error }: ValidationResult = lgValidator.validate(req.body);
+    if (error) return next({
+      statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+      message: error.details[0].message,
+    });
   }
-);
+
+  req.body.createdBy = req.user.business;
+
+  const lg = await createLc(req.body);
+  generateResponse(lg, "Lcs created successfully", res);
+});
 
 export const deleteLc = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
