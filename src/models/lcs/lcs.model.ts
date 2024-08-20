@@ -120,7 +120,7 @@ const LcsSchema: Schema = new Schema({
   performanceBond: bondSchema,
   retentionMoneyBond: bondSchema,
   otherBond: bondSchema,
-  
+
   beneficiaryBanksDetails: {
     bank: String,
     swiftCode: String,
@@ -152,6 +152,7 @@ const LcsSchema: Schema = new Schema({
   physicalLgSwiftCode: String,
 
   bids: { type: [Schema.Types.ObjectId], ref: "Bid", default: [] },
+  lastDateOfReceivingBids: Date
 }, { timestamps: true, versionKey: false });
 
 LcsSchema.plugin(mongoosePaginate);
