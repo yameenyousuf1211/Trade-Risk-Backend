@@ -39,7 +39,9 @@ const registerValidator = joi.object({
                 then: joi.required(),
                 otherwise: joi.forbidden()
             }),
+
         constitution: joi.string().valid('Individual', 'Limited Liability Company', 'Public Limited Company', 'Partnership','Estalishment').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+
         businessType: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         productInfo: joi.object({
             products: joi.array().items(joi.string()).required(),

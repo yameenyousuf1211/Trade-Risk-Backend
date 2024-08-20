@@ -98,19 +98,19 @@ export const lgValidator = joi.object({
   issueLgWithStandardText: joi.boolean().optional(),
   lgStandardText: joi.string().optional(),
   draft: joi.boolean().optional(),
-  createdBy: joi.string().required(),
-  refId: joi.number().required(),
   physicalLg: joi.boolean().optional().allow(null).allow(''),
   physicalLgBank: joi.string().optional().allow(null).allow(''),
   physicalLgCountry: joi.string().optional().allow(null).allow(''),
   physicalLgSwiftCode: joi.string().optional().allow(null).allow(''),
-}).custom((value, helpers) => {
-  if (value.lgDetailsType === contractRelatedLGsCondition) {
-    const { bidBond, advancePaymentBond, performanceBond, retentionMoneyBond } = value;
-    if (!bidBond && !advancePaymentBond && !performanceBond && !retentionMoneyBond) {
-      return helpers.error('any.required', { label: 'At least one of the bond fields' });
+  lastDateOfReceivingBids: joi.date().required(),
+})
+  .custom((value, helpers) => {
+    if (value.lgDetailsType === contractRelatedLGsCondition) {
+      const { bidBond, advancePaymentBond, performanceBond, retentionMoneyBond } = value;
+      if (!bidBond && !advancePaymentBond && !performanceBond && !retentionMoneyBond) {
+        return helpers.error('any.required', { label: 'At least one of the bond fields' });
+      }
     }
-  }
-  return value;
-}, 'At least one bond field required validation');
+    return value;
+  }, 'At least one bond field required validation');
 
