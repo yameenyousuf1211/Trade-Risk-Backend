@@ -1,6 +1,5 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
-import phone from 'phone';
 
 const registerValidator = joi.object({
     name: joi.string().required(),
@@ -31,14 +30,8 @@ const registerValidator = joi.object({
         // Corporate specific fields
         phone: joi.string().when('type', {
             is: 'corporate',
-            then: joi.string().required().custom((value, helpers) => {
-                const { isValid } = phone(value);
-                if (!isValid) {
-                    return helpers.error('any.custom', { message: 'Invalid phone number' });
-                } return value;
-            }).messages({
-                'any.custom': 'Invalid phone number'
-            }), otherwise: joi.forbidden()
+            then: joi.string().required(),
+            otherwise: joi.forbidden()
         }),
         commercialRegistrationNumber: joi.string().min(4)
             .when('type', {
@@ -46,7 +39,9 @@ const registerValidator = joi.object({
                 then: joi.required(),
                 otherwise: joi.forbidden()
             }),
-        constitution: joi.string().valid('partnership', 'public_limited_co', 'limited_liability_co', 'individual_proprietorship_co').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+
+        constitution: joi.string().valid('Individual', 'Limited Liability Company', 'Public Limited Company', 'Partnership','Estalishment').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+
         businessType: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         productInfo: joi.object({
             products: joi.array().items(joi.string()).required(),
