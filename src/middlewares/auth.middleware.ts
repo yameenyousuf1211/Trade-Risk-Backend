@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
-import { STATUS_CODES } from '../utils/constants';
-import { findUser } from '../models';
+import {  STATUS_CODES } from '../utils/constants';
+import { findUser } from '../models'; 
 
 
 const authMiddleware = (roles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const accessToken = req.headers.authorization?.split(' ')[1] ?? req.session?.accessToken;
-
+                
         if (!accessToken) {
             return next({
                 statusCode: STATUS_CODES.UNAUTHORIZED,
@@ -15,7 +15,7 @@ const authMiddleware = (roles: string[]) => {
             });
         }
 
-        verify(accessToken, "secret", (err: any, decoded: any) => {
+        verify(accessToken,"secret",(err: any,decoded:any) => {
             if (err) {
                 return next({
                     statusCode: STATUS_CODES.UNAUTHORIZED,
@@ -28,15 +28,15 @@ const authMiddleware = (roles: string[]) => {
                     message: 'Invalid token!'
                 });
             }
-            const decodedUser = decoded as any;
+            const decodedUser = decoded as { _id: string, role: string, email: string, socialId: string };
+            
 
-
-            findUser({ _id: decodedUser._id }).then(user => {
+             findUser({ _id: decodedUser._id }).then(user => {
                 if (!user) return next({
                     statusCode: STATUS_CODES.UNAUTHORIZED,
                     message: 'Invalid token user not found!'
                 });
-
+        
                 if (roles.includes(decodedUser.role)) {
                     req.user = { ...decodedUser };
                     next();
@@ -51,7 +51,7 @@ const authMiddleware = (roles: string[]) => {
                 });
             });
         });
-
+        
     }
 }
 

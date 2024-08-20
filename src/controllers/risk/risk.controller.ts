@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateRefId, generateResponse, parseBody } from "../../utils/helpers";
-import { createRisk, fetchRisks, findRisk, getAllUsers, updateRisk } from "../../models";
+import { createRisk, fetchRisks, findRisk, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
 import { ValidationResult } from "joi";
 import { riskValidator } from "../../validation/risk/risk.validation";
@@ -14,7 +14,6 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
     const risk = req.query.risk;
     const createdBy = req.query.createdBy == 'true' ? true : false;
     const filter = req.query.filter;
-    const search = req.query.search 
 
     const query: PipelineStage[] = [];
 
@@ -33,41 +32,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
             draft
         }
     })
-    if (search) {
-        const isNumeric = !isNaN(Number(search));
-        if (isNumeric) {
-            query.push({ $match: { refId: Number(search) } });
-        } else {
-            const userQuery = { swiftCode: { $regex: search, $options: 'i' } };
 
-            const { data: users } = await getAllUsers({
-                query: userQuery,
-            });
-
-            const ids = users.map((user:any) => user._id);
-
-            query.push({
-                $match: {
-                    createdBy: { $in: ids }
-                }
-            });
-        }
-    }
-    query.push({
-        $lookup: {
-            from: 'users',
-            localField: 'createdBy',
-            foreignField: '_id',
-            as: 'userCreatedRisk'
-        }
-    });
-
-    query.push({
-        $unwind: {
-            path: '$userCreatedRisk',
-            preserveNullAndEmptyArrays: true
-        }
-    });
     query.push({
         $lookup: {
             from: 'bids',
@@ -107,8 +72,6 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
     query.push({
         $group: {
             _id: '$_id',
-            swiftCode: { $first: '$swiftCode' },
-            country: { $first: '$country' },
             issuingBank: { $first: '$issuingBank' },
             exporterInfo: { $first: '$exporterInfo' },
             confirmingBank: { $first: '$confirmingBank' },
@@ -144,17 +107,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
             },
             importerInfo: { $first: '$importerInfo' },
             status: { $first: '$status' },
-            createdBy: {
-                $first: {
-                    _id: '$userCreatedRisk._id',
-                    name: '$userCreatedRisk.name',
-                    firstname: '$userCreatedRisk.firstname',
-                    lastname: '$userCreatedRisk.lastname',
-                    email: '$userCreatedRisk.email',
-                    swiftCode: '$userCreatedRisk.swiftCode',
-                    country: '$userCreatedRisk.accountCountry',
-                }
-            },
+            createdBy: { $first: '$createdBy' },
             createdAt: { $first: '$createdAt' },
             updatedAt: { $first: '$updatedAt' },
 

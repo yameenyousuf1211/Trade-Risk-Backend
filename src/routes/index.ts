@@ -9,7 +9,6 @@ import CountryAPI from "./country/country.route";
 import RiskAPI from "./risk/risk.route";
 import NotificationAPI from "./notification/notification.route";
 import RoleAPI from "./role/role.route";
-import BusinessAPI from "./business/business.route";
 
 export default class API {
     router: Router;
@@ -27,13 +26,12 @@ export default class API {
         routeGroups.push(new RootAPI(router));
         routeGroups.push(new AuthAPI(router));
         routeGroups.push(new UserAPI(router));
-        routeGroups.push(new LcsAPI(router));
-        routeGroups.push(new BidsAPI(router));
-        routeGroups.push(new CountryAPI(router));
-        routeGroups.push(new RiskAPI(router));
-        routeGroups.push(new NotificationAPI(router));
-        routeGroups.push(new RoleAPI(router));
-        routeGroups.push(new BusinessAPI(router));
+        routeGroups.push(new LcsAPI(router))
+        routeGroups.push(new BidsAPI(router))
+        routeGroups.push(new CountryAPI(router))
+        routeGroups.push(new RiskAPI(router))
+        routeGroups.push(new NotificationAPI(router))
+        routeGroups.push(new RoleAPI(router))
     }
 
     setContentType(req: Request, res: Response, next: NextFunction) {

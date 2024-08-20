@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteNotifications, fetchNotifications,subscribe, updateNotifications } from "../../controllers";
+import { deleteNotifications, fetchNotifications, notifications,subscribe, updateNotifications } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLES } from "../../utils/constants";
 import { notificationValidation, subscriptionValidation } from "../../validation/notification/notification.validation";
@@ -11,7 +11,7 @@ export default class NotificationAPI {
     }
     
     setupRoutes() {
-        // this.router.post('/send-notification',authMiddleware(Object.values(ROLES)),notificationValidation,notifications);
+        this.router.post('/send-notification',authMiddleware(Object.values(ROLES)),notificationValidation,notifications);
         this.router.post('/subscriptions',authMiddleware(Object.values(ROLES)),subscriptionValidation,subscribe);
         this.router.get('/',authMiddleware(Object.values(ROLES)),fetchNotifications);
         this.router.put('/',authMiddleware(Object.values(ROLES)),updateNotifications);

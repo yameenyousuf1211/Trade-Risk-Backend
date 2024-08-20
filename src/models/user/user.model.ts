@@ -9,21 +9,61 @@ import { QueryWithHelpers } from "mongoose";
 import { sign } from "jsonwebtoken";
 import { IUser } from "../../interface";
 
+const KeysSchema = new Schema({
+    auth: { type: String, required: true },
+    p256dh: { type: String, required: true }
+}, { _id: false });
+
+const GcmTokenSchema = new Schema({
+    endpoint: { type: String, required: true },
+    expirationTime: { type: Date, default: null },
+    keys: { type: KeysSchema, required: true }
+}, { _id: false });
+
+
 // Define the Mongoose schema
-const userSchema = new Schema({
+const userSchema = new Schema<IUser>({
     name: { type: String },
     email: { type: String, lowercase: true, required: true },
     password: { type: String, select: false },
-    role: { type: String, enum: ['admin', 'user'], default: "user", required: true },
-    type: { type: String, enum: ['corporate', 'bank'] },
-    business: { type: Schema.Types.ObjectId, ref: "Business" },
-
-    // notification settings
+    address: { type: String },
+    country:{ type: String },
+    phone: { type: String },
+    constitution: { type: String, enum: Object.values(COMPANY_CONSTITUTION) },
+    businessType: { type: String },
+    role: { type: String, enum: Object.values(ROLES), default: "user", required: true },
+    productInfo: {
+        products: [{ type: String }],
+        annualSalary: { type: Number },
+        annualValueExports: { type: Number },
+        annualValueImports: { type: Number }
+    },
+    currentBanks: [{ type: Schema.Types.ObjectId, ref: "bank" }],
+    bank: { type: String, },
+    accountNumber: { type: Number },
+    swiftCode: { type: String },
+    accountHolderName: { type: String },
+    accountCountry: { type: String },
+    accountCity: { type: String},
+    pocName: { type: String },
+    businessNature: { type: String },
+    pocEmail: { type: String },
+    pocPhone: { type: String },
+    poc: { type: String },
+    pocDesignation: { type: String },
+    confirmationLcs: { type: Boolean },
+    discountingLcs: { type: Boolean },
+    guaranteesCounterGuarantees: { type: Boolean },
+    discountingAvalizedBills: { type: Boolean },
+    avalizationExportBills: { type: Boolean },
+    riskParticipation: { type: Boolean },
+    authorizationPocLetter: { type: String },
     allowNotification: { type: Boolean, default: true },
     allowBidsNotification: { type: Boolean, default: true },
     allowNewRequestNotification: { type: Boolean, default: true },
+    gcmTokens: [GcmTokenSchema],
+    isDeleted: { type: Boolean, default: false },
 
-    fcmTokens: { type: [String], default: [] },
 }, { timestamps: true, versionKey: false });
 
 // hash password before saving
@@ -43,9 +83,7 @@ userSchema.methods.generateAccessToken = function (): string {
             _id: this._id,
             name: this.name,
             email: this.email,
-            role: this.role,
-            type: this.type,
-            business: this.business
+            role: this.role
         },
         process.env.ACCESS_TOKEN_SECRET as string,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
@@ -76,10 +114,10 @@ export const findUser = (query: Record<string, any>): QueryWithHelpers<any, Docu
 export const getAllUsers = async ({ query, page, limit, populate }: IPaginationFunctionParams)
     : Promise<IPaginationResult<IUser>> => {
     const { data, pagination }: IPaginationResult<IUser> = await getMongoosePaginatedData({
-        model: UserModel, query, page, limit, populate
+        model: UserModel, query,page, limit, populate
     });
 
     return { data, pagination };
 };
 
-export const updateUser = (id: string, obj: Record<string, any>): Promise<any> => UserModel.findByIdAndUpdate(id, obj, { new: true });
+export const updateUser = (id: string, obj: Record<string, any>): Promise<any> => UserModel.findByIdAndUpdate(id,obj,{new:true});

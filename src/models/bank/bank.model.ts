@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { IBank } from '../../interface';
 
+
+
 const BankSchema: Schema = new Schema({
     name: { type: String },
     country: { type: String },

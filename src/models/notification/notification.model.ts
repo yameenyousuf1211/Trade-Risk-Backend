@@ -15,9 +15,7 @@ export interface CreateNotificationInput {
     title: string;
     message: string;
     user: string;
-    requestId:string;
-    senderId:string;
-    receiverId:string;
+    requestId:string
 }
 
 const notificationSchema: Schema = new Schema({
@@ -32,11 +30,7 @@ const notificationSchema: Schema = new Schema({
         type: String,
         required: true,
     },
-    senderId:{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    receiverId:{
+    user:{
         type: Schema.Types.ObjectId,
         ref: 'User'
     },

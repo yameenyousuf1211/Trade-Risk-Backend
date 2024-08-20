@@ -12,11 +12,11 @@ export default class AuthAPI {
     }
 
     setupRoutes() {
-        this.router.post('/register', registerValidation, register);
-        this.router.post('/login', loginValidation, login);
-        this.router.get('/current-user', authMiddleware(Object.values(ROLES)), currentUser)
-        this.router.post('/logout', authMiddleware(Object.values(ROLES)), logout);
-    }
+        this.router.post('/register',upload("authorization").fields([{name:'image',maxCount:1}]),registerValidation ,register);
+        this.router.post('/login', loginValidation,login);
+        this.router.get('/current-user',authMiddleware(Object.values(ROLES)),currentUser)
+        this.router.post('/logout',authMiddleware(Object.values(ROLES)),logout);
+    }   
 
     getRouter() {
         return this.router;
