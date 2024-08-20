@@ -12,7 +12,7 @@ interface ILcs extends Document {
     };
     refId?: number;
     extraInfo?: {
-        dats?: Date;
+        days?: number;
         other?: string;
     };
     paymentTerms?: string;
