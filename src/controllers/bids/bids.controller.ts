@@ -1,9 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
-import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, IBid, updateBid, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, findUser, IBid, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 import mongoose, { PipelineStage } from "mongoose";
+import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
@@ -149,6 +150,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     console.log('test passed');
 
     const role = req.user.role;
+    let notification:any;
 
     const newBidId = getMongoId();
 
@@ -159,6 +161,12 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Lc not found',
             statusCode: STATUS_CODES.NOT_FOUND
         });
+        notification={
+            users:lc.createdBy,
+            title:`${req.user.name}`,
+            message:` has added a bid on your LC refId ${lc.refId}`,
+            requestId:lc._id,senderId:req.user._id,receiverId:lc.createdBy
+        }
 
         const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
         if (isBidAlreadyAccepted) return next({
@@ -181,6 +189,12 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Risk not found',
             statusCode: STATUS_CODES.NOT_FOUND
         })
+        notification={
+            users:risk.createdBy,
+            title:`${req.user.name}`,
+            message:` has added a bid on your RISK ${risk.transaction}`,
+            requestId:null,senderId:req.user._id,receiverId:risk.createdBy
+        }
 
         const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
 
@@ -197,6 +211,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
 
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
+    await createAndSendNotifications(notification, false,req.user.type);
     generateResponse(bid, 'Bids created successfully', res);
 })
 

@@ -12,14 +12,14 @@ interface ILcs extends Document {
     };
     refId?: number;
     extraInfo?: {
-        dats?: Date;
+        days?: number;
         other?: string;
     };
     paymentTerms?: string;
-    issuingBank?: {
+    issuingBank?: [{
         bank?: string;
         country?: string;
-    };
+    }];
     advisingBank?: {
         bank?: string;
         country?: string;

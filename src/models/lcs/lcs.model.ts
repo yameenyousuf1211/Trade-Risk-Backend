@@ -44,7 +44,7 @@ const LcsSchema: Schema = new Schema({
   },
   refId: Number,
   extraInfo: {
-    date: Date,
+    days: Number,
     other: String,
   },
   paymentTerms: String,

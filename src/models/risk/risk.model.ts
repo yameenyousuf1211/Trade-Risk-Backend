@@ -10,6 +10,7 @@ interface IRisk extends Document {
         agreement: string;
         signCopy: string;
     };
+    refId:Number,
     status:string;
     transaction: "Risk Participation" | "Outright Sales";
     riskParticipation?: string;

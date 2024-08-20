@@ -93,7 +93,7 @@ export const fetchNotifications = asyncHandler(
 
     const pipeline:PipelineStage[] = []
   
-    pipeline.push({$match:{user:new mongoose.Types.ObjectId(req.user._id as string)}})
+    pipeline.push({$match:{receiverId:new mongoose.Types.ObjectId(req.user.business as string)}})
     pipeline.push({$sort:{createdAt:-1}})
 
     const notification = await fetchNotification({ limit, page,query:pipeline });

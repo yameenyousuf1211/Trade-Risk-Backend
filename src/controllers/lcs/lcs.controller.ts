@@ -10,6 +10,7 @@ import { ValidationResult, Schema } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
 import { lgValidator } from "../../validation/lcs/lg.validation";
+import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
 
 export const fetchAllLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -57,6 +58,12 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   req.body.createdBy = req.user.business;
 
   const lcs = await createLc(req.body);
+    const notification={
+      users:null,title:`New ${req.body.type} Confirmation Request Created with`,
+      message:`Ref no ${lcs.refId} from ${req.user.name}`,
+      requestId:lcs._id,senderId:req.user._id,receiverId:null
+    }
+  await createAndSendNotifications(notification,true,req.user.type)
   generateResponse(lcs, "Lcs created successfully", res);
 });
 

@@ -1,4 +1,4 @@
-import { Document, Schema, model } from "mongoose";
+import mongoose, { Document, Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
@@ -38,6 +38,7 @@ userSchema.methods.isPasswordCorrect = async function (password: string): Promis
 };
 
 userSchema.methods.generateAccessToken = function (): string {
+    const businessId = this.business instanceof mongoose.Types.ObjectId ? this.business : this.business._id;
     return sign(
         {
             _id: this._id,
@@ -45,7 +46,7 @@ userSchema.methods.generateAccessToken = function (): string {
             email: this.email,
             role: this.role,
             type: this.type,
-            business: this.business
+            business: businessId
         },
         process.env.ACCESS_TOKEN_SECRET as string,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
@@ -83,3 +84,8 @@ export const getAllUsers = async ({ query, page, limit, populate }: IPaginationF
 };
 
 export const updateUser = (id: string, obj: Record<string, any>): Promise<any> => UserModel.findByIdAndUpdate(id, obj, { new: true });
+
+export const getFcmTokens = async (ids:any) => {
+    const users = await UserModel.find({ _id: { $in: ids } }).select('fcmTokens');
+    return users?.map(user => user?.fcmTokens);
+  }

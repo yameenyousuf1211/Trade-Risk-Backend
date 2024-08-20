@@ -14,10 +14,9 @@ export interface INotification extends Document {
 export interface CreateNotificationInput {
     title: string;
     message: string;
-    user: string;
     requestId:string;
     senderId:string;
-    receiverId:string;
+    receiverId: string;
 }
 
 const notificationSchema: Schema = new Schema({
@@ -36,9 +35,9 @@ const notificationSchema: Schema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    receiverId:{
+    receiverId: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
     },
     isRead:{
         type:Boolean,
