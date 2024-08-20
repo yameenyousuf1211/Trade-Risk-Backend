@@ -147,6 +147,8 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         statusCode: STATUS_CODES.BAD_REQUEST
     });
 
+    console.log('test passed');
+
     const role = req.user.role;
     let notification:any;
 

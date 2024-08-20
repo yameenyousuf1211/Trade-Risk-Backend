@@ -35,7 +35,7 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 export const login = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const body = parseBody(req.body);
 
-    let user = await findUser({ email: body?.email }).select('+password');
+    let user = await findUser({ email: body?.email }).select('+password').populate('business');
     if (!user) return next({
         statusCode: STATUS_CODES.BAD_REQUEST,
         message: 'Invalid email or password'
@@ -53,8 +53,9 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
     const accessToken = await user.generateAccessToken();
     req.session = { accessToken };
     if (body.fcmToken) {
-        user = await updateUser(user._id, { $addToSet: { fcmTokens: body.fcmToken } });
+        await updateUser(user._id, { $addToSet: { fcmTokens: body.fcmToken } });
     }
+
     // remove password
     user = user.toObject();
     delete user.password;

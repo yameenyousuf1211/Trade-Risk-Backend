@@ -5,6 +5,7 @@ declare global {
         interface Request {
             user: {
                 _id: string,
+                name:string,
                 role: string,
                 email: string,
                 type: string,
@@ -27,6 +28,7 @@ export interface IUser extends Document {
     country?: string;
     phone?: string;
     address?: string;
+    commercialRegistrationNumber?: string;
     constitution?: string;
     password?: string;
     bank?: string;

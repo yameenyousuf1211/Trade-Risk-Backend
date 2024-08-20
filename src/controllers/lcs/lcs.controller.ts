@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import {
   asyncHandler,
-  generateRefId,
   generateResponse,
 } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
@@ -19,6 +18,7 @@ export const fetchAllLcs = asyncHandler(
     const limit = +(req.query.limit || 10);
 
     const filters: any[] = [];
+    if (req.query.draft) filters.push({ draft: true });
     if (req.query.type) filters.push({ type: req.query.type });
     if (req.query.refId) filters.push({ refId: req.query.refId });
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
@@ -33,59 +33,39 @@ export const fetchAllLcs = asyncHandler(
     generateResponse(data, "List fetched successfully", res);
   });
 
-export const createLcs = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.draft) {
-      const { error }: ValidationResult = lcsValidator.validate(req.body);
-      if (error) return next({
-        statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-        message: error.details[0].message,
-      });
-    }
+export const createLcOrLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.type) return next({
+    statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+    message: "Type is required",
+  });
+
+  const isLc = req.body.type.toLowerCase().includes("lc");
+  const lcOrLgValidation = isLc ? lcsValidator : lgValidator;
+
+  console.log('isLc >>>>>>>>>>> ', isLc);
+
+  if (!req.body.draft) {
+    const { error }: ValidationResult = lcOrLgValidation.validate(req.body);
+    if (error) return next({
+      statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+      message: error.details[0].message,
+    });
+
     const countLcs = await lcsCount({ draft: false });
     req.body.refId = countLcs + 1;
-    req.body.createdBy = req.user.business;
+  }
 
-    const lcs = await createLc(req.body);
-    let issuingBankNames = req.body.issuingBanks.map((x: any) => `${x.bank}, ${x.country}`).join(' & ');
+  req.body.createdBy = req.user.business;
+
+  const lcs = await createLc(req.body);
     const notification={
-      users:req.user._id,title:"New LC Confirmation Request",
-      message:`Ref no ${lcs.refId} from ${issuingBankNames}`,
+      users:req.user._id,title:`New ${req.body.type} Confirmation Request Created with`,
+      message:`Ref no ${lcs.refId} from ${req.user.name}`,
       requestId:null,senderId:req.user._id,receiverId:[]
     }
-    await createAndSendNotifications(notification,true)
-    generateResponse(lcs, "Lcs created successfully", res);
-  }
-);
-
-export const createLg = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.body.draft;
-
-    req.body.createdBy = req.user.business;
-
-    if (!draft) {
-      const countLcs = await lcsCount({ draft: false });
-      req.body.refId = countLcs + 1;
-
-      const { error }: ValidationResult = lgValidator.validate(req.body);
-      if (error) return next({
-        statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-        message: error.details[0].message,
-      });
-    }
-
-    const lg = await createLc(req.body);
-    let issuingBankNames = req.body.issuingBanks.map((x: any) => `${x.bank}, ${x.country}`).join(' & ');
-    const notification={
-      users:req.user._id,title:"New LG Confirmation Request",
-      message:`Ref no ${lg.refId} from ${issuingBankNames}`,
-      requestId:null,senderId:req.user._id,receiverId:[]
-    }
-    await createAndSendNotifications(notification,true)
-    generateResponse(lg, "Lcs created successfully", res);
-  }
-);
+  await createAndSendNotifications(notification,true)
+  generateResponse(lcs, "Lcs created successfully", res);
+});
 
 export const deleteLc = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -103,22 +83,21 @@ export const deleteLc = asyncHandler(
   }
 );
 
-export const findLcs = asyncHandler(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const { lcId } = req.params;
-    const lc = await findLc({ _id: lcId }).populate({
-      path: "bids",
-      populate: { 'path': 'bidBy' }
-    });
+export const fetchLc = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const { lcId } = req.params;
 
-    if (!lc) return next({
-      message: "Lc not found",
-      statusCode: STATUS_CODES.NOT_FOUND,
-    });
+  const lc = await findLc({ _id: lcId }).populate({
+    path: "bids",
+    populate: { 'path': 'bidBy' }
+  });
 
-    generateResponse(lc, "Lc fetched successfully", res);
-  }
-);
+  if (!lc) return next({
+    message: "Lc not found",
+    statusCode: STATUS_CODES.NOT_FOUND,
+  });
+
+  generateResponse(lc, "Lc fetched successfully", res);
+});
 
 export const statusCheck = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {

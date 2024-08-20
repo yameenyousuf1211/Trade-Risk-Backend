@@ -23,6 +23,7 @@ const BusinessSchema: Schema = new Schema({
     // corporate fields
     phone: { type: String },
     constitution: { type: String }, //enum: Object.values(COMPANY_CONSTITUTION) },
+    commercialRegistrationNumber: { type: String },
     businessType: { type: String },
     productInfo: {
         products: [String],
