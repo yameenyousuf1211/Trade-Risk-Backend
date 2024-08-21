@@ -49,11 +49,10 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
       statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
       message: error.details[0].message,
     });
-
-    const countLcs = await lcsCount({ draft: false });
-    req.body.refId = countLcs + 1;
   }
-
+  const countLcs = await lcsCount({ draft: false });
+  req.body.refId = countLcs + 1;
+  
   req.body.createdBy = req.user.business;
 
   const lcs = await createLc(req.body);
