@@ -23,10 +23,13 @@ export const riskValidator = joi.object({
         }),
         participationRate:joi.string().required(),
     }).required(),
-    issuingBank: joi.object({
-        bank: joi.string().required(),
-        country: joi.string().required()
-    }).required(),
+    issuingBanks: joi.array().items(
+        joi.object({
+            bank: joi.string().required(),
+            country: joi.string().required(),
+            swiftCode: joi.string().allow(null, '')
+        })
+    ).required(),
     advisingBank: joi.object({
         bank: joi.string().optional(),
         country: joi.string().optional()
