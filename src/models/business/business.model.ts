@@ -53,23 +53,5 @@ export const updateBusiness = (query: any, obj: any) => BusinessModel.findOneAnd
 // // export const findBank = (query: Record<string, any>): QueryWithHelpers<any, Document<any, any, any>> => BankModel.findOne(query);
 
 
-// create dummy business data for testing
-const businessData = {
-    name: { type: String },
-    email: { type: String, lowercase: true, required: true },
-    type: { type: String, enum: ['corporate', 'bank'] },
-    address: { type: String },
-    swiftCode: { type: String },
-    pocEmail: { type: String },
-    pocPhone: { type: String },
-    country: { type: String },
 
-    // bank fields 
-    confirmationLcs: { type: Boolean },
-    discountingLcs: { type: Boolean },
-    guaranteesCounterGuarantees: { type: Boolean },
-    discountingAvalizedBills: { type: Boolean },
-    avalizationExportBills: { type: Boolean },
-    riskParticipation: { type: Boolean },
-};
 

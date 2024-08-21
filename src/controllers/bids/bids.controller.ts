@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 
-import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, findUser, IBid, updateBid, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createBid, fetchBids, findBid, findLc, findRisk, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
-import mongoose from "mongoose";
 
 import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
 
@@ -82,8 +81,6 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             });
         }
     } else {
-        console.log("Risk body called");
-
         const risk = await findRisk({ _id: req.body.risk });
         if (!risk) return next({
             message: 'Risk not found',
@@ -177,15 +174,15 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
 });
 
 export const findBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.user._id;
+    const businessId = req.user.business;
 
-    const data = await BidsStatusCount(userId);
+    const data = await BidsStatusCount(businessId);
     generateResponse(data, 'Bids count fetched successfully', res);
 })
 
 export const fetchbid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
-    const data = await findBid({ _id: id });
+    const data = await findBid({ _id: id }).lean();
     generateResponse(data, 'Bid fetched successfully', res);
 })
 
