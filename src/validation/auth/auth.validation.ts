@@ -1,5 +1,6 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
+import { emailExist } from './email.validation';
 
 const registerValidator = joi.object({
     name: joi.string().required(),
@@ -73,7 +74,7 @@ const loginValidator = joi.object({
     fcmToken: joi.string().optional(),
 });
 
-const registerValidation = [validateRequest(registerValidator)];
+const registerValidation = [validateRequest(registerValidator),emailExist];
 const loginValidation = validateRequest(loginValidator);
 
 

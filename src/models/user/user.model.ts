@@ -2,7 +2,6 @@ import mongoose, { Document, Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
-import { COMPANY_CONSTITUTION, ROLES } from "../../utils/constants";
 import { getMongoosePaginatedData } from "../../utils/helpers";
 import { compare } from "bcrypt";
 import { QueryWithHelpers } from "mongoose";
@@ -53,14 +52,6 @@ userSchema.methods.generateAccessToken = function (): string {
     );
 };
 
-userSchema.methods.generateRefreshToken = function (): string {
-    return sign(
-        { _id: this._id },
-        process.env.REFRESH_TOKEN_SECRET as string,
-        { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
-    );
-};
-
 // mongoose pagination plugins
 userSchema.plugin(mongoosePaginate);
 userSchema.plugin(aggregatePaginate);
@@ -68,7 +59,7 @@ userSchema.plugin(aggregatePaginate);
 const UserModel = model("User", userSchema);
 
 // create new user
-export const createUser = (obj: Record<string, any>): Promise<any> => UserModel.create(obj);
+export const createUser = (obj: Record<string, any>): Promise<IUser> => UserModel.create(obj);
 
 // find user by query
 export const findUser = (query: Record<string, any>): QueryWithHelpers<any, Document> => UserModel.findOne(query);
@@ -88,4 +79,4 @@ export const updateUser = (id: string, obj: Record<string, any>): Promise<any> =
 export const getFcmTokens = async (ids:any) => {
     const users = await UserModel.find({ _id: { $in: ids } }).select('fcmTokens');
     return users?.map(user => user?.fcmTokens);
-  }
+}

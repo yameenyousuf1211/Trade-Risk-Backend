@@ -46,7 +46,7 @@ const LcsSchema: Schema = new Schema({
   extraInfo: {
     days: Number,
     other: String,
-  },
+},
   paymentTerms: String,
   issuingBanks: [{
     bank: String,
@@ -98,7 +98,6 @@ const LcsSchema: Schema = new Schema({
   baseRate: String,
   createdBy: { type: Schema.Types.ObjectId, ref: "Business" },
 
-  // Assuming an array of strings for attachment URLs
   attachments: [String],
   draft: Boolean,
   status: { type: String, enum: ["Pending", "Expired", "Accepted", "Add bid"], default: "Add bid" },

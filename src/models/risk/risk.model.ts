@@ -23,10 +23,10 @@ interface IRisk extends Document {
         perAnnum: string;
         participationRate: string;
     };
-    issuingBank: {
+    issuingBanks: [{
         bank: string;
         country: string;
-    };
+    }];
     advisingBank: {
         bank: string;
         country: string;
