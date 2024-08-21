@@ -4,7 +4,7 @@ import {
   generateResponse,
 } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
-import { createLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
+import { aggregateFetchLcs, createLc, deleteLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
 import mongoose from "mongoose";
 import { ValidationResult } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
@@ -66,18 +66,15 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   generateResponse(lcs, "Lcs created successfully", res);
 });
 
-export const deleteLc = asyncHandler(
+export const deleteLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-    const lc = await findLc({ _id: req.params.id });
+   const lc = await deleteLc(req.params.id);
+    
+   if(!lc) return next({
+      message: "Lc not found",
+      statusCode: STATUS_CODES.NOT_FOUND,
+    });
 
-    if (!lc)
-      return next({
-        message: "Lc not found",
-        statusCode: STATUS_CODES.NOT_FOUND,
-      });
-
-    lc.isDeleted = true;
-    await lc.save();
     generateResponse(null, "Lc deleted successfully", res);
   }
 );
@@ -179,12 +176,7 @@ export const totalRequestLc = asyncHandler(
     const pipeline: any = [
       {
         $match: {
-          createdBy: new mongoose.Types.ObjectId(req.user._id as string),
-        },
-      },
-      {
-        $match: {
-          isDeleted: false,
+          createdBy: new mongoose.Types.ObjectId(req.user.business as string),
         },
       },
       {
@@ -196,25 +188,15 @@ export const totalRequestLc = asyncHandler(
         },
       },
       {
-        $group: {
-          _id: "$_id", // Group by _id to maintain document count
-          totalLCCount: { $sum: 1 },
-          bidStatusCounts: {
-            $push: {
-              $cond: {
-                if: { $ne: ["$bids.status", []] },
-                then: "$bids.status",
-                else: null,
-              },
-            },
-          },
+        // Flatten the bids array so each bid becomes a separate document
+        $unwind: {
+          path: "$bids",
+          preserveNullAndEmptyArrays: true // This keeps documents with no bids
         },
       },
-      { $unwind: "$bidStatusCounts" },
-      { $unwind: "$bidStatusCounts" },
       {
         $group: {
-          _id: "$bidStatusCounts",
+          _id: "$bids.status",
           count: { $sum: 1 },
         },
       },
@@ -227,8 +209,9 @@ export const totalRequestLc = asyncHandler(
       },
     ];
 
-    const data = await fetchLcs({ query: pipeline });
+    const data = await aggregateFetchLcs(pipeline);
 
     generateResponse(data, "Lc status count fetched successfully", res);
   }
 );
+
