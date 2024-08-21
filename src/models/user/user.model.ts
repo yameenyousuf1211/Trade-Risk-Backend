@@ -6,7 +6,7 @@ import { getMongoosePaginatedData } from "../../utils/helpers";
 import { compare } from "bcrypt";
 import { QueryWithHelpers } from "mongoose";
 import { sign } from "jsonwebtoken";
-import { IUser } from "../../interface";
+import { IUser, IUserDocs } from "../../interface";
 
 // Define the Mongoose schema
 const userSchema = new Schema({
@@ -59,7 +59,7 @@ userSchema.plugin(aggregatePaginate);
 const UserModel = model("User", userSchema);
 
 // create new user
-export const createUser = (obj: Record<string, any>): Promise<IUser> => UserModel.create(obj);
+export const createUser = (obj: Record<string, any>): Promise<IUserDocs> => UserModel.create(obj);
 
 // find user by query
 export const findUser = (query: Record<string, any>): QueryWithHelpers<any, Document> => UserModel.findOne(query);
@@ -74,7 +74,7 @@ export const getAllUsers = async ({ query, page, limit, populate }: IPaginationF
     return { data, pagination };
 };
 
-export const updateUser = (id: string, obj: Record<string, any>): Promise<any> => UserModel.findByIdAndUpdate(id, obj, { new: true });
+export const updateUser = (id: string, obj: Record<string, any>): Promise<IUserDocs> => UserModel.findByIdAndUpdate(id, obj, { new: true }).exec();
 
 export const getFcmTokens = async (ids:any) => {
     const users = await UserModel.find({ _id: { $in: ids } }).select('fcmTokens');
