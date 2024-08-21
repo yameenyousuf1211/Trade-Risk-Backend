@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail } from "../../utils/helpers";
-import {  createUser, findUser, updateUser } from "../../models";
-import {  STATUS_CODES } from "../../utils/constants";
+
+import { createBanks, createUser, findUser, updateUser } from "../../models";
+import { ROLES, STATUS_CODES } from "../../utils/constants";
 import phone from "phone";
+import { IBank } from "../../interface";
+
 import { createBusiness } from "../../models/business/business.model";
 
 interface FileArray {
