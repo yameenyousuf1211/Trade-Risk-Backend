@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail } from "../../utils/helpers";
-import { createBanks, createUser, findUser, updateUser } from "../../models";
-import { ROLES, STATUS_CODES } from "../../utils/constants";
+import {  createUser, findUser, updateUser } from "../../models";
+import {  STATUS_CODES } from "../../utils/constants";
 import phone from "phone";
-import { IBank } from "../../interface";
 import { createBusiness } from "../../models/business/business.model";
 
 interface FileArray {
@@ -12,12 +11,6 @@ interface FileArray {
 
 export const register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const body = parseBody(req.body);
-
-    const userExist = await findUser({ email: body?.email });
-    if (userExist) return next({
-        statusCode: STATUS_CODES.BAD_REQUEST,
-        message: 'User already exist'
-    });
 
     req.body.password = generatePassword(); // password will be generate and send to user via email later he can change
 

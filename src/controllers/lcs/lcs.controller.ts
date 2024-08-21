@@ -6,7 +6,7 @@ import {
 import { STATUS_CODES } from "../../utils/constants";
 import { createLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
 import mongoose from "mongoose";
-import { ValidationResult, Schema } from "joi";
+import { ValidationResult } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
 import { lgValidator } from "../../validation/lcs/lg.validation";
@@ -187,7 +187,6 @@ export const totalRequestLc = asyncHandler(
           isDeleted: false,
         },
       },
-
       {
         $lookup: {
           from: "bids",

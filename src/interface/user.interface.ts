@@ -15,49 +15,26 @@ declare global {
     }
 }
 
-export interface IUser extends Document {
-    _id?: string;
+
+export interface IUser {
     name?: string;
     email: string;
-    businessNature?: string;
+    password?: string;
+    role: 'admin' | 'user';
+    type?: 'corporate' | 'bank';
+    business?: string;
+
+    // Notification settings
     allowNotification?: boolean;
-    role: string;
     allowBidsNotification?: boolean;
     allowNewRequestNotification?: boolean;
-    fcmTokens: string;
-    country?: string;
-    phone?: string;
-    address?: string;
-    commercialRegistrationNumber?: string;
-    constitution?: string;
-    password?: string;
-    bank?: string;
-    accountNumber?: number;
-    swiftCode?: string;
-    accountHolderName?: string;
-    accountCountry?: string;
-    accountCity?: string;
-    businessType?: string;
-    productInfo?: {
-        product: string;
-        annualSalary: number;
-        annualValueExports: number;
-        annualValueImports: number;
-    };
-    pocName?: string;
-    pocEmail?: string;
-    pocPhone?: string;
-    poc?: string;
-    pocDesignation?: string;
-    currentBanks?: string[];
-    authorizationPocLetter?: string;
-    confirmationLcs?: boolean;
-    discountingLcs?: boolean
-    guaranteesCounterGuarantees?: boolean
-    discountingAvalizedBills?: boolean
-    avalizationExportBills?: boolean
-    riskParticipation: boolean
-    isDeleted?: boolean;
+
+    fcmTokens?: string[];
+    
     createdAt?: Date;
     updatedAt?: Date;
 }
+export interface IUserDocs  extends Document,IUser {
+    _id: string;
+    isPasswordCorrect(password: string): Promise<boolean>;
+} 

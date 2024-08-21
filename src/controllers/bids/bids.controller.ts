@@ -4,7 +4,6 @@ import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers"
 import { BidsStatusCount, createBid, fetchBids, findBid, findBids, findLc, findRisk, findUser, IBid, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
-import mongoose from "mongoose";
 import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +25,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
         },
         { 
             path: 'lc',
-            select: 'createdBy refId status issuingBank amount', 
+            select: 'createdBy refId status issuingBanks amount', 
         }
     ];
 
