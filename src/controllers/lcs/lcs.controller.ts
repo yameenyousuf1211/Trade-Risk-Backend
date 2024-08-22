@@ -55,7 +55,8 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
       message: error.details[0].message,
     });
   }
-  const countLcs = await lcsCount({ draft: false });
+
+  const countLcs = await lcsCount();
   req.body.refId = countLcs + 1;
   
   req.body.createdBy = req.user.business;
