@@ -12,7 +12,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const limit = +(req.query.limit || 10);
     const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
     const lc = req.query.lc || '';
-    const corporateBusinessId = req.query.corporateBusinessId || null;
+    const corporateBusinessId = req.query.corporateBusinessId || null
 
     const filter: { [key: string]: any } = {};
 
