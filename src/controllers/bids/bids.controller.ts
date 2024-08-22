@@ -10,7 +10,7 @@ import { createAndSendNotifications } from "../../utils/firebase.notification&St
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
-    const type = req.query.type || null;
+    const type = req.query.type || 'LC Confirmation';
     const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
     const lc = req.query.lc || '';
     const corporateBusinessId = req.query.corporateBusinessId || null
