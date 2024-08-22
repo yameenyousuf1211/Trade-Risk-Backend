@@ -188,7 +188,9 @@ export const findLc = (
   }
   return queryBuilder;
 };
+
 export const updateLc = (query: any, update: any) => LcsModel.findOneAndUpdate(query, update, { new: true });
 export const deleteLc = (id: string) => LcsModel.findByIdAndDelete(id);
 export const lcsCount = (query?: any) => LcsModel.countDocuments(query);
 export const aggregateFetchLcs = (query: any) => LcsModel.aggregate(query);
+export const fetchAllLcsWithoutPagination = (query: any) => LcsModel.find(query);
