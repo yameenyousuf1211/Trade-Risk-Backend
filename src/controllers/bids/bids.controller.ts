@@ -10,6 +10,7 @@ import { createAndSendNotifications } from "../../utils/firebase.notification&St
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page: number = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
+    const type = req.query.type || null;
     const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
     const lc = req.query.lc || '';
     const corporateBusinessId = req.query.corporateBusinessId || null
@@ -18,7 +19,8 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     if (bidBy) filter['bidBy'] = bidBy;
     if (lc) filter['lc'] = lc;
-
+    if(type) filter['bidType'] = type;
+    
     if (corporateBusinessId) {
         const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
         console.log('LC IDs:', lcIds.map((lc:any) => lc._id));
@@ -38,7 +40,6 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     // Fetch the bids with the constructed query
     const fetchedBids = await fetchBids({ page, limit, query: filter, populate });
-    console.log(fetchedBids);
     
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
