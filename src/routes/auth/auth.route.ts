@@ -1,4 +1,4 @@
-import { currentUser, login, logout, register,phoneVerification } from "../../controllers";
+import { currentUser, login, logout, register,phoneVerification, isEmailAlreadyExist } from "../../controllers";
 import { Router } from "express";
 import { loginValidation, registerValidation } from "../../validation/auth/auth.validation";
 import { upload } from "../../utils/multer";
@@ -17,6 +17,7 @@ export default class AuthAPI {
         this.router.get('/current-user', authMiddleware(Object.values(ROLES)), currentUser)
         this.router.post('/phone-verification',phoneVerification)
         this.router.post('/logout', authMiddleware(Object.values(ROLES)), logout);
+        this.router.post('/check-email',isEmailAlreadyExist);
     }
 
     getRouter() {
