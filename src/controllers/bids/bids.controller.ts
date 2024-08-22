@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 
-import { BidsStatusCount, createBid, fetchBids, findBid, findLc, findRisk, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 
@@ -20,9 +20,9 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     if (lc) filter['lc'] = lc;
 
     if (corporateBusinessId) {
-        filter['lc'] = {
-            $in: await findLc({ createdBy: corporateBusinessId }).select('_id')
-        };
+        const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
+        console.log('LC IDs:', lcIds.map((lc:any) => lc._id));
+        filter['lc'] = { $in: lcIds.map((lc:any) => lc._id) };
     }
 
     const populate = [
@@ -38,7 +38,8 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     // Fetch the bids with the constructed query
     const fetchedBids = await fetchBids({ page, limit, query: filter, populate });
-
+    console.log(fetchedBids);
+    
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
