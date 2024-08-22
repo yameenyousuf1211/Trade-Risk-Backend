@@ -34,6 +34,7 @@ export const lgValidator = joi.object({
     name: joi.string().required(),
     address: joi.string().optional(),
     phoneNumber: joi.string().optional(),
+    city: joi.string().optional(),
   }).required(),
 
   lgDetailsType: joi.string().optional().default('Choose any other type of LGs'),
