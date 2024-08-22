@@ -11,31 +11,37 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const page: number = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
     const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
-    const lc = req.query.lc || '' ;
+    const lc = req.query.lc || '';
+    const corporateBusinessId = req.query.corporateBusinessId || null;
 
-    const filter = [];
-    if (bidBy) filter.push({ bidBy: bidBy });
-    if (lc) filter.push({ lc: lc });
-    
-    const query: { [key: string]: any } = filter.length > 0 ? { $and: filter } : {};
-    
+    const filter: { [key: string]: any } = {};
+
+    if (bidBy) filter['bidBy'] = bidBy;
+    if (lc) filter['lc'] = lc;
+
+    if (corporateBusinessId) {
+        filter['lc'] = {
+            $in: await findLc({ createdBy: corporateBusinessId }).select('_id')
+        };
+    }
+
     const populate = [
-        { 
-            path: 'bidBy', 
-            select: 'name email pocEmail swiftCode ' 
+        {
+            path: 'bidBy',
+            select: 'name email pocEmail swiftCode '
         },
-        { 
+        {
             path: 'lc',
-            select: 'createdBy refId status issuingBanks amount', 
-
+            select: 'createdBy refId status issuingBanks amount',
         }
     ];
 
     // Fetch the bids with the constructed query
-    const fetchedBids = await fetchBids({ page, limit, query,populate });
-    
+    const fetchedBids = await fetchBids({ page, limit, query: filter, populate });
+
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
+
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.lc && !req.body.risk) return next({
@@ -43,7 +49,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         statusCode: STATUS_CODES.BAD_REQUEST
     });
     const role = req.user.role;
-    let notification:any;
+    let notification: any;
 
     const newBidId = getMongoId();
 
@@ -53,11 +59,11 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Lc not found',
             statusCode: STATUS_CODES.NOT_FOUND
         });
-        notification={
-            users:lc.createdBy,
-            title:`${req.user.name}`,
-            message:` has added a bid on your LC refId ${lc.refId}`,
-            requestId:lc._id,senderId:req.user._id,receiverId:lc.createdBy
+        notification = {
+            users: lc.createdBy,
+            title: `${req.user.name}`,
+            message: ` has added a bid on your LC refId ${lc.refId}`,
+            requestId: lc._id, senderId: req.user._id, receiverId: lc.createdBy
         }
 
         const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
@@ -66,8 +72,8 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-        const isBidExist = await findBid({ lc: req.body.lc,bidBy:req.user.business });
-        
+        const isBidExist = await findBid({ lc: req.body.lc, bidBy: req.user.business });
+
         if (isBidExist) return next({
             message: 'Lc already has a pending bid',
             statusCode: STATUS_CODES.BAD_REQUEST
@@ -86,11 +92,11 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Risk not found',
             statusCode: STATUS_CODES.NOT_FOUND
         })
-        notification={
-            users:risk.createdBy,
-            title:`${req.user.name}`,
-            message:` has added a bid on your RISK ${risk.transaction}`,
-            requestId:null,senderId:req.user._id,receiverId:risk.createdBy
+        notification = {
+            users: risk.createdBy,
+            title: `${req.user.name}`,
+            message: ` has added a bid on your RISK ${risk.transaction}`,
+            requestId: null, senderId: req.user._id, receiverId: risk.createdBy
         }
 
         const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
@@ -108,7 +114,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
 
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
-    await createAndSendNotifications(notification, false,req.user.type);
+    await createAndSendNotifications(notification, false, req.user.type);
     generateResponse(bid, 'Bids created successfully', res);
 })
 

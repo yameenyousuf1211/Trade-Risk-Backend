@@ -57,6 +57,7 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   }
 
   const countLcs = await lcsCount();
+
   req.body.refId = countLcs + 1;
   
   req.body.createdBy = req.user.business;
