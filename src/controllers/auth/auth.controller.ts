@@ -87,3 +87,10 @@ export const phoneVerification = asyncHandler(async (req: Request, res: Response
             })
     }
 });
+
+export const isEmailAlreadyExist = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    const user = await findUser({ email });
+    generateResponse({ isExist: !!user }, 'Email checked successfully', res);
+
+});
