@@ -18,7 +18,12 @@ export const fetchAllLcs = asyncHandler(
     const limit = +(req.query.limit || 10);
 
     const filters: any[] = [];
-    if (req.query.draft) filters.push({ draft: true });
+    if (req.query.draft) {
+      filters.push({ draft: true });
+    }
+    else{
+      filters.push({ draft: false });
+    }
     if (req.query.type) filters.push({ type: req.query.type });
     if (req.query.refId) filters.push({ refId: req.query.refId });
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
@@ -50,7 +55,7 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
       message: error.details[0].message,
     });
   }
-  
+
   const countLcs = await lcsCount();
   req.body.refId = countLcs + 1;
   
