@@ -32,7 +32,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
         },
         {
             path: 'lc',
-            select: 'createdBy refId status issuingBanks amount',
+            select: 'createdBy refId status issuingBanks amount confirmingBank',
         }
     ];
 
