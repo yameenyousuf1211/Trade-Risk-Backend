@@ -63,7 +63,7 @@ const registerValidator = joi.object({
         accountCountry: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountCity: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         businessNature: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
-        poc: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        poc: joi.string().when('type', { is: 'corporate', then: joi.optional(), otherwise: joi.forbidden() }).allow(null,''),
         pocDesignation: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
     }).required(),
 });
