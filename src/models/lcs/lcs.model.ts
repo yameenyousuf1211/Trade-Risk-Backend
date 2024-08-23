@@ -150,7 +150,8 @@ const LcsSchema: Schema = new Schema({
   physicalLg: Boolean,
   physicalLgCountry: String,
   physicalLgSwiftCode: String,
-
+  totalContractValue:String,
+  totalContractCurrency:String,
   bids: { type: [Schema.Types.ObjectId], ref: "Bid", default: [] },
   lastDateOfReceivingBids: String
 }, { timestamps: true, versionKey: false });

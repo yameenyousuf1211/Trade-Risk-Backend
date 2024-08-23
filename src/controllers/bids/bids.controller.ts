@@ -21,8 +21,9 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     if (bidBy) filter['bidBy'] = bidBy;
     if (lc) filter['lc'] = lc;
-    if (type) filter['bidType'] = type;
 
+    if(type) filter['bidType'] = type;
+    filter['sort'] = { createdAt: -1 };
     if (corporateBusinessId) {
         const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
         console.log('LC IDs:', lcIds.map((lc: any) => lc._id));
@@ -76,12 +77,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-        const isBidExist = await findBid({ lc: req.body.lc, bidBy: req.user.business });
-
-        if (isBidExist) return next({
-            message: 'Lc already has a pending bid',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
+     
 
         if (role === 'admin') {
             const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: newBidId } });
