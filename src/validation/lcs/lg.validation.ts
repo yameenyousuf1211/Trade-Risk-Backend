@@ -104,6 +104,7 @@ export const lgValidator = joi.object({
   physicalLgCountry: joi.string().optional().allow(null).allow(''),
   physicalLgSwiftCode: joi.string().optional().allow(null).allow(''),
   lastDateOfReceivingBids: joi.date().required(),
+  totalLgAmount: joi.string().optional(),
 })
   .custom((value, helpers) => {
     if (value.lgDetailsType === contractRelatedLGsCondition) {

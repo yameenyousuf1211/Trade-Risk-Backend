@@ -131,6 +131,7 @@ const LcsSchema: Schema = new Schema({
     expectedPrice: Boolean,
     pricePerAnnum: String,
   },
+  totalLgAmount: String,
   typeOfLg: {
     type: String, enum: [
       "Bid Bond",
