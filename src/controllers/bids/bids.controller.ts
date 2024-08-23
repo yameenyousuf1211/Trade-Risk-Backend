@@ -21,12 +21,12 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     if (bidBy) filter['bidBy'] = bidBy;
     if (lc) filter['lc'] = lc;
-    if(type) filter['bidType'] = type;
-    
+    if (type) filter['bidType'] = type;
+
     if (corporateBusinessId) {
         const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
-        console.log('LC IDs:', lcIds.map((lc:any) => lc._id));
-        filter['lc'] = { $in: lcIds.map((lc:any) => lc._id) };
+        console.log('LC IDs:', lcIds.map((lc: any) => lc._id));
+        filter['lc'] = { $in: lcIds.map((lc: any) => lc._id) };
     }
 
     const populate = [
@@ -42,7 +42,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     // Fetch the bids with the constructed query
     const fetchedBids = await fetchBids({ page, limit, query: filter, populate });
-    
+
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
@@ -154,12 +154,12 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
 
     if (bid.status === 'Accepted') {
         if (key === 'lc') {
-            await updateBids({
-                $and: [
-                    { _id: { $ne: bid._id } },
-                    { lc: bid.lc }
-                ]
-            }, { status: 'Rejected' });
+            await updateBids(
+                { $and: [{ _id: { $ne: bid._id } }, { lc: bid.lc }] },
+                {
+                    status: 'Rejected',
+                    bids: req.body.bids
+                });
 
             const lc = await findLc({ _id: bid.lc }).select('status');
             lc.status = 'Accepted';
