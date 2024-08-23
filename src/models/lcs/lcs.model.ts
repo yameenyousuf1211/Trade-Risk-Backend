@@ -17,8 +17,8 @@ const bondSchema = new Schema({
   currencyType: String,
   cashMargin: Number,
   valueInPercentage: Number,
-  expectedDate: Date,
-  lgExpiryDate: Date,
+  expectedDate: String,
+  lgExpiryDate: String,
   name: String,
   lgDetailAmount: Number,
   lgTenor: {
@@ -152,7 +152,7 @@ const LcsSchema: Schema = new Schema({
   physicalLgSwiftCode: String,
 
   bids: { type: [Schema.Types.ObjectId], ref: "Bid", default: [] },
-  lastDateOfReceivingBids: Date
+  lastDateOfReceivingBids: String
 }, { timestamps: true, versionKey: false });
 
 LcsSchema.plugin(mongoosePaginate);
