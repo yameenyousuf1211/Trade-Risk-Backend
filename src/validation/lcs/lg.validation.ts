@@ -9,8 +9,8 @@ const bondSchema = joi.object({
   cashMargin: joi.number(),
   valueInPercentage: joi.string().allow(''),
   name: joi.string().allow(''),
-  expectedDate: joi.date(),
-  lgExpiryDate: joi.date(),
+  expectedDate: joi.string(),
+  lgExpiryDate: joi.string(),
   lgTenor: joi.object({
     lgTenorType: joi.string().allow(''),
     lgTenorValue: joi.string().allow(''),
@@ -103,7 +103,7 @@ export const lgValidator = joi.object({
   physicalLgBank: joi.string().optional().allow(null).allow(''),
   physicalLgCountry: joi.string().optional().allow(null).allow(''),
   physicalLgSwiftCode: joi.string().optional().allow(null).allow(''),
-  lastDateOfReceivingBids: joi.date().required(),
+  lastDateOfReceivingBids: joi.string().required(),
   totalLgAmount: joi.number().optional(),
 })
   .custom((value, helpers) => {
