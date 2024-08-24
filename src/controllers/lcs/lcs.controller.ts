@@ -68,7 +68,7 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
       message:`Ref no ${lcs.refId} from ${req.user.name}`,
       requestId:lcs._id,senderId:req.user._id,receiverId:null
     }
-  await createAndSendNotifications(notification,true,req.user.type)
+  await createAndSendNotifications(notification,true,'bank')
   generateResponse(lcs, "Lcs created successfully", res);
 });
 

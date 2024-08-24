@@ -113,7 +113,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
 
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
-    await createAndSendNotifications(notification, false, req.user.type);
+    await createAndSendNotifications(notification, false, 'corporate');
     generateResponse(bid, 'Bids created successfully', res);
 })
 

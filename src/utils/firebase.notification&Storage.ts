@@ -13,6 +13,8 @@ interface NotificationParams {
     title: string;
     body: string;
     token: any;
+    userType:string;
+    requestId:string;
 }
 
 export const createAndSendNotifications = async ({  users, title,message, requestId,senderId,receiverId }:any,sendToAll:boolean,userType:string) => {
@@ -40,15 +42,19 @@ export const createAndSendNotifications = async ({  users, title,message, reques
   let fcmTokens = await getFcmTokens(users);
   fcmTokens = fcmTokens.flat();
 
-  sendFirebaseNotification({ title,body:message, token:fcmTokens });
+  sendFirebaseNotification({ title,body:message, token:fcmTokens,userType,requestId });
 }
 
-export const sendFirebaseNotification = async ({ title, body, token }:NotificationParams) => {
+export const sendFirebaseNotification = async ({ title, body, token,userType,requestId }:NotificationParams) => {
   const message = {
     notification: {
       title,
       body,
-    }
+    },
+    data: {
+      userType,
+      requestId,
+  }
   };
 
   try {
