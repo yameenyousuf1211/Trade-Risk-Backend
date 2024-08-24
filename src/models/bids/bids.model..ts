@@ -64,9 +64,9 @@ export const updateBid = (query: Record<string, any>, update: Record<string, any
 // export const findMany = (query: Record<string, any>) => BidModel.find(query);
 
 export const fetchBids = async ({ query, page, limit, populate,sort }: IPaginationFunctionParams)
-    : Promise<IPaginationResult<IBid>> => {
-    const { data, pagination }: IPaginationResult<IBid> = await getMongoosePaginatedData({
-        model: BidModel, query, page, limit,populate,sort
+: Promise<IPaginationResult<IBid>> => {
+    const { data, pagination }: IPaginationResult<IBid> = await getMongooseAggregatePaginatedData({
+        model: BidModel, query: [query], page, limit
     });
 
     return { data, pagination };

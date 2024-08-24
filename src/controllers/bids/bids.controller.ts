@@ -6,45 +6,85 @@ import { STATUS_CODES } from "../../utils/constants";
 
 
 import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
+import mongoose, { PipelineStage } from "mongoose";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const page: number = +(req.query.page || 1);
-    const limit = +(req.query.limit || 10);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
     const type = req.query.type || 'LC Confirmation';
-
     const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
     const lc = req.query.lc || '';
-    const corporateBusinessId = req.query.corporateBusinessId || null
+    const corporateBusinessId = req.query.corporateBusinessId || null;
 
-    const filter: { [key: string]: any } = {};
+    const query: PipelineStage[] = [];
 
-    if (bidBy) filter['bidBy'] = bidBy;
-    if (lc) filter['lc'] = lc;
+    if (type) query.push({ $match: { bidType: type } });
+    if (lc) query.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
 
-    if(type) filter['bidType'] = type;
-    if (corporateBusinessId) {
-        const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
-        console.log('LC IDs:', lcIds.map((lc: any) => lc._id));
-        filter['lc'] = { $in: lcIds.map((lc: any) => lc._id) };
+    if (bidBy) {
+        query.push({ $match: { bidBy: new mongoose.Types.ObjectId(req.user.business as string) } });
     }
 
-    const populate = [
-        {
-            path: 'bidBy',
-            select: 'name email pocEmail swiftCode '
-        },
-        {
-            path: 'lc',
-            select: 'createdBy refId status issuingBanks amount confirmingBank',
-        }
-    ];
+    if (corporateBusinessId) {
+        const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
+        const lcIdArray = lcIds.map((lc: any) => lc._id);
+        query.push({ $match: { lc: { $in: lcIdArray } } });
+    }
 
-    // Fetch the bids with the constructed query
-    const fetchedBids = await fetchBids({ page, limit, query: filter, populate ,sort: { createdAt: -1 } });
+    query.push({
+        $lookup: {
+            from: 'businesses',
+            localField: 'bidBy',
+            foreignField: '_id',
+            as: 'bidByInfo'
+        }
+    });
+
+    query.push({
+        $unwind: {
+            path: '$bidByInfo',
+            preserveNullAndEmptyArrays: true
+        }
+    });
+
+    query.push({
+        $lookup: {
+            from: 'lcs',
+            localField: 'lc',
+            foreignField: '_id',
+            as: 'lcInfo'
+        }
+    });
+
+    query.push({
+        $unwind: {
+            path: '$lcInfo',
+            preserveNullAndEmptyArrays: true
+        }
+    });
+
+    query.push({
+        $group: {
+            _id: '$_id',
+            bidType: { $first: '$bidType' },
+            amount: { $first: '$amount' },
+            validity: { $first: '$validity' },
+            status: { $first: '$status' },
+            createdAt: { $first: '$createdAt' },
+            bidByInfo: { $first: '$bidByInfo' },
+            lcInfo: { $first: '$lcInfo' },
+            createdBy: { $first: '$createdBy' }
+        }
+    });
+
+    query.push({ $sort: { createdAt: -1 } });
+
+    const fetchedBids = await fetchBids({query, page, limit,sort: { createdAt: -1 }});
 
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
+
 
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
