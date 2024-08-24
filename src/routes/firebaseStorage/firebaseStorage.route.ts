@@ -11,8 +11,8 @@ export default class FIREBASESTORAGEAPI {
     }
     
     setupRoutes() {
-        this.router.post('/', upload("file").fields([{ name: 'file', maxCount: 1 }]), authMiddleware(Object.values(ROLES)), uploadFile);
-        this.router.delete('/:fileId', authMiddleware(Object.values(ROLES)), deleteFile);
+        this.router.post('/', upload("file").fields([{ name: 'file', maxCount: 1 }]), uploadFile);
+        this.router.delete('/:fileId', deleteFile);
     }    
 
     getRouter() {
