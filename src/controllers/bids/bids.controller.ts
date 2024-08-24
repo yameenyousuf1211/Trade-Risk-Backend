@@ -42,7 +42,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     ];
 
     // Fetch the bids with the constructed query
-    const fetchedBids = await fetchBids({ page, limit, query: filter, populate });
+    const fetchedBids = await fetchBids({ page, limit, query: filter, populate ,sort: { createdAt: -1 } });
 
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
