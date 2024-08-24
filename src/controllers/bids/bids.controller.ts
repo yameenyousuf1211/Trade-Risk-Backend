@@ -23,7 +23,6 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     if (lc) filter['lc'] = lc;
 
     if(type) filter['bidType'] = type;
-    filter['sort'] = { createdAt: -1 };
     if (corporateBusinessId) {
         const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
         console.log('LC IDs:', lcIds.map((lc: any) => lc._id));
