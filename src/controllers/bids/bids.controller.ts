@@ -37,13 +37,13 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             from: 'businesses',
             localField: 'bidBy',
             foreignField: '_id',
-            as: 'bidByInfo'
+            as: 'bidBy'
         }
     });
 
     query.push({
         $unwind: {
-            path: '$bidByInfo',
+            path: '$bidBy',
             preserveNullAndEmptyArrays: true
         }
     });
@@ -72,7 +72,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             validity: { $first: '$validity' },
             status: { $first: '$status' },
             createdAt: { $first: '$createdAt' },
-            bidByInfo: { $first: '$bidByInfo' },
+            bidByInfo: { $first: '$bidBy' },
             lcInfo: { $first: '$lcInfo' },
             createdBy: { $first: '$createdBy' }
         }
