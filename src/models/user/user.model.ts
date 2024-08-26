@@ -23,6 +23,7 @@ const userSchema = new Schema({
     allowNewRequestNotification: { type: Boolean, default: true },
 
     fcmTokens: { type: [String], default: [] },
+    attachments: { type: [String], default: [] },
 }, { timestamps: true, versionKey: false });
 
 // hash password before saving

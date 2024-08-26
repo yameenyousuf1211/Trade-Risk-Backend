@@ -22,8 +22,8 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
         message: 'Business not created'
     });
 
-    const { name, email, role, type, password, fcmTokens } = body;
-    const user = await createUser({ name, email, role, type, password, business: business._id, fcmTokens });
+    const { name, email, role, type, password, fcmTokens,attachments } = body;
+    const user = await createUser({ name, email, role, type, password, business: business._id, fcmTokens,attachments });
     generateResponse(user, "Register successful", res);
 });
 
