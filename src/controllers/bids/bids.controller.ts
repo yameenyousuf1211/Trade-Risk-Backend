@@ -59,7 +59,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 
     query.push({
         $unwind: {
-            path: '$lcInfo',
+            path: '$lc',
             preserveNullAndEmptyArrays: true
         }
     });
@@ -73,12 +73,10 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             status: { $first: '$status' },
             createdAt: { $first: '$createdAt' },
             bidByInfo: { $first: '$bidBy' },
-            lcInfo: { $first: '$lcInfo' },
+            lcInfo: { $first: '$lc' },
             createdBy: { $first: '$createdBy' }
         }
     });
-
-    query.push({ $sort: { createdAt: -1 } });
 
     const fetchedBids = await fetchBids({query, page, limit,sort: { createdAt: -1 }});
 
