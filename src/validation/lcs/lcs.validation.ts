@@ -27,7 +27,7 @@ export const lcsValidator = joi.object({
         days: joi.number(),
         other: joi.string()
     }).optional().when('paymentTerms', {
-        is: 'Usance LC',
+        is: 'Sight LC',
         then: joi.optional(),
         otherwise: joi.forbidden()
     }),
@@ -179,6 +179,7 @@ export const lcsValidator = joi.object({
         then: joi.required(),
         otherwise: joi.forbidden()
     }),
+    lastDateOfReceivingBids: joi.date().required(),
 });
 
 const lcsValidation = validateRequest(lcsValidator);
