@@ -78,7 +78,9 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
         }
     });
 
-    const fetchedBids = await fetchBids({query, page, limit,sort: { createdAt: -1 }});
+    query.push({ $sort: { createdAt: -1 } });
+
+    const fetchedBids = await fetchBids({query, page, limit});
 
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
