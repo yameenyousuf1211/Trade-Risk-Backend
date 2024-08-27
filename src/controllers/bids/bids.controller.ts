@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 
-import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 
@@ -22,7 +22,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     if (bidBy) filter['bidBy'] = bidBy;
     if (lc) filter['lc'] = lc;
 
-    if(type) filter['bidType'] = type;
+    if (type) filter['bidType'] = type;
     if (corporateBusinessId) {
         const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
         console.log('LC IDs:', lcIds.map((lc: any) => lc._id));
@@ -41,7 +41,7 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     ];
 
     // Fetch the bids with the constructed query
-    const fetchedBids = await fetchBids({ page, limit, query: filter, populate ,sort: { createdAt: -1 } });
+    const fetchedBids = await fetchBids({ page, limit, query: filter, populate, sort: { createdAt: -1 } });
 
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
@@ -76,7 +76,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-     
+
 
         if (role === 'admin') {
             const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: newBidId } });
@@ -130,7 +130,6 @@ export const deleteBid = asyncHandler(async (req: Request, res: Response, next: 
 })
 
 export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const bid = await findBid({ _id: req.body.id });
     const key = req.query.key ? req.query.key : 'lc';
     const status = req.query.status as string;
 
@@ -139,12 +138,15 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
         statusCode: STATUS_CODES.BAD_REQUEST
     })
 
+    const bid: any = await findBid({ _id: req.body.id });
     if (!bid) return next({
         message: 'bid not found',
         statusCode: STATUS_CODES.NOT_FOUND
     })
 
+    // Update the bid object
     bid.status = status;
+    if (Array.isArray(req.body.bids) && req.body.bids.length > 0) bid.bids = req.body.bids;
     await bid.save();
 
     if (bid.status === 'Accepted') {
