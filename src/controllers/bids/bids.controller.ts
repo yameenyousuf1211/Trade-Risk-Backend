@@ -6,7 +6,7 @@ import { STATUS_CODES } from "../../utils/constants";
 
 
 import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
-import mongoose, { PipelineStage } from "mongoose";
+import mongoose from "mongoose";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page = Number(req.query.page) || 1;
@@ -38,6 +38,9 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             localField: 'bidBy',
             foreignField: '_id',
             as: 'bidBy',
+            pipeline: [
+                { $project: { name: 1, email: 1, swiftCode: 1,  pocEmail:1 } }
+            ]
         },
     });
 
@@ -54,6 +57,9 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             localField: 'lc',
             foreignField: '_id',
             as: 'lc',
+            pipeline: [
+                { $project: { amount: 1, refId: 1, issuingBanks: 1, confirmingBank:1,createdBy:1,status:1 } }
+            ]
         },
     });
 
@@ -68,13 +74,17 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
         $group: {
             _id: '$_id',
             bidType: { $first: '$bidType' },
-            amount: { $first: '$amount' },
-            validity: { $first: '$validity' },
+            confirmationPrice: { $first: '$confirmationPrice' },
+            perAnnum: { $first: '$perAnnum' },
+            bids: { $first: '$bids' },
+            bidValidity: { $first: '$bidValidity' },
+            approvalStatus: { $first: '$approvalStatus' },
             status: { $first: '$status' },
-            createdAt: { $first: '$createdAt' },
-            bidByInfo: { $first: '$bidBy' },
-            lcInfo: { $first: '$lc' },
+            bidBy: { $first: '$bidBy' },
+            lc: { $first: '$lc' },
             createdBy: { $first: '$createdBy' },
+            createdAt: { $first: '$createdAt' },
+            updatedAt: { $first: '$updatedAt' },
         },
     });
 
