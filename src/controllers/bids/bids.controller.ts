@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 
-import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
 
 
@@ -17,54 +17,54 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
     const lc = req.query.lc || '';
     const corporateBusinessId = req.query.corporateBusinessId || null;
 
-    const query: PipelineStage[] = [];
+    const pipeline: mongoose.PipelineStage[] = [];
 
-    if (type) query.push({ $match: { bidType: type } });
-    if (lc) query.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
+    if (type) pipeline.push({ $match: { bidType: type } });
+    if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
 
     if (bidBy) {
-        query.push({ $match: { bidBy: new mongoose.Types.ObjectId(req.user.business as string) } });
+        pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(req.user.business as string) } });
     }
 
     if (corporateBusinessId) {
         const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
         const lcIdArray = lcIds.map((lc: any) => lc._id);
-        query.push({ $match: { lc: { $in: lcIdArray } } });
+        pipeline.push({ $match: { lc: { $in: lcIdArray } } });
     }
 
-    query.push({
+    pipeline.push({
         $lookup: {
             from: 'businesses',
             localField: 'bidBy',
             foreignField: '_id',
-            as: 'bidBy'
-        }
+            as: 'bidBy',
+        },
     });
 
-    query.push({
+    pipeline.push({
         $unwind: {
             path: '$bidBy',
-            preserveNullAndEmptyArrays: true
-        }
+            preserveNullAndEmptyArrays: true,
+        },
     });
 
-    query.push({
+    pipeline.push({
         $lookup: {
             from: 'lcs',
             localField: 'lc',
             foreignField: '_id',
-            as: 'lcInfo'
-        }
+            as: 'lc',
+        },
     });
 
-    query.push({
+    pipeline.push({
         $unwind: {
             path: '$lc',
-            preserveNullAndEmptyArrays: true
-        }
+            preserveNullAndEmptyArrays: true,
+        },
     });
 
-    query.push({
+    pipeline.push({
         $group: {
             _id: '$_id',
             bidType: { $first: '$bidType' },
@@ -74,13 +74,13 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
             createdAt: { $first: '$createdAt' },
             bidByInfo: { $first: '$bidBy' },
             lcInfo: { $first: '$lc' },
-            createdBy: { $first: '$createdBy' }
-        }
+            createdBy: { $first: '$createdBy' },
+        },
     });
 
-    query.push({ $sort: { createdAt: -1 } });
+    pipeline.push({ $sort: { createdAt: -1 } });
 
-    const fetchedBids = await fetchBids({query, page, limit});
+    const fetchedBids = await fetchBids({ query: pipeline, page, limit });
 
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
@@ -116,7 +116,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-     
+
 
         if (role === 'admin') {
             const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: newBidId } });
@@ -170,7 +170,6 @@ export const deleteBid = asyncHandler(async (req: Request, res: Response, next: 
 })
 
 export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const bid = await findBid({ _id: req.body.id });
     const key = req.query.key ? req.query.key : 'lc';
     const status = req.query.status as string;
 
@@ -179,12 +178,15 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
         statusCode: STATUS_CODES.BAD_REQUEST
     })
 
+    const bid: any = await findBid({ _id: req.body.id });
     if (!bid) return next({
         message: 'bid not found',
         statusCode: STATUS_CODES.NOT_FOUND
     })
 
+    // Update the bid object
     bid.status = status;
+    if (Array.isArray(req.body.bids) && req.body.bids.length > 0) bid.bids = req.body.bids;
     await bid.save();
 
     if (bid.status === 'Accepted') {

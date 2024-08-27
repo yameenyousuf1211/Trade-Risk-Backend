@@ -59,7 +59,7 @@ const BidModel = mongoose.model<IBid>('Bid', bidSchema);
 export const createBid = (obj: IBid) => BidModel.create(obj);
 export const findBid = (query: Record<string, any>) => BidModel.findOne(query);
 export const findBids = (query: Record<string, any>) => BidModel.find(query);
-export const updateBid = (query: Record<string, any>, update: Record<string, any>) => BidModel.updateOne(query, update);
+export const updateBid = (query: Record<string, any>, update: Record<string, any>) => BidModel.findOneAndUpdate(query, update, { new: true });
 
 // export const findMany = (query: Record<string, any>) => BidModel.find(query);
 
@@ -84,9 +84,9 @@ export const BidsStatusCount = (userId: string) => BidModel.aggregate([
     },
     {
         $project: {
-            _id: 0,        
-            status: '$_id', 
-            count: 1       
+            _id: 0,
+            status: '$_id',
+            count: 1
         }
     }
 ]);
