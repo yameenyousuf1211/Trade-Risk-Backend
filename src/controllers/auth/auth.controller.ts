@@ -13,17 +13,21 @@ interface FileArray {
 
 export const register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const body = parseBody(req.body);
-
-    req.body.password = generatePassword(); // password will be generate and send to user via email later he can change
-
     const business = await createBusiness(body?.businessData);
     if (!business) return next({
         statusCode: STATUS_CODES.BAD_REQUEST,
         message: 'Business not created'
     });
 
-    const { name, email, role, type, password, fcmTokens } = body;
-    const user = await createUser({ name, email, role, type, password, business: business._id, fcmTokens });
+    const data = {
+        ...body,
+        password:generatePassword(),
+        business: business._id
+    }
+
+    delete data?.businessData
+
+    const user = await createUser(data);
     generateResponse(user, "Register successful", res);
 });
 

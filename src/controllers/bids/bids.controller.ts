@@ -5,46 +5,34 @@ import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, fi
 import { STATUS_CODES } from "../../utils/constants";
 
 
-import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
+import { createAndSendNotifications } from "../../utils/firebase";
+import mongoose from "mongoose";
+import ILcs from "../../interface/lc.interface";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const page: number = +(req.query.page || 1);
-    const limit = +(req.query.limit || 10);
+    const  {corporateBusinessId,lc,bidBy,type} = req.query;
+   const page = Number(req.query.page) || 1;
+   const limit = Number(req.query.limit) || 10;
 
-    const type = req.query.type || 'LC Confirmation';
+   const pipeline: mongoose.PipelineStage[] = [{ $match: { bidType: type || 'LC Confirmation' } }];
 
-    const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
-    const lc = req.query.lc || '';
-    const corporateBusinessId = req.query.corporateBusinessId || null
+   if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
 
-    const filter: { [key: string]: any } = {};
+   if (bidBy) {
+       pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(bidBy as string) } });
+   }
 
-    if (bidBy) filter['bidBy'] = bidBy;
-    if (lc) filter['lc'] = lc;
+   if (corporateBusinessId) {
+       const lcIds:ILcs[] = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
+       const lcIdArray = lcIds.map((lc: Partial<ILcs>) => lc._id);
+       pipeline.push({ $match: { lc: { $in: lcIdArray } } });
+   }
 
-    if (type) filter['bidType'] = type;
-    if (corporateBusinessId) {
-        const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
-        console.log('LC IDs:', lcIds.map((lc: any) => lc._id));
-        filter['lc'] = { $in: lcIds.map((lc: any) => lc._id) };
-    }
+   const fetchedBids = await fetchBids(pipeline,page, limit);
 
-    const populate = [
-        {
-            path: 'bidBy',
-            select: 'name email pocEmail swiftCode '
-        },
-        {
-            path: 'lc',
-            select: 'createdBy refId status issuingBanks amount confirmingBank',
-        }
-    ];
-
-    // Fetch the bids with the constructed query
-    const fetchedBids = await fetchBids({ page, limit, query: filter, populate, sort: { createdAt: -1 } });
-
-    generateResponse(fetchedBids, 'List fetched successfully', res);
+   generateResponse(fetchedBids, 'List fetched successfully', res);
 });
+
 
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -113,7 +101,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
 
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
-    await createAndSendNotifications(notification, false, req.user.type);
+    await createAndSendNotifications(notification, false, 'corporate');
     generateResponse(bid, 'Bids created successfully', res);
 })
 

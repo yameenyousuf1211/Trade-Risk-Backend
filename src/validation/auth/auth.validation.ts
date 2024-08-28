@@ -8,6 +8,7 @@ const registerValidator = joi.object({
     role: joi.string().valid('admin', 'user').required(),
     type: joi.string().valid('corporate', 'bank').required(),
     fcmTokens: joi.array().items(joi.string()).required(),
+    attachments: joi.array().items(joi.string()),
 
     businessData: joi.object({
         name: joi.string().required(),

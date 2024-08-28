@@ -28,8 +28,8 @@ export const lcsValidator = joi.object({
         other: joi.string()
     }).optional().when('paymentTerms', {
         is: 'Sight LC',
-        then: joi.optional(),
-        otherwise: joi.forbidden()
+        then: joi.forbidden(),
+        otherwise: joi.optional()
     }),
     issuingBanks: joi.array().items(
         joi.object({
