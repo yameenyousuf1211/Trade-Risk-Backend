@@ -63,15 +63,6 @@ export const updateBid = (query: Record<string, any>, update: Record<string, any
 
 // export const findMany = (query: Record<string, any>) => BidModel.find(query);
 
-export const fetchBids = async ({ query, page, limit }: IPaginationFunctionParams)
-: Promise<IPaginationResult<IBid>> => {
-    const { data, pagination }: IPaginationResult<IBid> = await getMongooseAggregatePaginatedData({
-        model: BidModel, query: [query], page, limit
-    });
-
-    return { data, pagination };
-};
-
 export const BidsStatusCount = (userId: string) => BidModel.aggregate([
     {
         $match: { bidBy: new mongoose.Types.ObjectId(userId) }
@@ -94,4 +85,74 @@ export const BidsStatusCount = (userId: string) => BidModel.aggregate([
 export const updateBids = (query: any, update: any) => BidModel.updateMany(query, update);
 
 
-
+export const fetchBids = async(pipelineStage:mongoose.PipelineStage[],page:number,limit = 10)=>{
+    const pipeline=[...pipelineStage,]
+        // Lookup to join with businesses collection
+        pipeline.push({
+            $lookup: {
+                from: 'businesses',
+                localField: 'bidBy',
+                foreignField: '_id',
+                as: 'bidBy',
+                pipeline: [
+                    { $project: { name: 1, email: 1, swiftCode: 1, pocEmail: 1 } }
+                ]
+            },
+        });
+    
+        // Unwind the bidBy array to get a single object
+        pipeline.push({
+            $unwind: {
+                path: '$bidBy',
+                preserveNullAndEmptyArrays: true,
+            },
+        });
+    
+        // Lookup to join with lcs collection
+        pipeline.push({
+            $lookup: {
+                from: 'lcs',
+                localField: 'lc',
+                foreignField: '_id',
+                as: 'lc',
+                pipeline: [
+                    { $project: { amount: 1, refId: 1, issuingBanks: 1, confirmingBank: 1, createdBy: 1, status: 1 } }
+                ]
+            },
+        });
+    
+        // Unwind the lc array to get a single object
+        pipeline.push({
+            $unwind: {
+                path: '$lc',
+                preserveNullAndEmptyArrays: true,
+            },
+        });
+    
+        // Group the results
+        pipeline.push({
+            $group: {
+                _id: '$_id',
+                bidType: { $first: '$bidType' },
+                confirmationPrice: { $first: '$confirmationPrice' },
+                perAnnum: { $first: '$perAnnum' },
+                bids: { $first: '$bids' },
+                bidValidity: { $first: '$bidValidity' },
+                approvalStatus: { $first: '$approvalStatus' },
+                status: { $first: '$status' },
+                bidBy: { $first: '$bidBy' },
+                lc: { $first: '$lc' },
+                createdBy: { $first: '$createdBy' },
+                createdAt: { $first: '$createdAt' },
+                updatedAt: { $first: '$updatedAt' },
+            },
+        });
+    
+        // Sort the results by creation date
+        pipeline.push({ $sort: { createdAt: -1 } });
+        const { data, pagination }: IPaginationResult<IBid> = await getMongooseAggregatePaginatedData({
+            model: BidModel, query: [pipeline], page, limit
+        });
+        return { data, pagination }
+    
+}

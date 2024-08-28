@@ -1,6 +1,6 @@
 import { asyncHandler } from './../../utils/helpers';
 import { NextFunction, Request, Response } from "express";
-import { bucket } from "../../utils/firebase.notification&Storage";
+import { bucket } from "../../utils/firebase";
 import { STATUS_CODES } from "http";
 import { generateResponse } from "../../utils/helpers";
 const fs =require('fs');

@@ -5,94 +5,32 @@ import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, fi
 import { STATUS_CODES } from "../../utils/constants";
 
 
-import { createAndSendNotifications } from "../../utils/firebase.notification&Storage";
+import { createAndSendNotifications } from "../../utils/firebase";
 import mongoose from "mongoose";
+import ILcs from "../../interface/lc.interface";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const  {corporateBusinessId,lc,bidBy,type} = req.query;
+   const page = Number(req.query.page) || 1;
+   const limit = Number(req.query.limit) || 10;
 
-    const type = req.query.type || 'LC Confirmation';
-    const bidBy = req.query.bidBy === 'true' ? req.user.business : null;
-    const lc = req.query.lc || '';
-    const corporateBusinessId = req.query.corporateBusinessId || null;
+   const pipeline: mongoose.PipelineStage[] = [{ $match: { bidType: type || 'LC Confirmation' } }];
 
-    const pipeline: mongoose.PipelineStage[] = [];
+   if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
 
-    if (type) pipeline.push({ $match: { bidType: type } });
-    if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
+   if (bidBy) {
+       pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(bidBy as string) } });
+   }
 
-    if (bidBy) {
-        pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(req.user.business as string) } });
-    }
+   if (corporateBusinessId) {
+       const lcIds:ILcs[] = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
+       const lcIdArray = lcIds.map((lc: Partial<ILcs>) => lc._id);
+       pipeline.push({ $match: { lc: { $in: lcIdArray } } });
+   }
 
-    if (corporateBusinessId) {
-        const lcIds = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
-        const lcIdArray = lcIds.map((lc: any) => lc._id);
-        pipeline.push({ $match: { lc: { $in: lcIdArray } } });
-    }
+   const fetchedBids = await fetchBids(pipeline,page, limit);
 
-    pipeline.push({
-        $lookup: {
-            from: 'businesses',
-            localField: 'bidBy',
-            foreignField: '_id',
-            as: 'bidBy',
-            pipeline: [
-                { $project: { name: 1, email: 1, swiftCode: 1,  pocEmail:1 } }
-            ]
-        },
-    });
-
-    pipeline.push({
-        $unwind: {
-            path: '$bidBy',
-            preserveNullAndEmptyArrays: true,
-        },
-    });
-
-    pipeline.push({
-        $lookup: {
-            from: 'lcs',
-            localField: 'lc',
-            foreignField: '_id',
-            as: 'lc',
-            pipeline: [
-                { $project: { amount: 1, refId: 1, issuingBanks: 1, confirmingBank:1,createdBy:1,status:1 } }
-            ]
-        },
-    });
-
-    pipeline.push({
-        $unwind: {
-            path: '$lc',
-            preserveNullAndEmptyArrays: true,
-        },
-    });
-
-    pipeline.push({
-        $group: {
-            _id: '$_id',
-            bidType: { $first: '$bidType' },
-            confirmationPrice: { $first: '$confirmationPrice' },
-            perAnnum: { $first: '$perAnnum' },
-            bids: { $first: '$bids' },
-            bidValidity: { $first: '$bidValidity' },
-            approvalStatus: { $first: '$approvalStatus' },
-            status: { $first: '$status' },
-            bidBy: { $first: '$bidBy' },
-            lc: { $first: '$lc' },
-            createdBy: { $first: '$createdBy' },
-            createdAt: { $first: '$createdAt' },
-            updatedAt: { $first: '$updatedAt' },
-        },
-    });
-
-    pipeline.push({ $sort: { createdAt: -1 } });
-
-    const fetchedBids = await fetchBids({ query: pipeline, page, limit });
-
-    generateResponse(fetchedBids, 'List fetched successfully', res);
+   generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
 
