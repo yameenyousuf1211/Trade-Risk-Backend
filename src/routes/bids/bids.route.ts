@@ -17,7 +17,7 @@ export default class BidsAPI {
         this.router.get('/', authMiddleware(Object.values(ROLES)), getAllBids);
         this.router.get('/:id', authMiddleware(Object.values(ROLES)), fetchbid);
         this.router.get('/count/list', authMiddleware(Object.values(ROLES)), findBidsCount);
-        this.router.post('/', authMiddleware(Object.values(ROLES)), bidsValidation, createBids)
+        this.router.post('/', authMiddleware([ROLES.BANK]), bidsValidation, createBids)
         this.router.put('/update/:bidId', authMiddleware([ROLES.ADMIN]), approvedOrRejectBidsByBankAdmin);
         this.router.put('/', authMiddleware(Object.values(ROLES)), acceptOrRejectBids)
     }
