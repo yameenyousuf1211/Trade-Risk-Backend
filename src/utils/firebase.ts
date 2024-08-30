@@ -52,8 +52,8 @@ export const createAndSendNotifications = async ({
   const userIds = await fetchUsers(sendToAll, userType, users);
   await createNotifications(userIds, title, message, requestId, senderId, receiverId);
 
-  const fcmTokens = (await getFcmTokens(userIds))?.flat();
-  const payload = { userType, requestId:requestId.toString() };
+  const fcmTokens = await getFcmTokens(userIds);
+  const payload = { userType, requestId: requestId.toString() };
 
   const notificationData: NotificationParams = { title, body: message, tokens: fcmTokens, payload };
   await sendFirebaseNotification(notificationData);
@@ -63,15 +63,14 @@ export const sendFirebaseNotification = async (data: NotificationParams) => {
   const { title, body, tokens, payload } = data;
   const message = {
     notification: { title, body },
-    data: payload ,
+    tokens,
+    data: payload,
   };
 
   try {
-    if (tokens.length > 0) {
-      const multicastMessage = { ...message, tokens };
-      const response = await admin.messaging().sendMulticast(multicastMessage);
-      return response;
-    }
+    const response = await admin.messaging().sendMulticast(message);
+    console.log('sendFirebaseNotification ok>>>>>>>>>>', response);
+    return response;
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;

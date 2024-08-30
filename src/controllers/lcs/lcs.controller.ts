@@ -33,44 +33,44 @@ export const fetchAllLcs = asyncHandler(
   });
 
 export const createLcOrLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-  
+
   if (!req.body.type) return next({
     statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
     message: "Type is required",
   });
 
-  const isLc = req.body.type.toLowerCase().includes("lc");
-  const lcOrLgValidation = isLc ? lcsValidator : lgValidator;
+  // const isLc = req.body.type.toLowerCase().includes("lc");
+  // const lcOrLgValidation = isLc ? lcsValidator : lgValidator;
 
-  if (!req.body.draft) {
-    const { error }: ValidationResult = lcOrLgValidation.validate(req.body);
-    if (error) return next({
-      statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-      message: error.details[0].message,
-    });
-  }
+  // if (!req.body.draft) {
+  //   const { error }: ValidationResult = lcOrLgValidation.validate(req.body);
+  //   if (error) return next({
+  //     statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+  //     message: error.details[0].message,
+  //   });
+  // }
 
   const countLcs = await lcsCount();
 
   req.body.refId = countLcs + 1;
-  
+
   req.body.createdBy = req.user.business;
 
   const lcs = await createLc(req.body);
-    const notification={
-      users:null,title:`New ${req.body.type} Confirmation Request Created with`,
-      message:`Ref no ${lcs.refId} from ${req.user.name}`,
-      requestId:lcs._id,senderId:req.user._id,receiverId:null
-    }
-  await createAndSendNotifications(notification,true,'bank')
+  const notification = {
+    users: null, title: `New ${req.body.type} Confirmation Request Created with`,
+    message: `Ref no ${lcs.refId} from ${req.user.name}`,
+    requestId: lcs._id, senderId: req.user._id, receiverId: null
+  }
+  await createAndSendNotifications(notification, true, 'bank')
   generateResponse(lcs, "Lcs created successfully", res);
 });
 
 export const deleteLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
-   const lc = await deleteLc(req.params.id);
-    
-   if(!lc) return next({
+    const lc = await deleteLc(req.params.id);
+
+    if (!lc) return next({
       message: "Lc not found",
       statusCode: STATUS_CODES.NOT_FOUND,
     });
@@ -98,7 +98,7 @@ export const fetchLc = asyncHandler(async (req: Request, res: Response, next: Ne
 export const statusCheck = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
     const id = req.user.business;
-    
+
     const requestId = req.params.requestId;
     const key = req.query.key ? req.query.key : "lc";
 
