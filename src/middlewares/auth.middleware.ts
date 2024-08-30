@@ -41,32 +41,6 @@ const authMiddleware = (roles: string[], types: string[]) => {
 
             // next middleware is called
             next();
-
-
-            // findUser({ _id: decodedUser._id })
-            //     .then(user => {
-            //         if (!user) return next({
-            //             statusCode: STATUS_CODES.UNAUTHORIZED,
-            //             message: 'Invalid token user not found!'
-            //         });
-
-            //         console.log('token is working >>>>>>>>',)
-            //         console.log('roles >>>>>>>>', roles)
-            //         console.log('types >>>>>>>>', types)
-
-            //         if (roles.includes(decodedUser.role) && types.includes(decodedUser.type)) {
-            //             req.user = { ...decodedUser };
-            //             next();
-            //         } else return next({
-            //             statusCode: STATUS_CODES.UNAUTHORIZED,
-            //             message: 'Unauthorized access!'
-            //         });
-            //     }).catch(err => {
-            //         return next({
-            //             statusCode: STATUS_CODES.UNAUTHORIZED,
-            //             message: 'Invalid token catch error!'
-            //         });
-            //     });
         });
     }
 }
