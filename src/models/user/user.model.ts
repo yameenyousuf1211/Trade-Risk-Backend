@@ -79,5 +79,5 @@ export const updateUser = (id: string, obj: Record<string, any>): Promise<IUserD
 
 export const getFcmTokens = async (ids:any) => {
     const users = await UserModel.find({ _id: { $in: ids } }).select('fcmTokens');
-    return users?.map(user => user?.fcmTokens);
+    return users?.map(user => user?.fcmTokens).flat();
 }
