@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { fetchAllUsers, updateUsers } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
-import { ROLES } from "../../utils/constants";
+import { ROLE_TYPES, ROLES } from "../../utils/constants";
 
 export default class UserAPI {
     constructor(private readonly router: Router) {
@@ -11,7 +11,7 @@ export default class UserAPI {
 
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
-        this.router.put('/', authMiddleware(Object.values(ROLES)), updateUsers);
+        this.router.put('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateUsers);
     }
 
     getRouter() {

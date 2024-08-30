@@ -22,11 +22,12 @@ interface NotificationParams {
 const fetchUsers = async (sendToAll: boolean, userType: string, users: any[]) => {
   if (sendToAll) {
     const query = { type: userType };
-    const usersData = await getAllUsers({ query, page: 1, limit: 10000 });
+    const usersData = await getAllUsers({ query, page: 1, limit: 1000 });
+    console.log('usersData>>>>>>>>>>', usersData);
     return usersData.data.map((user: any) => user._id);
   } else {
-    const usersData = await findUser({ business: users });
-    return usersData.map((user: any) => user._id);
+    const user = await findUser({ business: users });
+    return [user._id];
   }
 };
 
@@ -49,6 +50,9 @@ export const createAndSendNotifications = async ({
   senderId,
   receiverId,
 }: any, sendToAll: boolean, userType: string) => {
+
+  console.log('sendToAll, userType, users>>>>>>>>>>', sendToAll, userType, users);
+
   const userIds = await fetchUsers(sendToAll, userType, users);
   await createNotifications(userIds, title, message, requestId, senderId, receiverId);
 

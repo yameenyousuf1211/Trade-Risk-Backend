@@ -10,30 +10,28 @@ import mongoose from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const  {corporateBusinessId,lc,bidBy,type} = req.query;
-   const page = Number(req.query.page) || 1;
-   const limit = Number(req.query.limit) || 10;
+    const { corporateBusinessId, lc, bidBy, type } = req.query;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
 
-   const pipeline: mongoose.PipelineStage[] = [{ $match: { bidType: type || 'LC Confirmation' } }];
+    const pipeline: mongoose.PipelineStage[] = [{ $match: { bidType: type || 'LC Confirmation' } }];
 
-   if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
+    if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
 
-   if (bidBy) {
-       pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(bidBy as string) } });
-   }
+    if (bidBy) {
+        pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(bidBy as string) } });
+    }
 
-   if (corporateBusinessId) {
-       const lcIds:ILcs[] = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
-       const lcIdArray = lcIds.map((lc: Partial<ILcs>) => lc._id);
-       pipeline.push({ $match: { lc: { $in: lcIdArray } } });
-   }
+    if (corporateBusinessId) {
+        const lcIds: ILcs[] = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
+        const lcIdArray = lcIds.map((lc: Partial<ILcs>) => lc._id);
+        pipeline.push({ $match: { lc: { $in: lcIdArray } } });
+    }
 
-   const fetchedBids = await fetchBids(pipeline,page, limit);
+    const fetchedBids = await fetchBids(pipeline, page, limit);
 
-   generateResponse(fetchedBids, 'List fetched successfully', res);
+    generateResponse(fetchedBids, 'List fetched successfully', res);
 });
-
-
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.lc && !req.body.risk) return next({
@@ -55,7 +53,9 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             users: lc.createdBy,
             title: `${req.user.name}`,
             message: ` has added a bid on your LC refId ${lc.refId}`,
-            requestId: lc._id, senderId: req.user._id, receiverId: lc.createdBy
+            requestId: lc._id,
+            senderId: req.user._id,
+            receiverId: lc.createdBy
         }
 
         const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
@@ -63,8 +63,6 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Lc already accepted a bid',
             statusCode: STATUS_CODES.BAD_REQUEST
         });
-
-
 
         if (role === 'admin') {
             const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: newBidId } });
