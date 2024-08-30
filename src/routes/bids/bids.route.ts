@@ -4,7 +4,7 @@ import {
 } from "../../controllers";
 import { Router } from "express";
 import authMiddleware from "../../middlewares/auth.middleware";
-import { ROLES } from "../../utils/constants";
+import { ROLE_TYPES, ROLES } from "../../utils/constants";
 import { bidsValidation } from "../../validation/bids/bids.validation";
 
 export default class BidsAPI {
@@ -14,12 +14,12 @@ export default class BidsAPI {
     }
 
     setupRoutes() {
-        this.router.get('/', authMiddleware(Object.values(ROLES)), getAllBids);
-        this.router.get('/:id', authMiddleware(Object.values(ROLES)), fetchbid);
-        this.router.get('/count/list', authMiddleware(Object.values(ROLES)), findBidsCount);
-        this.router.post('/', authMiddleware([ROLES.BANK]), bidsValidation, createBids)
-        this.router.put('/update/:bidId', authMiddleware([ROLES.ADMIN]), approvedOrRejectBidsByBankAdmin);
-        this.router.put('/', authMiddleware(Object.values(ROLES)), acceptOrRejectBids)
+        this.router.get('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), getAllBids);
+        this.router.get('/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), fetchbid);
+        this.router.get('/count/list', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), findBidsCount);
+        this.router.post('/', authMiddleware(Object.values(ROLES), [ROLE_TYPES.BANK]), bidsValidation, createBids)
+        this.router.put('/update/:bidId', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), approvedOrRejectBidsByBankAdmin);
+        this.router.put('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), acceptOrRejectBids)
     }
 
     getRouter() {

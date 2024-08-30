@@ -60,10 +60,13 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   const notification = {
     users: null, title: `New ${req.body.type} Confirmation Request Created with`,
     message: `Ref no ${lcs.refId} from ${req.user.name}`,
-    requestId: lcs._id, senderId: req.user._id, receiverId: null
+    requestId: lcs._id,
+    senderId: req.user._id,
+    receiverId: null
   }
-  await createAndSendNotifications(notification, true, 'bank')
+
   generateResponse(lcs, "Lcs created successfully", res);
+  await createAndSendNotifications(notification, true, 'bank')
 });
 
 export const deleteLcs = asyncHandler(

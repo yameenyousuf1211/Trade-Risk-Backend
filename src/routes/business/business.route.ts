@@ -1,7 +1,7 @@
 import { updateBusinessCurrentBanks } from "../../controllers";
 import { Router } from "express";
 import authMiddleware from "../../middlewares/auth.middleware";
-import { ROLES } from "../../utils/constants";
+import { ROLE_TYPES, ROLES } from "../../utils/constants";
 
 export default class BusinessAPI {
     constructor(private readonly router: Router) {
@@ -10,7 +10,7 @@ export default class BusinessAPI {
     }
 
     setupRoutes() {
-        this.router.put('/update-bank', authMiddleware(Object.values(ROLES)), updateBusinessCurrentBanks);
+        this.router.put('/update-bank', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateBusinessCurrentBanks);
     }
 
     getRouter() {

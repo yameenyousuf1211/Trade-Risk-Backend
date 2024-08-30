@@ -2,7 +2,7 @@ import { Router } from "express";
 import { acceptOrRejectBids, createLcOrLg, deleteLcs, fetchAllLcs, fetchLc, statusCheck, totalRequestLc, updateLcs, updateLg } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
 // import { lcsValidation } from "../../validation/lcs/lcs.validation";
-import { ROLES } from "../../utils/constants";
+import { ROLE_TYPES, ROLES } from "../../utils/constants";
 import { upload } from "../../utils/multer";
 
 export default class LcsAPI {
@@ -12,15 +12,15 @@ export default class LcsAPI {
     }
 
     setupRoutes() {
-        this.router.get('/', authMiddleware(Object.values(ROLES)), fetchAllLcs);
-        this.router.get('/:lcId', authMiddleware(Object.values(ROLES)), fetchLc);
-        this.router.get('/total-request/list', authMiddleware(Object.values(ROLES)), totalRequestLc);
-        this.router.get('/status/check/:requestId', authMiddleware(Object.values(ROLES)), statusCheck);
-        this.router.post('/create', authMiddleware(Object.values(ROLES)), createLcOrLg);
-        this.router.delete('/:id', authMiddleware(Object.values(ROLES)), deleteLcs);
-        this.router.put('/', authMiddleware(Object.values(ROLES)), acceptOrRejectBids)
-        this.router.put('/:id', upload("authorization").fields([{ name: 'authorization-letter', maxCount: 3 }]), authMiddleware(Object.values(ROLES)), updateLcs)
-        this.router.put('/lg/:id', authMiddleware(Object.values(ROLES)), updateLg)
+        this.router.get('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), fetchAllLcs);
+        this.router.get('/:lcId', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), fetchLc);
+        this.router.get('/total-request/list', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), totalRequestLc);
+        this.router.get('/status/check/:requestId', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), statusCheck);
+        this.router.post('/create', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), createLcOrLg);
+        this.router.delete('/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), deleteLcs);
+        this.router.put('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), acceptOrRejectBids)
+        this.router.put('/:id', upload("authorization").fields([{ name: 'authorization-letter', maxCount: 3 }]), authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateLcs)
+        this.router.put('/lg/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateLg)
     }
 
     getRouter() {
