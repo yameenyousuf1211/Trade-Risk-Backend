@@ -122,7 +122,7 @@ const LcsSchema: Schema = new Schema({
 
   totalLgAmount: Number,
 
-  lgStandardText: String,
+
   physicalLg: Boolean,
   physicalLgCountry: String,
   physicalLgSwiftCode: String,
@@ -157,7 +157,7 @@ const LcsSchema: Schema = new Schema({
 
   // 4 - 100% cash margin
   issueLgWithStandardText: Boolean,
-  // if no then text required
+  lgStandardText: String,
 
   // 5 - 100% cash margin
   lgDetails: {
