@@ -101,7 +101,7 @@ const LcsSchema: Schema = new Schema({
   baseRate: String,
   createdBy: { type: Schema.Types.ObjectId, ref: "Business" },
 
-  attachments: [String],
+  attachments: [Object],
   draft: Boolean,
   status: { type: String, enum: ["Pending", "Expired", "Accepted", "Add bid"], default: "Add bid" },
 
