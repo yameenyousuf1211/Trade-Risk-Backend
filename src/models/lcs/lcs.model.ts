@@ -13,7 +13,7 @@ import { QueryWithHelpers } from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
 const bondSchema = new Schema({
-  Contract: String,
+  Contract: Boolean,
   currencyType: String,
   cashMargin: Number,
   valueInPercentage: Number,
@@ -101,7 +101,7 @@ const LcsSchema: Schema = new Schema({
   baseRate: String,
   createdBy: { type: Schema.Types.ObjectId, ref: "Business" },
 
-  attachments: [String],
+  attachments: [Object],
   draft: Boolean,
   status: { type: String, enum: ["Pending", "Expired", "Accepted", "Add bid"], default: "Add bid" },
 

@@ -139,10 +139,8 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
         if (key === 'lc') {
             await updateBids(
                 { $and: [{ _id: { $ne: bid._id } }, { lc: bid.lc }] },
-                {
-                    status: 'Rejected',
-                    bids: req.body.bids
-                });
+                { status: 'Rejected' }
+            );
 
             const lc = await findLc({ _id: bid.lc }).select('status');
             lc.status = 'Accepted';

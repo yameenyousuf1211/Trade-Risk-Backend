@@ -18,15 +18,7 @@ const authMiddleware = (roles: string[], types: string[]) => {
                 message: 'Invalid token!'
             });
 
-            if (!decoded) return next({
-                statusCode: STATUS_CODES.UNAUTHORIZED,
-                message: 'Invalid token!'
-            });
-
-            // const decodedUser = decoded as any;
             req.user = { ...decoded };
-            console.log('first >>>>>>>>', req.user);
-
 
             const user = await findUser({ _id: req.user._id });
             if (!user) return next({
