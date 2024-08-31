@@ -13,7 +13,7 @@ import { QueryWithHelpers } from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
 const bondSchema = new Schema({
-  Contract: String,
+  Contract: Boolean,
   currencyType: String,
   cashMargin: Number,
   valueInPercentage: Number,
