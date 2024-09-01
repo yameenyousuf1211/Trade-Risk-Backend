@@ -27,6 +27,6 @@ jobs:
         cache: 'npm'
     - run: npm i
     - run: echo '${{secrets.PROD_ENV}}' > .env
+    - run: echo '${{secrets.FIREBASE_ADMIN_CONFIG}}' > traderisk-463ed-firebase-adminsdk-g2ow6-9cdef4d862.json
     - run: npm run build
     - run: pm2 restart apis-trade-risk-prod
-  
