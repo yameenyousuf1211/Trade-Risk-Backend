@@ -5,7 +5,7 @@ import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, fi
 import { STATUS_CODES } from "../../utils/constants";
 
 
-import { createAndSendNotifications } from "../../utils/firebase";
+// import { createAndSendNotifications } from "../../utils/firebase";
 import mongoose from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
@@ -49,6 +49,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Lc not found',
             statusCode: STATUS_CODES.NOT_FOUND
         });
+
         notification = {
             users: lc.createdBy,
             title: `${req.user.name}`,
@@ -77,11 +78,14 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
             message: 'Risk not found',
             statusCode: STATUS_CODES.NOT_FOUND
         })
+
         notification = {
             users: risk.createdBy,
             title: `${req.user.name}`,
             message: ` has added a bid on your RISK ${risk.transaction}`,
-            requestId: null, senderId: req.user._id, receiverId: risk.createdBy
+            requestId: null,
+            senderId: req.user._id,
+            receiverId: risk.createdBy
         }
 
         const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
@@ -93,14 +97,16 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         risk.status = 'Pending'
         await risk.save();
     }
+
     req.body.bidBy = req.user.business;
     req.body.createdBy = req.user._id;
 
     const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
 
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
-    await createAndSendNotifications(notification, false, 'corporate');
     generateResponse(bid, 'Bids created successfully', res);
+
+    // await createAndSendNotifications(notification, false, 'corporate');
 })
 
 export const deleteBid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

@@ -10,8 +10,8 @@ interface IRisk extends Document {
         agreement: string;
         signCopy: string;
     };
-    refId:Number,
-    status:string;
+    refId: Number,
+    status: string;
     transaction: "Risk Participation" | "Outright Sales";
     riskParticipation?: string;
     outrightSales?: string;
@@ -45,7 +45,7 @@ interface IRisk extends Document {
         country: string;
         port: string;
     };
-    currency:string;
+    currency: string;
     transhipment?: boolean;
     expectedDateConfirmation?: Date;
     description?: string;
@@ -69,7 +69,7 @@ interface IRisk extends Document {
     isDeleted: boolean;
     period: {
         expectedDate: boolean;
-        startDate?: Date; 
+        startDate?: Date;
     };
     country: string;
     swiftCode: string;
@@ -77,21 +77,21 @@ interface IRisk extends Document {
 
 const RiskSchema: Schema = new Schema({
     banks: [{ type: String }],
-    baftAgreement:{
+    baftAgreement: {
         agreement: { type: String },
-        signCopy:{type:String}
+        signCopy: { type: String }
     },
-    refId:{type:Number},
-    transaction:{type:String,enum:["Risk Participation","Outright Sales"]} ,
-    riskParticipation:{type:String},
-    outrightSales:{type:String},
-    riskParticipationTransaction:{
-        type:{type:String},
-        amount:{type:Number},
-        returnOffer:{type:String},
-        baseRate:{type:String},
-        perAnnum:{type:String},
-        participationRate:{type:String},
+    refId: { type: Number },
+    transaction: { type: String, enum: ["Risk Participation", "Outright Sales"] },
+    riskParticipation: { type: String },
+    outrightSales: { type: String },
+    riskParticipationTransaction: {
+        type: { type: String },
+        amount: { type: Number },
+        returnOffer: { type: String },
+        baseRate: { type: String },
+        perAnnum: { type: String },
+        participationRate: { type: String },
     },
     issuingBank: {
         bank: {
@@ -117,12 +117,12 @@ const RiskSchema: Schema = new Schema({
             type: String,
         },
     },
-    days:{type:Number},
-    isLcDiscounting:{type:Boolean},
-    expectedDiscounting:{type:Boolean},
-    expectedDateDiscounting:{type:Date},
-    expiryDate:{type:Date},
-    paymentTerms:{type:String},
+    days: { type: Number },
+    isLcDiscounting: { type: Boolean },
+    expectedDiscounting: { type: Boolean },
+    expectedDateDiscounting: { type: Date },
+    expiryDate: { type: Date },
+    paymentTerms: { type: String },
     shipmentPort: {
         country: {
             type: String,
@@ -134,11 +134,11 @@ const RiskSchema: Schema = new Schema({
     transhipment: {
         type: Boolean,
     },
-    currency:{
-        type:String
+    currency: {
+        type: String
     },
-    expectedDateConfirmation:{type:Date},
-    description:{type:String},
+    expectedDateConfirmation: { type: Date },
+    description: { type: String },
     importerInfo: {
         applicantName: {
             type: String,
@@ -158,24 +158,24 @@ const RiskSchema: Schema = new Schema({
             type: String,
         },
     },
-    paymentReceviedType:{type:String},
-    attachment:[{type:String}],
-    note:{type:String},
-    createdBy:{
-        type:Schema.Types.ObjectId,
-        ref:'user'
+    paymentReceviedType: { type: String },
+    attachment: [{ type: String }],
+    note: { type: String },
+    createdBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
     },
     draft: {
         type: Boolean,
     },
-    isDeleted:{
-        type:Boolean,
-        default:false
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
-    status:{
-        type:String,
-        enum:['Pending','Expired','Rejected','Accepted','Add bid'],
-        default:'Add bid'
+    status: {
+        type: String,
+        enum: ['Pending', 'Expired', 'Rejected', 'Accepted', 'Add bid'],
+        default: 'Add bid'
     },
     period: {
         expectedDate: {
@@ -188,7 +188,7 @@ const RiskSchema: Schema = new Schema({
     },
     country: { type: String },
     swiftCode: { type: String },
-},{timestamps:true});
+}, { timestamps: true });
 
 RiskSchema.plugin(mongoosePaginate);
 RiskSchema.plugin(aggregatePaginate);
@@ -202,9 +202,9 @@ export const fetchRisks = async ({ query, page, limit, populate }: IPaginationFu
     });
     return { data, pagination };
 };
-export const createRisk = (payload:IRisk) => RiskModel.create(payload);
+export const createRisk = (payload: IRisk) => RiskModel.create(payload);
 export const findRisk = (query: Record<string, any>) => RiskModel.findOne(query);
 export const updateRisk = async (query: Record<string, any>, payload: Record<string, any>) => RiskModel.findOneAndUpdate(query, payload, { new: true });
-
+export const riskCount = (query?: any) => RiskModel.countDocuments(query);
 
 

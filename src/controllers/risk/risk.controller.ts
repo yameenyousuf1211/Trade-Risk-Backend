@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler, generateRefId, generateResponse, parseBody } from "../../utils/helpers";
-import { createRisk, fetchRisks, findRisk, getAllUsers, updateRisk } from "../../models";
+import { asyncHandler, generateResponse, parseBody } from "../../utils/helpers";
+import { createRisk, fetchRisks, findRisk, getAllUsers, riskCount, updateRisk } from "../../models";
 import mongoose, { PipelineStage } from "mongoose";
 import { ValidationResult } from "joi";
 import { riskValidator } from "../../validation/risk/risk.validation";
@@ -14,13 +14,13 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
     const risk = req.query.risk;
     const createdBy = req.query.createdBy == 'true' ? true : false;
     const filter = req.query.filter;
-    const search = req.query.search 
+    const search = req.query.search
 
     const query: PipelineStage[] = [];
 
     query.push({ $match: { isDeleted: false } });
 
-    if(risk) query.push({ $match: { _id: new mongoose.Types.ObjectId(risk as string) }} )
+    if (risk) query.push({ $match: { _id: new mongoose.Types.ObjectId(risk as string) } })
     if (createdBy) {
         query.push({ $match: { createdBy: new mongoose.Types.ObjectId(req.user._id as string) } });
     }
@@ -44,7 +44,7 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
                 query: userQuery,
             });
 
-            const ids = users.map((user:any) => user._id);
+            const ids = users.map((user: any) => user._id);
 
             query.push({
                 $match: {
@@ -180,7 +180,6 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
 });
 
 export const createRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-
     const draft = req.body.draft == 'true' ? true : false
     const body = parseBody(req.body);
 
@@ -194,13 +193,13 @@ export const createRisks = asyncHandler(async (req: Request, res: Response, next
             return next(customError);
         }
     }
-    req.body.refId = generateRefId();
+    const countRisks = await riskCount();
+    req.body.refId = countRisks + 1;
     req.body.createdBy = req.user._id;
     req.body.draft = draft;
 
-    const data = await createRisk(body);
-
-    generateResponse(data, "Risk created successfully", res);
+    const risk = await createRisk(body);
+    generateResponse(risk, "Risk created successfully", res);
 });
 
 export const riskUpdate = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -230,9 +229,9 @@ export const deleteRisks = asyncHandler(async (req: Request, res: Response, next
 });
 
 export const findSingleRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const data = await findRisk({ _id: req.params.id } );
+    const data = await findRisk({ _id: req.params.id });
 
-    if(!data){
+    if (!data) {
         return next({
             statusCode: STATUS_CODES.NOT_FOUND,
             message: "Risk not found"

@@ -4,9 +4,49 @@ import { hash } from 'bcrypt';
 import { ROLES } from './constants';
 import { Resend } from 'resend';
 import mongoose from 'mongoose';
+import admin from 'firebase-admin';
+import path from 'path';
 
-const resend = new Resend('re_PfY2RMhd_HcEgmT5L2qW5hT2HwzwqzM6G');
-// import { FCM } from "firebase-admin-push";
+require('dotenv').config();
+
+const serviceAccount = path.resolve('./traderisk-463ed-firebase-adminsdk-g2ow6-9cdef4d862.json');
+
+const firebaseAdmin = admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  storageBucket: process.env.STORAGE_BUCKET,
+});
+
+export const bucket = admin.storage().bucket();
+
+interface IPayload {
+  [key: string]: any;
+}
+
+interface NotificationParams {
+  title: string;
+  body: string;
+  tokens: string[];
+  payload?: IPayload;
+}
+
+export const sendFirebaseNotification = async ({ title, body, tokens, payload }: NotificationParams) => {
+  const message = {
+    notification: { title, body },
+    tokens,
+    data: payload,
+  };
+
+  try {
+    const response = await firebaseAdmin.messaging().sendMulticast(message);
+    console.log('sendFirebaseNotification ok >>>> ', response);
+    return response;
+  } catch (error) {
+    console.error('Error sending message:', error);
+    throw error;
+  }
+};
+
+
 
 // generate response with status code
 export const generateResponse = (data: any, message: string, res: Response, code = 200) => {
@@ -128,43 +168,8 @@ export function generatePassword(): string {
   return password;
 }
 
-export function generateRefId(): number {
-  const uniqueNumbers = new Set<number>();
-
-  while (uniqueNumbers.size < 900000) { // Maximum possible unique 6-digit numbers
-    const randomNumber = Math.floor(100000 + Math.random() * 900000);
-    uniqueNumbers.add(randomNumber);
-  }
-
-  // Convert the set to an array and return a random number from it
-  const uniqueNumbersArray = Array.from(uniqueNumbers);
-  return uniqueNumbersArray[Math.floor(Math.random() * uniqueNumbersArray.length)];
-}
-
-// export const sendNotification = ({ title, body, fcmTokens, data, priority = 'normal' }: { title: string, body: string, fcmTokens: string[], data: any, priority?: string }) => {
-//     const serverKey = process.env.FIREBASE_SERVER_KEY;
-//     const fcm: FCM = new FCM(serverKey);
-
-//     const message = {
-//         registration_ids: fcmTokens,
-//         priority,
-//         notification: {
-//             title,
-//             body,
-//         },
-//         data
-//     };
-//     // Send the notification
-//     fcm.send(message, (error: any, response: any) => {
-//         if (error) {
-//             console.error('Error sending notification:', error);
-//         } else {
-//             console.log('Notification sent successfully:', response);
-//         }
-//     });
-// }
-
 export const sendEmail = async ({ subject, to, html }: { subject: string, to: string, html: string }) => {
+  const resend = new Resend('re_PfY2RMhd_HcEgmT5L2qW5hT2HwzwqzM6G');
 
   const { data, error } = await resend.emails.send({
     from: 'yameenyousuf2016@gmail.com',
@@ -176,10 +181,6 @@ export const sendEmail = async ({ subject, to, html }: { subject: string, to: st
   if (error) return error;
   return data;
 }
-
-
-
-
 
 export const portsList = [
   {

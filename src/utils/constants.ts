@@ -22,6 +22,12 @@ export enum ROLE_TYPES {
   CORPORATE = 'corporate',
 }
 
+export enum NOTIFICATION_TYPES {
+  LC_CREATED = 'lc_created',
+  RISK_CREATED = 'risk_created',
+  BID_CREATED = 'bid_created',
+}
+
 export enum COMPANY_CONSTITUTION {
   Partnership = 'partnership',
   Public_Limited_Co = 'public_limited_co',
