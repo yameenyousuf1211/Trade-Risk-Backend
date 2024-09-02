@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { asyncHandler, generatePassword, generateResponse, parseBody, sendEmail } from "../../utils/helpers";
+import { asyncHandler, generatePassword, generateResponse, parseBody } from "../../utils/helpers";
 
-import {  createUser, findUser, updateUser } from "../../models";
-import {  STATUS_CODES } from "../../utils/constants";
+import { createUser, findUser, updateUser } from "../../models";
+import { STATUS_CODES } from "../../utils/constants";
 import phone from "phone";
 
 import { createBusiness } from "../../models/business/business.model";
@@ -21,7 +21,7 @@ export const register = asyncHandler(async (req: Request, res: Response, next: N
 
     const data = {
         ...body,
-        password:generatePassword(),
+        password: generatePassword(),
         business: business._id
     }
 
@@ -85,10 +85,10 @@ export const phoneVerification = asyncHandler(async (req: Request, res: Response
     if (isValid) {
         generateResponse(null, 'Phone number verified successfully', res);
     } else {
-            return next({
-                statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-                message: 'Invalid phone number'
-            })
+        return next({
+            statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
+            message: 'Invalid phone number'
+        })
     }
 });
 

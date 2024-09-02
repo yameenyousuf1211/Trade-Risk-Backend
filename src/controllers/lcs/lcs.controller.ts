@@ -4,13 +4,12 @@ import {
   generateResponse,
 } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
-import { aggregateFetchLcs, createLc, deleteLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
+import { aggregateFetchLcs, createAndSendNotifications, createLc, deleteLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
 import mongoose from "mongoose";
 import { ValidationResult } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
 import { lgValidator } from "../../validation/lcs/lg.validation";
-import { createAndSendNotifications } from "../../utils/firebase";
 
 export const fetchAllLcs = asyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -33,40 +32,27 @@ export const fetchAllLcs = asyncHandler(
   });
 
 export const createLcOrLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-
   if (!req.body.type) return next({
     statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
     message: "Type is required",
   });
 
-  // const isLc = req.body.type.toLowerCase().includes("lc");
-  // const lcOrLgValidation = isLc ? lcsValidator : lgValidator;
-
-  // if (!req.body.draft) {
-  //   const { error }: ValidationResult = lcOrLgValidation.validate(req.body);
-  //   if (error) return next({
-  //     statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY,
-  //     message: error.details[0].message,
-  //   });
-  // }
-
   const countLcs = await lcsCount();
-
   req.body.refId = countLcs + 1;
 
   req.body.createdBy = req.user.business;
 
   const lcs = await createLc(req.body);
   const notification = {
-    users: null, title: `New ${req.body.type} Confirmation Request Created with`,
-    message: `Ref no ${lcs.refId} from ${req.user.name}`,
-    requestId: lcs._id,
-    senderId: req.user._id,
-    receiverId: null
+    // title: `New ${req.body.type} Confirmation Request Created with`,
+    // message: `Ref no ${lcs.refId} from ${req.user.name}`,
+    // requestId: lcs._id,
+    // senderId: req.user._id,
+    // receiverId: null
   }
 
   generateResponse(lcs, "Lcs created successfully", res);
-  await createAndSendNotifications(notification, true, 'bank')
+  await createAndSendNotifications({lc: lcs._id, });
 });
 
 export const deleteLcs = asyncHandler(
