@@ -3,7 +3,7 @@ import {
   asyncHandler,
   generateResponse,
 } from "../../utils/helpers";
-import { STATUS_CODES } from "../../utils/constants";
+import { NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
 import { aggregateFetchLcs, createAndSendNotifications, createLc, deleteLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
 import mongoose from "mongoose";
 import { ValidationResult } from "joi";
@@ -42,17 +42,14 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
 
   req.body.createdBy = req.user.business;
 
-  const lcs = await createLc(req.body);
-  const notification = {
-    // title: `New ${req.body.type} Confirmation Request Created with`,
-    // message: `Ref no ${lcs.refId} from ${req.user.name}`,
-    // requestId: lcs._id,
-    // senderId: req.user._id,
-    // receiverId: null
-  }
+  const lc = await createLc(req.body);
+  generateResponse(lc, "Lcs created successfully", res);
 
-  generateResponse(lcs, "Lcs created successfully", res);
-  await createAndSendNotifications({lc: lcs._id, });
+  await createAndSendNotifications({
+    lc: lc._id,
+    type: NOTIFICATION_TYPES.LC_CREATED,
+    sender: req.user._id,
+  });
 });
 
 export const deleteLcs = asyncHandler(

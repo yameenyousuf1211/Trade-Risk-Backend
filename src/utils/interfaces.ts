@@ -20,3 +20,21 @@ export interface IPaginationFunctionParams {
     select?: string,
     sort?: Record<string, any>,
 }
+
+export interface SendNotificationParams {
+    type: string;
+    sender: string;
+    lc?: string;
+    bid?: string;
+}
+
+interface IPayload {
+    [key: string]: any;
+}
+
+export interface FirebaseNotificationParams {
+    title: string;
+    body: string;
+    tokens: string[];
+    payload?: IPayload;
+}
