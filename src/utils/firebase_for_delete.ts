@@ -64,23 +64,3 @@
 //   const notificationData: NotificationParams = { title, body: message, tokens: fcmTokens, payload };
 //   await sendFirebaseNotification(notificationData);
 // };
-
-// export const sendFirebaseNotification = async (data: NotificationParams) => {
-//   const { title, body, tokens, payload } = data;
-//   const message = {
-//     notification: { title, body },
-//     tokens,
-//     data: payload,
-//   };
-
-//   try {
-//     const response = await admin.messaging().sendMulticast(message);
-//     console.log('sendFirebaseNotification ok>>>>>>>>>>', response);
-//     return response;
-//   } catch (error) {
-//     console.error('Error sending message:', error);
-//     throw error;
-//   }
-// };
-
-// export const bucket = admin.storage().bucket();
