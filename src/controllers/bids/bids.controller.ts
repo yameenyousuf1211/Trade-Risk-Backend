@@ -1,11 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
-
 import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { STATUS_CODES } from "../../utils/constants";
-
-
-// import { createAndSendNotifications } from "../../utils/firebase";
 import mongoose from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
@@ -51,12 +47,12 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         });
 
         notification = {
-            users: lc.createdBy,
-            title: `${req.user.name}`,
-            message: ` has added a bid on your LC refId ${lc.refId}`,
-            requestId: lc._id,
-            senderId: req.user._id,
-            receiverId: lc.createdBy
+            // users: lc.createdBy,
+            // title: `${req.user.name}`,
+            // message: ` has added a bid on your LC refId ${lc.refId}`,
+            // requestId: lc._id,
+            // senderId: req.user._id,
+            // receiverId: lc.createdBy
         }
 
         const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
@@ -106,7 +102,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
     generateResponse(bid, 'Bids created successfully', res);
 
-    // await createAndSendNotifications(notification, false, 'corporate');
+    // await createAndSendNotifications(notification);
 })
 
 export const deleteBid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

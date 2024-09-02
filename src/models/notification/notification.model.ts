@@ -15,7 +15,6 @@ interface INotification {
     message: string;
     type: string;
     sender: Types.ObjectId;
-    senderBusiness?: Types.ObjectId;
     receivers?: [Types.ObjectId];
     lc: Types.ObjectId;
     bid: Types.ObjectId;
@@ -29,7 +28,6 @@ const notificationSchema: Schema = new Schema<INotification>({
     message: String,
     type: { type: String, enum: Object.values(NOTIFICATION_TYPES) },
     sender: { type: Schema.Types.ObjectId, ref: 'User' },
-    senderBusiness: { type: Schema.Types.ObjectId, ref: 'Business' },
     receivers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     lc: { type: Schema.Types.ObjectId, ref: 'LC', default: null },
     bid: { type: Schema.Types.ObjectId, ref: 'Bid', default: null },
@@ -76,13 +74,13 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
 
             title = `New ${lcObj?.type} Request`;
             body = `Ref No: ${lcObj?.refId} from ${senderObj?.business?.name} by ${senderObj?.name}`;
-            console.log('title, body>>>>>>>>>>', title, body);
+            console.log({ title, body });
             break;
 
-        // case NOTIFICATION_TYPES.BID_CREATED:
-        //     //   title = `${sender?.userName}`;
-        //     body = `Commented on your post`;
-        //     break;
+        case NOTIFICATION_TYPES.BID_CREATED:
+            //   title = `${sender?.userName}`;
+            body = `Commented on your post`;
+            break;
 
         default:
             break;
