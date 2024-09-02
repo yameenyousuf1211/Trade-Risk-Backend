@@ -2,11 +2,11 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 import { getMongooseAggregatePaginatedData, sendFirebaseNotification } from "../../utils/helpers";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
-import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
+import { IPaginationFunctionParams, IPaginationResult, SendNotificationParams } from "../../utils/interfaces";
 import { NOTIFICATION_TYPES } from '../../utils/constants';
 import { findLc } from '../lcs/lcs.model';
 import { findBid } from '../bids/bids.model.';
-import { findUser } from '../user/user.model';
+import { findUser, findUsers, getFcmTokens } from '../user/user.model';
 
 interface INotification {
     id?: string;
@@ -15,7 +15,8 @@ interface INotification {
     message: string;
     type: string;
     sender: Types.ObjectId;
-    receiver?: Types.ObjectId;
+    senderBusiness?: Types.ObjectId;
+    receivers?: [Types.ObjectId];
     lc: Types.ObjectId;
     bid: Types.ObjectId;
     isRead: boolean
@@ -28,7 +29,8 @@ const notificationSchema: Schema = new Schema<INotification>({
     message: String,
     type: { type: String, enum: Object.values(NOTIFICATION_TYPES) },
     sender: { type: Schema.Types.ObjectId, ref: 'User' },
-    receiver: { type: Schema.Types.ObjectId, ref: 'User' },
+    senderBusiness: { type: Schema.Types.ObjectId, ref: 'Business' },
+    receivers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     lc: { type: Schema.Types.ObjectId, ref: 'LC', default: null },
     bid: { type: Schema.Types.ObjectId, ref: 'Bid', default: null },
     isRead: { type: Boolean, default: false }
@@ -52,22 +54,29 @@ export const createNotification = (notification: INotification) => NotificationM
 export const updateNotification = (id: string, notification: any) => NotificationModel.findByIdAndUpdate(id, notification);
 export const deleteNotification = (id: string) => NotificationModel.findByIdAndDelete(id);
 
-export const createAndSendNotifications = async ({ type, sender, receiver, lc, bid }: any) => {
-    let body: string;
-    let title: string;
+export const createAndSendNotifications = async ({ type, sender, lc, bid }: SendNotificationParams) => {
+    let body: string = '';
+    let title: string = '';
     let lcObj: any;
     let bidObj: any;
     let senderObj: any;
+    let receivers: string[] = [];
 
     if (lc) lcObj = await findLc({ _id: lc });
     if (bid) bidObj = await findBid({ _id: bid });
     if (sender) senderObj = await findUser({ _id: sender }).populate('business');
 
-
     switch (type) {
         case NOTIFICATION_TYPES.LC_CREATED:
+            // get array of users ids
+            const users = await findUsers({ type: 'bank' }).select('_id');
+            console.log('LC_CREATED users?.length >>>>>>>>>>', users?.length);
+
+            receivers = users.map((user: any) => user._id);
+
             title = `New ${lcObj?.type} Request`;
             body = `Ref No: ${lcObj?.refId} from ${senderObj?.business?.name} by ${senderObj?.name}`;
+            console.log('title, body>>>>>>>>>>', title, body);
             break;
 
         // case NOTIFICATION_TYPES.BID_CREATED:
@@ -79,9 +88,22 @@ export const createAndSendNotifications = async ({ type, sender, receiver, lc, b
             break;
     }
 
-    const notification = await NotificationModel.create();
-    await sendFirebaseNotification({ title, body, tokens: [receiver?.fcmToken] });
+    if (!receivers?.length) return;
+
+    // get fcm tokens of users
+    const tokens = await getFcmTokens({ _id: { $in: receivers } });
+
+    const notification = await NotificationModel.create({
+        title,
+        message: body,
+        type,
+        sender,
+        receivers,
+        lc,
+        bid
+    });
+
+    await sendFirebaseNotification({ title, body, tokens });
 
     return notification;
-
 }

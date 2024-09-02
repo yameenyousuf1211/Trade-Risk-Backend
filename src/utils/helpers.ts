@@ -6,6 +6,7 @@ import { Resend } from 'resend';
 import mongoose from 'mongoose';
 import admin from 'firebase-admin';
 import path from 'path';
+import { FirebaseNotificationParams } from './interfaces';
 
 require('dotenv').config();
 
@@ -18,18 +19,7 @@ const firebaseAdmin = admin.initializeApp({
 
 export const bucket = admin.storage().bucket();
 
-interface IPayload {
-  [key: string]: any;
-}
-
-interface NotificationParams {
-  title: string;
-  body: string;
-  tokens: string[];
-  payload?: IPayload;
-}
-
-export const sendFirebaseNotification = async ({ title, body, tokens, payload }: NotificationParams) => {
+export const sendFirebaseNotification = async ({ title, body, tokens, payload }: FirebaseNotificationParams) => {
   const message = {
     notification: { title, body },
     tokens,
@@ -37,16 +27,15 @@ export const sendFirebaseNotification = async ({ title, body, tokens, payload }:
   };
 
   try {
-    const response = await firebaseAdmin.messaging().sendMulticast(message);
-    console.log('sendFirebaseNotification ok >>>> ', response);
+    const response = await firebaseAdmin.messaging().sendEachForMulticast(message);
+    console.log('successCount >>>> ', response?.successCount);
+    console.log('failureCount >>>> ', response?.failureCount);
     return response;
   } catch (error) {
     console.error('Error sending message:', error);
     throw error;
   }
 };
-
-
 
 // generate response with status code
 export const generateResponse = (data: any, message: string, res: Response, code = 200) => {

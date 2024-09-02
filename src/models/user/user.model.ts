@@ -77,7 +77,9 @@ export const getAllUsers = async ({ query, page, limit, populate }: IPaginationF
 
 export const updateUser = (id: string, obj: Record<string, any>): Promise<IUserDocs> => UserModel.findByIdAndUpdate(id, obj, { new: true }).exec();
 
-export const getFcmTokens = async (ids:any) => {
-    const users = await UserModel.find({ _id: { $in: ids } }).select('fcmTokens');
+export const getFcmTokens = async (query: any) => {
+    const users = await UserModel.find(query).select('fcmTokens');
     return users?.map(user => user?.fcmTokens).flat();
 }
+
+export const findUsers = (query: any) => UserModel.find(query);
