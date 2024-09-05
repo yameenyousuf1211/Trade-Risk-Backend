@@ -115,8 +115,8 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
     const key = req.query.key ? req.query.key : 'lc';
     const status = req.query.status as string;
 
-    if (!req.query.status) return next({
-        message: 'status is required in query params',
+    if (!req.query.status || (req.query.status !== 'Accepted' && req.query.status !== 'Rejected')) return next({
+        message: 'status should be either Accepted or Rejected',
         statusCode: STATUS_CODES.BAD_REQUEST
     })
 
@@ -131,7 +131,16 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
     if (Array.isArray(req.body.bids) && req.body.bids.length > 0) bid.bids = req.body.bids;
     await bid.save();
 
-    if (bid.status === 'Accepted') {
+    let notification = {
+        type: key === 'lc' ? NOTIFICATION_TYPES.BID_REJECTED : NOTIFICATION_TYPES.RISK_REJECTED,
+        sender: req.user._id,
+        bid: bid._id,
+        lc: bid.lc,
+    }
+
+    if (status === 'Accepted') {
+        notification.type = NOTIFICATION_TYPES.BID_ACCEPTED;
+
         if (key === 'lc') {
             await updateBids(
                 { $and: [{ _id: { $ne: bid._id } }, { lc: bid.lc }] },
@@ -142,6 +151,8 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
             lc.status = 'Accepted';
             await lc.save();
         } else {
+            notification.type = NOTIFICATION_TYPES.RISK_ACCEPTED;
+
             await updateBids({
                 $and: [
                     { _id: { $ne: bid._id } },
@@ -157,7 +168,11 @@ export const acceptOrRejectBids = asyncHandler(async (req: Request, res: Respons
         }
     }
 
+    console.log('notification in acceptOrRejectBids >>>>>>>> ', notification);
+
     generateResponse(bid, 'Bids status Updated', res);
+
+    await createAndSendNotifications(notification);
 });
 
 export const findBidsCount = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
