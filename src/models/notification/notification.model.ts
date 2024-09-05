@@ -88,6 +88,28 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
             body = `${senderObj?.business?.name} has placed a bid on request # ${lcObj?.refId}`;
             break;
 
+        case NOTIFICATION_TYPES.BID_ACCEPTED:
+            // get array of users ids
+            const bidSubmittedBy = await findUsers({ business: bidObj?.bidBy, type: ROLE_TYPES.BANK }).select('_id');
+            console.log('BID_ACCEPTED users?.length >>>>>>>>>>', bidSubmittedBy?.length);
+
+            receivers = bidSubmittedBy.map((user: any) => user._id);
+
+            title = 'Bid Accepted';
+            body = `${senderObj?.business?.name} has accepted your bid on request # ${lcObj?.refId}`;
+            break;
+
+        case NOTIFICATION_TYPES.BID_REJECTED:
+            // get array of users ids
+            const bidBy = await findUsers({ business: bidObj?.bidBy, type: ROLE_TYPES.BANK }).select('_id');
+            console.log('BID_REJECTED users?.length >>>>>>>>>>', bidBy?.length);
+
+            receivers = bidBy.map((user: any) => user._id);
+
+            title = 'Bid Rejected';
+            body = `${senderObj?.business?.name} has rejected your bid on request # ${lcObj?.refId}`;
+            break;
+
         default:
             break;
     }

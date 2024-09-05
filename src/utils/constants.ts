@@ -24,8 +24,12 @@ export enum ROLE_TYPES {
 
 export enum NOTIFICATION_TYPES {
   LC_CREATED = 'lc_created',
-  RISK_CREATED = 'risk_created',
   BID_CREATED = 'bid_created',
+  BID_ACCEPTED = 'bid_accepted',
+  BID_REJECTED = 'bid_rejected',
+  RISK_CREATED = 'risk_created',
+  RISK_ACCEPTED = 'risk_accepted',
+  RISK_REJECTED = 'risk_rejected',
 }
 
 export enum COMPANY_CONSTITUTION {
