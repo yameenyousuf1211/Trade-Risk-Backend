@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
-import { BidsStatusCount, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
-import { STATUS_CODES } from "../../utils/constants";
+import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
+import { NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
 import mongoose from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
@@ -47,12 +47,9 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         });
 
         notification = {
-            // users: lc.createdBy,
-            // title: `${req.user.name}`,
-            // message: ` has added a bid on your LC refId ${lc.refId}`,
-            // requestId: lc._id,
-            // senderId: req.user._id,
-            // receiverId: lc.createdBy
+            lc: req.body.lc,
+            type: NOTIFICATION_TYPES.BID_CREATED,
+            sender: req.user._id
         }
 
         const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
@@ -76,12 +73,9 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         })
 
         notification = {
-            users: risk.createdBy,
-            title: `${req.user.name}`,
-            message: ` has added a bid on your RISK ${risk.transaction}`,
-            requestId: null,
-            senderId: req.user._id,
-            receiverId: risk.createdBy
+            risk: req.body.risk,
+            type: NOTIFICATION_TYPES.RISK_CREATED,
+            sender: req.user._id,
         }
 
         const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
@@ -102,7 +96,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
     generateResponse(bid, 'Bids created successfully', res);
 
-    // await createAndSendNotifications(notification);
+    await createAndSendNotifications(notification);
 })
 
 export const deleteBid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

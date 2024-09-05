@@ -3,7 +3,7 @@ import { getMongooseAggregatePaginatedData, sendFirebaseNotification } from "../
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult, SendNotificationParams } from "../../utils/interfaces";
-import { NOTIFICATION_TYPES } from '../../utils/constants';
+import { NOTIFICATION_TYPES, ROLE_TYPES } from '../../utils/constants';
 import { findLc } from '../lcs/lcs.model';
 import { findBid } from '../bids/bids.model.';
 import { findUser, findUsers, getFcmTokens } from '../user/user.model';
@@ -67,10 +67,10 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
     switch (type) {
         case NOTIFICATION_TYPES.LC_CREATED:
             // get array of users ids
-            const users = await findUsers({ type: 'bank' }).select('_id');
-            console.log('LC_CREATED users?.length >>>>>>>>>>', users?.length);
+            const bankUsers = await findUsers({ type: ROLE_TYPES.BANK }).select('_id');
+            console.log('LC_CREATED users?.length >>>>>>>>>>', bankUsers?.length);
 
-            receivers = users.map((user: any) => user._id);
+            receivers = bankUsers.map((user: any) => user._id);
 
             title = `New ${lcObj?.type} Request`;
             body = `Ref No: ${lcObj?.refId} from ${senderObj?.business?.name} by ${senderObj?.name}`;
@@ -78,8 +78,14 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
             break;
 
         case NOTIFICATION_TYPES.BID_CREATED:
-            //   title = `${sender?.userName}`;
-            body = `Commented on your post`;
+            // get array of users ids
+            const corporateUsers = await findUsers({ business: lcObj?.createdBy, type: ROLE_TYPES.CORPORATE }).select('_id');
+            console.log('BID_CREATED users?.length >>>>>>>>>>', corporateUsers?.length);
+
+            receivers = corporateUsers.map((user: any) => user._id);
+
+            title = 'New Bid';
+            body = `${senderObj?.business?.name} has placed a bid on request # ${lcObj?.refId}`;
             break;
 
         default:
