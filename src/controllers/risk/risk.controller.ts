@@ -180,10 +180,9 @@ export const getRisks = asyncHandler(async (req: Request, res: Response, next: N
 });
 
 export const createRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.body.draft == 'true' ? true : false
     const body = parseBody(req.body);
 
-    if (!draft) {
+    if (!req.body.draft) {
         const { error }: ValidationResult = riskValidator.validate(body);
         if (error) {
             const customError: CustomError = {
@@ -196,16 +195,13 @@ export const createRisks = asyncHandler(async (req: Request, res: Response, next
     const countRisks = await riskCount();
     req.body.refId = countRisks + 1;
     req.body.createdBy = req.user._id;
-    req.body.draft = draft;
 
     const risk = await createRisk(body);
     generateResponse(risk, "Risk created successfully", res);
 });
 
 export const riskUpdate = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const draft = req.body.draft == 'true' ? true : false
-
-    if (!draft) {
+    if (!req.body.draft) {
         const { error }: ValidationResult = riskValidator.validate(req.body);
         if (error) {
             const customError: CustomError = {
@@ -215,11 +211,9 @@ export const riskUpdate = asyncHandler(async (req: Request, res: Response, next:
             return next(customError);
         }
     }
-    req.body.draft = draft;
     req.body.createdBy = req.user._id;
 
     const data = await updateRisk({ _id: req.params.id }, req.body);
-
     generateResponse(data, "Risk updated successfully", res);
 });
 
