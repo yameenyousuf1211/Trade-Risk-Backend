@@ -3,7 +3,6 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongooseAggregatePaginatedData, getMongoosePaginatedData } from "../../utils/helpers";
-import { get } from 'axios';
 
 export interface IBid extends Document {
     bidType: string;

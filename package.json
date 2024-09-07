@@ -15,8 +15,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/joi": "^17.2.3",
-    "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "cloudinary": "^2.2.0",
     "cookie-session": "^2.0.0",
@@ -37,8 +35,7 @@
     "phone": "^3.1.50",
     "request-ip": "^3.3.0",
     "resend": "^3.2.0",
-    "ts": "file:",
-    "web-push": "^3.6.7"
+    "ts": "file:"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
