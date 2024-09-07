@@ -1,14 +1,8 @@
 import mongoose, { Schema, Document } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
-import {
-  IPaginationFunctionParams,
-  IPaginationResult,
-} from "../../utils/interfaces";
-import {
-  getMongoosePaginatedData,
-  getMongooseAggregatePaginatedData,
-} from "../../utils/helpers";
+import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
+import { getMongoosePaginatedData } from "../../utils/helpers";
 import { QueryWithHelpers } from "mongoose";
 import ILcs from "../../interface/lc.interface";
 
@@ -25,6 +19,8 @@ const bondSchema = new Schema({
     lgTenorType: String,
     lgTenorValue: Number,
   },
+  attachments: [Object],
+  expectedPricing: Number,
   draft: String,
 }, { id: false });
 
@@ -206,12 +202,7 @@ LcsSchema.plugin(aggregatePaginate);
 // Create and export the model
 const LcsModel = mongoose.model<ILcs>("lcs", LcsSchema);
 
-export const fetchLcs = async ({
-  query,
-  page,
-  limit,
-  populate,
-}: IPaginationFunctionParams): Promise<IPaginationResult<ILcs>> => {
+export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunctionParams): Promise<IPaginationResult<ILcs>> => {
   const { data, pagination }: IPaginationResult<ILcs> =
     await getMongoosePaginatedData({
       model: LcsModel,
@@ -225,10 +216,7 @@ export const fetchLcs = async ({
 
 export const createLc = (obj: ILcs) => LcsModel.create(obj);
 
-export const findLc = (
-  query: Record<string, any>,
-  populate?: string | string[]
-): QueryWithHelpers<any, Document> => {
+export const findLc = (query: Record<string, any>, populate?: string | string[]): QueryWithHelpers<any, Document> => {
   const queryBuilder = LcsModel.findOne(query);
   if (populate) {
     queryBuilder.populate(populate);
