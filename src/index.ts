@@ -39,7 +39,7 @@ app.use(cors({
     origin: "*",
     credentials: true
 }));
-app.use(rateLimiter);
+// app.use(rateLimiter);
 
 app.get('/', (req, res) => generateResponse(null, `Welcome to ${process.env.APP_NAME}!`, res));
 
