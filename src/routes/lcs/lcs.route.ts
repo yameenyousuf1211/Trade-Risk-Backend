@@ -1,9 +1,7 @@
 import { Router } from "express";
-import { acceptOrRejectBids, createLcOrLg, deleteLcs, fetchAllLcs, fetchLc, statusCheck, totalRequestLc, updateLcs, updateLg } from "../../controllers";
+import { acceptOrRejectBids, createLcOrLg, deleteLcs, fetchAllLcs, fetchLc, statusCheck, totalRequestLc, updateLcs } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
-// import { lcsValidation } from "../../validation/lcs/lcs.validation";
 import { ROLE_TYPES, ROLES } from "../../utils/constants";
-import { upload } from "../../utils/multer";
 
 export default class LcsAPI {
     constructor(private readonly router: Router) {
@@ -19,8 +17,7 @@ export default class LcsAPI {
         this.router.post('/create', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), createLcOrLg);
         this.router.delete('/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), deleteLcs);
         this.router.put('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), acceptOrRejectBids)
-        this.router.put('/:id', upload("authorization").fields([{ name: 'authorization-letter', maxCount: 3 }]), authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateLcs)
-        this.router.put('/lg/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateLg)
+        this.router.put('/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateLcs)
     }
 
     getRouter() {
