@@ -45,11 +45,12 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   const lc = await createLc(req.body);
   generateResponse(lc, "Lcs created successfully", res);
 
-  await createAndSendNotifications({
-    lc: lc._id,
-    type: NOTIFICATION_TYPES.LC_CREATED,
-    sender: req.user._id,
-  });
+  if (!req.body.draft)
+    await createAndSendNotifications({
+      lc: lc._id,
+      type: NOTIFICATION_TYPES.LC_CREATED,
+      sender: req.user._id,
+    });
 });
 
 export const deleteLcs = asyncHandler(
