@@ -21,7 +21,7 @@ const bondSchema = new Schema({
   },
   attachments: [Object],
   expectedPricing: Number,
-  draft: String,
+  draft: Boolean,
 }, { id: false });
 
 // Define the schema
