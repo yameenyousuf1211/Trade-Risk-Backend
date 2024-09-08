@@ -29,12 +29,12 @@ export interface SendNotificationParams {
 }
 
 interface IPayload {
-    [key: string]: any;
+    [key: string]: string;
 }
 
 export interface FirebaseNotificationParams {
     title: string;
     body: string;
     tokens: string[];
-    payload?: IPayload;
+    data?: IPayload;
 }

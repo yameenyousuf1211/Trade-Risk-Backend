@@ -19,12 +19,16 @@ const firebaseAdmin = admin.initializeApp({
 
 export const bucket = admin.storage().bucket();
 
-export const sendFirebaseNotification = async ({ title, body, tokens, payload }: FirebaseNotificationParams) => {
+export const sendFirebaseNotification = async ({ title, body, tokens, data }: FirebaseNotificationParams) => {
   const message = {
     notification: { title, body },
     tokens,
-    data: payload,
+    webpush: {
+      notification: { data },
+    },
   };
+
+  console.log({ message });
 
   try {
     const response = await firebaseAdmin.messaging().sendEachForMulticast(message);
