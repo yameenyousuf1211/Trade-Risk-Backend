@@ -59,6 +59,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
     let bidObj: any;
     let senderObj: any;
     let receivers: string[] = [];
+    let data = {};
 
     if (lc) lcObj = await findLc({ _id: lc });
     if (bid) bidObj = await findBid({ _id: bid });
@@ -74,6 +75,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
 
             title = `New ${lcObj?.type} Request`;
             body = `Ref No: ${lcObj?.refId} from ${senderObj?.business?.name} by ${senderObj?.name}`;
+            data = { lc: lcObj?._id };
             console.log({ title, body });
             break;
 
@@ -86,6 +88,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
 
             title = 'New Bid';
             body = `${senderObj?.business?.name} has placed a bid on request # ${lcObj?.refId}`;
+            data = { lc: lcObj?._id, bid: bidObj?._id };
             break;
 
         case NOTIFICATION_TYPES.BID_ACCEPTED:
@@ -97,6 +100,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
 
             title = 'Bid Accepted';
             body = `${senderObj?.business?.name} has accepted your bid on request # ${lcObj?.refId}`;
+            data = { lc: lcObj?._id, bid: bidObj?._id };
             break;
 
         case NOTIFICATION_TYPES.BID_REJECTED:
@@ -108,6 +112,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
 
             title = 'Bid Rejected';
             body = `${senderObj?.business?.name} has rejected your bid on request # ${lcObj?.refId}`;
+            data = { lc: lcObj?._id, bid: bidObj?._id };
             break;
 
         default:
@@ -129,7 +134,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: Send
         bid
     });
 
-    await sendFirebaseNotification({ title, body, tokens });
+    await sendFirebaseNotification({ title, body, tokens, data });
 
     return notification;
 }
