@@ -5,12 +5,13 @@ declare global {
         interface Request {
             user: {
                 _id: string,
-                name:string,
+                name: string,
                 role: string,
                 email: string,
                 type: string,
                 business: any
             };
+            fileValidationError: string;
         }
     }
 }
@@ -30,11 +31,11 @@ export interface IUser {
     allowNewRequestNotification?: boolean;
 
     fcmTokens?: string[];
-    
+
     createdAt?: Date;
     updatedAt?: Date;
 }
-export interface IUserDocs  extends Document,IUser {
+export interface IUserDocs extends Document, IUser {
     _id: string;
     isPasswordCorrect(password: string): Promise<boolean>;
 } 
