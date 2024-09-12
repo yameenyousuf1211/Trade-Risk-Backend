@@ -1,31 +1,26 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
-import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllLcsWithoutPagination, fetchBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
-import mongoose from "mongoose";
-import ILcs from "../../interface/lc.interface";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { corporateBusinessId, lc, bidBy, type } = req.query;
+    const { type } = req.query;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
 
-    const pipeline: mongoose.PipelineStage[] = [{ $match: { bidType: type || 'LC Confirmation' } }];
+    if (!type) return next({
+        message: 'type is required',
+        statusCode: STATUS_CODES.BAD_REQUEST
+    });
 
-    if (lc) pipeline.push({ $match: { lc: new mongoose.Types.ObjectId(lc as string) } });
-
-    if (bidBy) {
-        pipeline.push({ $match: { bidBy: new mongoose.Types.ObjectId(bidBy as string) } });
+    const query = {
+        bidType: type,
+        bidBy: req.user.business
     }
 
-    if (corporateBusinessId) {
-        const lcIds: ILcs[] = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
-        const lcIdArray = lcIds.map((lc: Partial<ILcs>) => lc._id);
-        pipeline.push({ $match: { lc: { $in: lcIdArray } } });
-    }
+    const populate = { path: 'lc', select: 'issuingBanks confirmingBank' };
 
-    const fetchedBids = await fetchBids(pipeline, page, limit);
-
+    const fetchedBids = await fetchAllBids({ query, page, limit, populate });
     generateResponse(fetchedBids, 'List fetched successfully', res);
 });
 
