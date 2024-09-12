@@ -1,21 +1,26 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
-import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllBids, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { type } = req.query;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
+    const corporateBusinessId = req.user.business;
 
     if (!type) return next({
         message: 'type is required',
         statusCode: STATUS_CODES.BAD_REQUEST
     });
 
+    const corporateLcs = await fetchAllLcsWithoutPagination({ createdBy: corporateBusinessId }).select('_id');
+    const lcIds = corporateLcs.map(lc => lc._id);
+    console.log({ lcIds })
+
     const query = {
         bidType: type,
-        bidBy: req.user.business
+        lc: { $in: lcIds },
     }
 
     const populate = { path: 'lc', select: 'issuingBanks confirmingBank' };
