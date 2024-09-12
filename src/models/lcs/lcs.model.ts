@@ -95,6 +95,8 @@ const LcsSchema: Schema = new Schema({
     basePerRate: String,
   },
   baseRate: String,
+
+  // createdBy is business id
   createdBy: { type: Schema.Types.ObjectId, ref: "Business" },
 
   attachments: [Object],
@@ -228,4 +230,4 @@ export const updateLc = (query: any, update: any) => LcsModel.findOneAndUpdate(q
 export const deleteLc = (id: string) => LcsModel.findByIdAndDelete(id);
 export const lcsCount = (query?: any) => LcsModel.countDocuments(query);
 export const aggregateFetchLcs = (query: any) => LcsModel.aggregate(query);
-export const fetchAllLcsWithoutPagination = (query: any) => LcsModel.find(query);
+// export const fetchAllLcsWithoutPagination = (query: any) => LcsModel.find(query);
