@@ -120,6 +120,13 @@ const LcsSchema: Schema = new Schema({
 
   totalLgAmount: Number,
 
+  issuingBanks: [{
+    bank: String,
+    country: String,
+    swiftCode: String,
+    accountNumber: String,
+  }],
+
 
   physicalLg: Boolean,
   physicalLgCountry: String,
@@ -143,12 +150,14 @@ const LcsSchema: Schema = new Schema({
   },
 
   // 2 - 100% cash margin
-  issuingBanks: [{
-    bank: String,
+  preferredBanks: {
     country: String,
-    swiftCode: String,
-    accountNumber: String,
-  }],
+    banks: [{
+      bank: String,
+      swiftCode: String,
+      accountNumber: String,
+    }]
+  },
 
   // 3 - 100% cash margin
   typeOfLg: { type: String },
@@ -156,6 +165,7 @@ const LcsSchema: Schema = new Schema({
   // 4 - 100% cash margin
   issueLgWithStandardText: Boolean,
   lgStandardText: String,
+  draftAttachments: [Object],
 
   // 5 - 100% cash margin
   lgDetails: {
@@ -195,7 +205,7 @@ const LcsSchema: Schema = new Schema({
   expectedPrice: { expectedPrice: Boolean, pricePerAnnum: Number },
 
   // 13 - 100% cash margin
-  lastDateOfReceivingBids: String,
+  lastDateOfReceivingBids: Date,
 
 }, { timestamps: true, versionKey: false });
 
