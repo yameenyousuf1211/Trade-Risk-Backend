@@ -1,11 +1,11 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: Pull & Deploy
+name: Pull & Deploy Production Server
 
 on:
   push:
-    branches: [ "dev", "main" ]
+    branches: [ "main" ]
   
 jobs:
   build:
@@ -29,31 +29,3 @@ jobs:
     - run: echo '${{secrets.FIREBASE_ADMIN_CONFIG}}' > traderisk-463ed-firebase-adminsdk-g2ow6-9cdef4d862.json
     - run: npm run build
     - run: pm2 restart apis-trade-risk-prod
-  
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-
-      - name: Deploy NodeJS App to DigitalOcean
-        uses: appleboy/ssh-action@v0.1.7
-      - run: echo '${{secrets.SSH_HOST}}'
-      - run: echo '${{secrets.SSH_KEY}}'
-      - run: echo '${{secrets.SSH_USERNAME}}'
-        with:
-          host: ${{secrets.SSH_HOST}}
-          key: ${{secrets.SSH_KEY}}
-          # username: ${{secrets.SSH_USERNAME}}
-          script: |
-            cd /mnt/trade-risk/Trade-Risk-Backend
-            git pull origin dev
-            npm install
-            npm run build
-            sleep 10
-            pm2 restart apis-trade-risk
