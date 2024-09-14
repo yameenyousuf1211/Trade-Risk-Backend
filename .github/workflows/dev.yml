@@ -5,7 +5,7 @@ on:
     branches: [ "dev" ]
   
 jobs:
-  deploy:
+  deploy-dev:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -16,11 +16,8 @@ jobs:
         with:
           node-version: "16"
 
-      - name: Deploy NodeJS App to DigitalOcean
+      - name: Deploy NodeJS App
         uses: appleboy/ssh-action@v0.1.7
-      - run: echo '${{secrets.SSH_HOST}}'
-      - run: echo '${{secrets.SSH_KEY}}'
-      - run: echo '${{secrets.SSH_USERNAME}}'
         with:
           host: ${{secrets.SSH_HOST}}
           key: ${{secrets.SSH_KEY}}
