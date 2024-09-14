@@ -3,7 +3,7 @@ name: Pull & Deploy Dev Server
 on:
   push:
     branches: [ "dev" ]
-  
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,13 +18,10 @@ jobs:
 
       - name: Deploy NodeJS App to DigitalOcean
         uses: appleboy/ssh-action@v0.1.7
-      - run: echo '${{secrets.SSH_HOST}}'
-      - run: echo '${{secrets.SSH_KEY}}'
-      - run: echo '${{secrets.SSH_USERNAME}}'
         with:
-          host: ${{secrets.SSH_HOST}}
-          key: ${{secrets.SSH_KEY}}
-          # username: ${{secrets.SSH_USERNAME}}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             cd /mnt/trade-risk/Trade-Risk-Backend
             git pull origin dev
