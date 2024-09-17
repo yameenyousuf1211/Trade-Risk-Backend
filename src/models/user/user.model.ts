@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, model } from "mongoose";
+import mongoose, { Document, FilterQuery, Schema, model } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
@@ -6,7 +6,7 @@ import { getMongoosePaginatedData } from "../../utils/helpers";
 import { compare } from "bcrypt";
 import { QueryWithHelpers } from "mongoose";
 import { sign } from "jsonwebtoken";
-import { IUser, IUserDocs } from "../../interface";
+import { IUser, IUserDoc } from "../../interface";
 
 // Define the Mongoose schema
 const userSchema = new Schema({
@@ -22,7 +22,7 @@ const userSchema = new Schema({
     allowBidsNotification: { type: Boolean, default: true },
     allowNewRequestNotification: { type: Boolean, default: true },
 
-    fcmTokens: { type: [String], default: [] },
+    fcmToken: String,
     attachments: { type: [String], default: [] },
 }, { timestamps: true, versionKey: false });
 
@@ -60,7 +60,7 @@ userSchema.plugin(aggregatePaginate);
 const UserModel = model("User", userSchema);
 
 // create new user
-export const createUser = (obj: Record<string, any>): Promise<IUserDocs> => UserModel.create(obj);
+export const createUser = (obj: Record<string, any>): Promise<IUserDoc> => UserModel.create(obj);
 
 // find user by query
 export const findUser = (query: Record<string, any>): QueryWithHelpers<any, Document> => UserModel.findOne(query);
@@ -75,11 +75,14 @@ export const getAllUsers = async ({ query, page, limit, populate }: IPaginationF
     return { data, pagination };
 };
 
-export const updateUser = (id: string, obj: Record<string, any>): Promise<IUserDocs> => UserModel.findByIdAndUpdate(id, obj, { new: true }).exec();
+export const updateUser = (id: string, obj: Record<string, any>): Promise<IUserDoc> => UserModel.findByIdAndUpdate(id, obj, { new: true }).exec();
 
-export const getFcmTokens = async (query: any) => {
-    const users = await UserModel.find(query).select('fcmTokens');
-    return users?.map(user => user?.fcmTokens).flat();
+export const getFcmTokens = async (query: FilterQuery<IUser>): Promise<string[]> => {
+    const users = await UserModel.find({
+        ...query,
+        fcmToken: { $ne: null }
+    }).select('fcmToken');
+    return users.map(user => user.fcmToken);
 }
 
 export const findUsers = (query: any) => UserModel.find(query);
