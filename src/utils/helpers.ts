@@ -6,7 +6,7 @@ import { Resend } from 'resend';
 import mongoose from 'mongoose';
 import admin from 'firebase-admin';
 import path from 'path';
-import { FirebaseNotificationParams } from './interfaces';
+import { IFirebaseNotificationParams } from './interfaces';
 
 require('dotenv').config();
 
@@ -19,7 +19,7 @@ const firebaseAdmin = admin.initializeApp({
 
 export const bucket = admin.storage().bucket();
 
-export const sendFirebaseNotification = async ({ title, body, tokens, data }: FirebaseNotificationParams) => {
+export const sendFirebaseNotification = async ({ title, body, tokens, data }: IFirebaseNotificationParams) => {
   const message = {
     notification: { title, body },
     tokens,

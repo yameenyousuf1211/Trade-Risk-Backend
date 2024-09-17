@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
-import { SendNotificationParams } from "../../utils/interfaces";
+import { ICreateAndSendNotificationParams } from "../../utils/interfaces";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { type } = req.query;

@@ -21,7 +21,7 @@ export interface IPaginationFunctionParams {
     sort?: Record<string, any>,
 }
 
-export interface SendNotificationParams {
+export interface ICreateAndSendNotificationParams {
     type: string;
     sender: string;
     lc?: string;
@@ -32,7 +32,7 @@ interface IPayload {
     [key: string]: string;
 }
 
-export interface FirebaseNotificationParams {
+export interface IFirebaseNotificationParams {
     title: string;
     body: string;
     tokens: string[];
