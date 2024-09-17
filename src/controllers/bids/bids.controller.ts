@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
-import { NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
+import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
+import { SendNotificationParams } from "../../utils/interfaces";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { type } = req.query;
@@ -29,73 +30,46 @@ export const getAllBids = asyncHandler(async (req: Request, res: Response, next:
 });
 
 export const createBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.lc && !req.body.risk) return next({
-        message: 'lc or risk is required',
+    if (!req.body.lc) return next({
+        message: 'lc is required',
+        statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY
+    });
+
+    const role = req.user.role;
+
+    const lc = await findLc({ _id: req.body.lc });
+    if (!lc) return next({
+        message: 'Lc not found',
+        statusCode: STATUS_CODES.NOT_FOUND
+    });
+
+    const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: LC_STATUS.ACCEPTED });
+    if (isBidAlreadyAccepted) return next({
+        message: 'Lc already accepted a bid',
         statusCode: STATUS_CODES.BAD_REQUEST
     });
-    const role = req.user.role;
-    let notification: any;
-
-    const newBidId = getMongoId();
-
-    if (req.body.lc) {
-        const lc = await findLc({ _id: req.body.lc });
-        if (!lc) return next({
-            message: 'Lc not found',
-            statusCode: STATUS_CODES.NOT_FOUND
-        });
-
-        notification = {
-            lc: req.body.lc,
-            type: NOTIFICATION_TYPES.BID_CREATED,
-            sender: req.user._id
-        }
-
-        const isBidAlreadyAccepted = await findBid({ lc: req.body.lc, status: 'Accepted' });
-        if (isBidAlreadyAccepted) return next({
-            message: 'Lc already accepted a bid',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
-
-        if (role === 'admin') {
-            const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: newBidId } });
-            if (!updatedLc) return next({
-                message: 'Lc not found',
-                statusCode: STATUS_CODES.NOT_FOUND
-            });
-        }
-    } else {
-        const risk = await findRisk({ _id: req.body.risk });
-        if (!risk) return next({
-            message: 'Risk not found',
-            statusCode: STATUS_CODES.NOT_FOUND
-        })
-
-        notification = {
-            risk: req.body.risk,
-            type: NOTIFICATION_TYPES.RISK_CREATED,
-            sender: req.user._id,
-        }
-
-        const isbidExist = await findBid({ risk: req.body.risk, status: 'Accepted' });
-
-        if (isbidExist) return next({
-            message: 'Risk already accepted a bid',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        })
-        risk.status = 'Pending'
-        await risk.save();
-    }
 
     req.body.bidBy = req.user.business;
     req.body.createdBy = req.user._id;
 
-    const approvalStatus = role === 'admin' ? 'Approved' : 'Pending';
+    const approvalStatus = (role === 'admin') ? BID_APPROVAL_STATUS.APPROVED : BID_APPROVAL_STATUS.PENDING;
+    const bid = await createBid({ ...req.body, approvalStatus });
 
-    const bid = await createBid({ ...req.body, _id: newBidId, approvalStatus });
+    if (role === 'admin') {
+        const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: bid._id } });
+        if (!updatedLc) return next({
+            message: 'Lc not found',
+            statusCode: STATUS_CODES.NOT_FOUND
+        });
+    }
+
     generateResponse(bid, 'Bids created successfully', res);
 
-    await createAndSendNotifications(notification);
+    await createAndSendNotifications({
+        lc: req.body.lc,
+        type: NOTIFICATION_TYPES.BID_CREATED,
+        sender: req.user._id
+    });
 })
 
 export const deleteBid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

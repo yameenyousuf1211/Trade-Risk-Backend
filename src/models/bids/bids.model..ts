@@ -3,6 +3,7 @@ import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongoosePaginatedData } from "../../utils/helpers";
+import { BID_APPROVAL_STATUS, BID_STATUS } from '../../utils/constants';
 
 export interface IBid extends Document {
     bidType: string;
@@ -32,10 +33,10 @@ const bidSchema: Schema = new Schema({
     discountMargin: Number,
     discountBaseRate: String,
     perAnnum: Boolean,
-    status: { type: String, enum: ['Pending', 'Expired', 'Rejected', 'Accepted'], default: 'Pending' },
+    status: { type: String, enum: Object.values(BID_STATUS), default: BID_STATUS.PENDING },
 
     // admin bid submit status
-    approvalStatus: { type: String, enum: ['Pending', 'Approved', 'Rejected'] },
+    approvalStatus: { type: String, enum: [Object.values(BID_APPROVAL_STATUS)] },
 
     // for LG Re-Issuance
     bids: [{

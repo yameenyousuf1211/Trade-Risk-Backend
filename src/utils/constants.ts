@@ -32,6 +32,26 @@ export enum NOTIFICATION_TYPES {
   RISK_REJECTED = 'risk_rejected',
 }
 
+export enum LC_STATUS {
+  PENDING = 'Pending',
+  EXPIRED = 'Expired',
+  ACCEPTED = 'Accepted',
+  ADD_BID = 'Add bid',
+}
+
+export enum BID_STATUS {
+  PENDING = 'Pending',
+  EXPIRED = 'Expired',
+  REJECTED = 'Rejected',
+  ACCEPTED = 'Accepted'
+}
+
+export enum BID_APPROVAL_STATUS {
+  PENDING = 'Pending',
+  APPROVED = 'Approved',
+  REJECTED = 'Rejected',
+}
+
 export enum COMPANY_CONSTITUTION {
   Partnership = 'partnership',
   Public_Limited_Co = 'public_limited_co',

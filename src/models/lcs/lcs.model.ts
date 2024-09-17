@@ -5,6 +5,7 @@ import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interf
 import { getMongoosePaginatedData } from "../../utils/helpers";
 import { QueryWithHelpers } from "mongoose";
 import ILcs from "../../interface/lc.interface";
+import { LC_STATUS } from "../../utils/constants";
 
 const bondSchema = new Schema({
   Contract: Boolean,
@@ -101,7 +102,7 @@ const LcsSchema: Schema = new Schema({
 
   attachments: [Object],
   draft: Boolean,
-  status: { type: String, enum: ["Pending", "Expired", "Accepted", "Add bid"], default: "Add bid" },
+  status: { type: String, enum: Object.values(LC_STATUS), default: LC_STATUS.PENDING },
 
 
 
