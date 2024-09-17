@@ -30,12 +30,12 @@ export interface IUser {
     allowBidsNotification?: boolean;
     allowNewRequestNotification?: boolean;
 
-    fcmTokens?: string[];
+    fcmToken?: string;
 
     createdAt?: Date;
     updatedAt?: Date;
 }
-export interface IUserDocs extends Document, IUser {
+export interface IUserDoc extends Document, IUser {
     _id: string;
     isPasswordCorrect(password: string): Promise<boolean>;
 } 

@@ -42,7 +42,7 @@ const registerValidator = joi.object({
                 otherwise: joi.forbidden()
             }),
 
-        constitution: joi.string().valid('Individual', 'Limited Liability Company', 'Public Limited Company', 'Partnership','Estalishment').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        constitution: joi.string().valid('Individual', 'Limited Liability Company', 'Public Limited Company', 'Partnership', 'Estalishment').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
 
         businessType: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         productInfo: joi.object({
@@ -64,7 +64,7 @@ const registerValidator = joi.object({
         accountCountry: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountCity: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         businessNature: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
-        poc: joi.string().when('type', { is: 'corporate', then: joi.optional(), otherwise: joi.forbidden() }).allow(null,''),
+        poc: joi.string().when('type', { is: 'corporate', then: joi.optional(), otherwise: joi.forbidden() }).allow(null, ''),
         pocDesignation: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
     }).required(),
 });
@@ -75,7 +75,7 @@ const loginValidator = joi.object({
     fcmToken: joi.string().optional(),
 });
 
-const registerValidation = [validateRequest(registerValidator),emailExist];
+const registerValidation = [validateRequest(registerValidator), emailExist];
 const loginValidation = validateRequest(loginValidator);
 
 

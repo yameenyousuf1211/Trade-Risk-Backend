@@ -53,7 +53,7 @@ export const login = asyncHandler(async (req: Request, res: Response, next: Next
     const accessToken = await user.generateAccessToken();
     req.session = { accessToken };
     if (body.fcmToken) {
-        await updateUser(user._id, { $addToSet: { fcmTokens: body.fcmToken } });
+        await updateUser(user._id, { $set: { fcmToken: body.fcmToken } });
     }
 
     // remove password
@@ -96,5 +96,4 @@ export const isEmailAlreadyExist = asyncHandler(async (req: Request, res: Respon
     const { email } = req.body;
     const user = await findUser({ email });
     generateResponse({ isExist: !!user }, 'Email checked successfully', res);
-
 });
