@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
-import { getMongooseAggregatePaginatedData, getMongoosePaginatedData } from "../../utils/helpers";
+import { getMongoosePaginatedData } from "../../utils/helpers";
 
 export interface IBid extends Document {
     bidType: string;
@@ -21,10 +21,7 @@ export interface IBid extends Document {
 
 // Define the bid schema
 const bidSchema: Schema = new Schema({
-    bidType: {
-        type: String,
-        enum: ['LC Confirmation', 'LC Confirmation & Discounting', 'LC Discounting', 'Risk', 'LG Issuance'],
-    },
+    bidType: { type: String, enum: ['LC Confirmation', 'LC Confirmation & Discounting', 'LC Discounting', 'Risk', 'LG Issuance'] },
     lc: { type: Schema.Types.ObjectId, ref: 'lcs' },
     risk: { type: Schema.Types.ObjectId, ref: 'risks' },
     bidValidity: Date,
@@ -35,11 +32,7 @@ const bidSchema: Schema = new Schema({
     discountMargin: Number,
     discountBaseRate: String,
     perAnnum: Boolean,
-    status: {
-        type: String,
-        enum: ['Pending', 'Expired', 'Rejected', 'Accepted'],
-        default: 'Pending'
-    },
+    status: { type: String, enum: ['Pending', 'Expired', 'Rejected', 'Accepted'], default: 'Pending' },
 
     // admin bid submit status
     approvalStatus: { type: String, enum: ['Pending', 'Approved', 'Rejected'] },
@@ -52,10 +45,16 @@ const bidSchema: Schema = new Schema({
         perAnnum: Boolean,
         status: { type: String, enum: ['Pending', 'Rejected', 'Accepted'], default: 'Pending' },
     }],
+
+    attachments: [Object],                                                      // for LG 100% Cash Margin
+    issueLg: { email: String, branchName: String, branchAddress: String },      // for LG 100% Cash Margin
+    collectLg: { email: String, branchName: String, branchAddress: String }     // for LG 100% Cash Margin
+
 }, { timestamps: true, versionKey: false });
 
 bidSchema.plugin(mongoosePaginate);
 bidSchema.plugin(aggregatePaginate);
+
 // Create the bid model
 const BidModel = mongoose.model<IBid>('Bid', bidSchema);
 
@@ -64,11 +63,9 @@ export const findBid = (query: Record<string, any>) => BidModel.findOne(query);
 export const findBids = (query: Record<string, any>) => BidModel.find(query);
 export const updateBid = (query: Record<string, any>, update: Record<string, any>) => BidModel.findOneAndUpdate(query, update, { new: true });
 
-// export const findMany = (query: Record<string, any>) => BidModel.find(query);
-
-export const BidsStatusCount = (userId: string) => BidModel.aggregate([
+export const BidsStatusCount = (businessId: string) => BidModel.aggregate([
     {
-        $match: { bidBy: new mongoose.Types.ObjectId(userId) }
+        $match: { bidBy: new mongoose.Types.ObjectId(businessId) }
     },
     {
         $group: {
