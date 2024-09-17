@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 import { getMongooseAggregatePaginatedData, sendFirebaseNotification } from "../../utils/helpers";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
-import { IPaginationFunctionParams, IPaginationResult, SendNotificationParams } from "../../utils/interfaces";
+import { IPaginationFunctionParams, IPaginationResult, ICreateAndSendNotificationParams } from "../../utils/interfaces";
 import { NOTIFICATION_TYPES, ROLE_TYPES } from '../../utils/constants';
 import { findLc } from '../lcs/lcs.model';
 import { findBid } from '../bids/bids.model.';
@@ -52,7 +52,7 @@ export const createNotification = (notification: INotification) => NotificationM
 export const updateNotification = (id: string, notification: any) => NotificationModel.findByIdAndUpdate(id, notification);
 export const deleteNotification = (id: string) => NotificationModel.findByIdAndDelete(id);
 
-export const createAndSendNotifications = async ({ type, sender, lc, bid }: SendNotificationParams) => {
+export const createAndSendNotifications = async ({ type, sender, lc, bid }: ICreateAndSendNotificationParams) => {
     let body: string = '';
     let title: string = '';
     let lcObj: any;
