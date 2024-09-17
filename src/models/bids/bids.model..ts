@@ -36,7 +36,7 @@ const bidSchema: Schema = new Schema({
     status: { type: String, enum: Object.values(BID_STATUS), default: BID_STATUS.PENDING },
 
     // admin bid submit status
-    approvalStatus: { type: String, enum: [Object.values(BID_APPROVAL_STATUS)] },
+    approvalStatus: { type: String, enum: Object.values(BID_APPROVAL_STATUS) },
 
     // for LG Re-Issuance
     bids: [{
