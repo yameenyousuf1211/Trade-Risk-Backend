@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, FilterQuery } from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
@@ -6,6 +6,7 @@ import { getMongoosePaginatedData } from "../../utils/helpers";
 import { BID_APPROVAL_STATUS, BID_STATUS } from '../../utils/constants';
 
 export interface IBid extends Document {
+    bidNumber: number;
     bidType: string;
     bidValidity: Date
     lc: string;
@@ -64,6 +65,7 @@ export const createBid = (obj: IBid) => BidModel.create(obj);
 export const findBid = (query: Record<string, any>) => BidModel.findOne(query);
 export const findBids = (query: Record<string, any>) => BidModel.find(query);
 export const updateBid = (query: Record<string, any>, update: Record<string, any>) => BidModel.findOneAndUpdate(query, update, { new: true });
+export const countBids = (query: FilterQuery<IBid>) => BidModel.countDocuments(query);
 
 export const BidsStatusCount = (businessId: string) => BidModel.aggregate([
     {

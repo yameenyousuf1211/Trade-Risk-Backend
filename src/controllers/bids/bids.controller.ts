@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
-import { BidsStatusCount, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
+import { BidsStatusCount, countBids, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
 import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
 import { ICreateAndSendNotificationParams } from "../../utils/interfaces";
 
@@ -52,6 +52,8 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     req.body.bidBy = req.user.business;
     req.body.createdBy = req.user._id;
 
+    req.body.bidNumber = await countBids({}) + 1;
+
     const approvalStatus = (role === 'admin') ? BID_APPROVAL_STATUS.APPROVED : BID_APPROVAL_STATUS.PENDING;
     const bid = await createBid({ ...req.body, approvalStatus });
 
@@ -63,13 +65,13 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         });
     }
 
-    generateResponse(bid, 'Bids created successfully', res);
-
     await createAndSendNotifications({
         lc: req.body.lc,
         type: NOTIFICATION_TYPES.BID_CREATED,
         sender: req.user._id
     });
+
+    generateResponse(bid, 'Bids created successfully', res);
 })
 
 export const deleteBid = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

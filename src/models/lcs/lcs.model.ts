@@ -228,15 +228,7 @@ export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunc
 };
 
 export const createLc = (obj: ILcs) => LcsModel.create(obj);
-
-export const findLc = (query: Record<string, any>, populate?: string | string[]): QueryWithHelpers<any, Document> => {
-  const queryBuilder = LcsModel.findOne(query);
-  if (populate) {
-    queryBuilder.populate(populate);
-  }
-  return queryBuilder;
-};
-
+export const findLc = (query: Record<string, any>): QueryWithHelpers<any, Document> => LcsModel.findOne(query);
 export const updateLc = (query: any, update: any) => LcsModel.findOneAndUpdate(query, update, { new: true });
 export const deleteLc = (id: string) => LcsModel.findByIdAndDelete(id);
 export const lcsCount = (query?: any) => LcsModel.countDocuments(query);

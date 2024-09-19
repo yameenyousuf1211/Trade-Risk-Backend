@@ -69,20 +69,20 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: ICre
         case NOTIFICATION_TYPES.LC_CREATED:
             // get array of users ids
             const bankUsers = await findUsers({ type: ROLE_TYPES.BANK }).select('_id');
-            console.log('LC_CREATED users?.length >>>>>>>>>>', bankUsers?.length);
+            // console.log('LC_CREATED users?.length >>>>>>>>>>', bankUsers?.length);
 
             receivers = bankUsers.map((user: any) => user._id);
 
             title = `New ${lcObj?.type} Request`;
             body = `Ref No: ${lcObj?.refId} from ${senderObj?.business?.name} by ${senderObj?.name}`;
             data = { lc: lcObj?._id };
-            console.log({ title, body });
+            // console.log({ title, body });
             break;
 
         case NOTIFICATION_TYPES.BID_CREATED:
             // get array of users ids
             const corporateUsers = await findUsers({ business: lcObj?.createdBy, type: ROLE_TYPES.CORPORATE }).select('_id');
-            console.log('BID_CREATED users?.length >>>>>>>>>>', corporateUsers?.length);
+            // console.log('BID_CREATED users?.length >>>>>>>>>>', corporateUsers?.length);
 
             receivers = corporateUsers.map((user: any) => user._id);
 
@@ -94,7 +94,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: ICre
         case NOTIFICATION_TYPES.BID_ACCEPTED:
             // get array of users ids
             const bidSubmittedBy = await findUsers({ business: bidObj?.bidBy, type: ROLE_TYPES.BANK }).select('_id');
-            console.log('BID_ACCEPTED users?.length >>>>>>>>>>', bidSubmittedBy?.length);
+            // console.log('BID_ACCEPTED users?.length >>>>>>>>>>', bidSubmittedBy?.length);
 
             receivers = bidSubmittedBy.map((user: any) => user._id);
 
@@ -106,7 +106,7 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: ICre
         case NOTIFICATION_TYPES.BID_REJECTED:
             // get array of users ids
             const bidBy = await findUsers({ business: bidObj?.bidBy, type: ROLE_TYPES.BANK }).select('_id');
-            console.log('BID_REJECTED users?.length >>>>>>>>>>', bidBy?.length);
+            // console.log('BID_REJECTED users?.length >>>>>>>>>>', bidBy?.length);
 
             receivers = bidBy.map((user: any) => user._id);
 
@@ -133,6 +133,8 @@ export const createAndSendNotifications = async ({ type, sender, lc, bid }: ICre
         lc,
         bid
     });
+
+    if (!tokens?.length) return notification;
 
     await sendFirebaseNotification({ title, body, tokens, data });
 
