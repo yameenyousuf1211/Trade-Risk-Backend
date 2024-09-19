@@ -1,6 +1,7 @@
 import joi from 'joi';
 import { validateRequest } from '../../middlewares/validation.middleware';
 import { emailExist } from './email.validation';
+import { COMPANY_CONSTITUTION } from '../../utils/constants';
 
 const registerValidator = joi.object({
     name: joi.string().required(),
@@ -42,7 +43,8 @@ const registerValidator = joi.object({
                 otherwise: joi.forbidden()
             }),
 
-        constitution: joi.string().valid('Individual', 'Limited Liability Company', 'Public Limited Company', 'Partnership', 'Estalishment').when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        constitution: joi.string().valid(...Object.values(COMPANY_CONSTITUTION))
+            .when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
 
         businessType: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         productInfo: joi.object({

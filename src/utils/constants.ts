@@ -53,10 +53,12 @@ export enum BID_APPROVAL_STATUS {
 }
 
 export enum COMPANY_CONSTITUTION {
-  Partnership = 'partnership',
-  Public_Limited_Co = 'public_limited_co',
-  Limited_Liability_Co = 'limited_liability_co',
-  Individual_Proprietorship_Co = 'individual_proprietorship_co',
+  PROPRIETORSHIP_COMPANY = 'Proprietorship Company',
+  INDIVIDUAL = 'Individual',
+  LIMITED_LIABILITY_COMPANY = 'Limited Liability Company',
+  PUBLIC_LIMITED_COMPANY = 'Public Limited Company',
+  PARTNERSHIP = 'Partnership',
+  ESTABLISHMENT = 'Establishment'
 }
 
 
