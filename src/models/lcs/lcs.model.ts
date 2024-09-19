@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Schema, Document, UpdateQuery, FilterQuery } from "mongoose";
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
@@ -102,10 +102,7 @@ const LcsSchema: Schema = new Schema({
 
   attachments: [Object],
   draft: Boolean,
-  status: { type: String, enum: Object.values(LC_STATUS), default: LC_STATUS.PENDING },
-
-
-
+  status: { type: String, enum: Object.values(LC_STATUS), default: LC_STATUS.ADD_BID },
 
   lgDetailsType: String,  //  for LG Re-Issuance
   bidBond: bondSchema,
@@ -229,7 +226,9 @@ export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunc
 
 export const createLc = (obj: ILcs) => LcsModel.create(obj);
 export const findLc = (query: Record<string, any>): QueryWithHelpers<any, Document> => LcsModel.findOne(query);
-export const updateLc = (query: any, update: any) => LcsModel.findOneAndUpdate(query, update, { new: true });
+export const updateLc = (query: FilterQuery<ILcs>, update: UpdateQuery<ILcs>):
+  QueryWithHelpers<any, Document> => LcsModel.findOneAndUpdate(query, update, { new: true });
+
 export const deleteLc = (id: string) => LcsModel.findByIdAndDelete(id);
 export const lcsCount = (query?: any) => LcsModel.countDocuments(query);
 export const aggregateFetchLcs = (query: any) => LcsModel.aggregate(query);

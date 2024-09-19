@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 import { BidsStatusCount, countBids, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
-import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
+import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, ROLES, STATUS_CODES } from "../../utils/constants";
 import { ICreateAndSendNotificationParams } from "../../utils/interfaces";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -54,13 +54,13 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
 
     req.body.bidNumber = await countBids({}) + 1;
 
-    const approvalStatus = (role === 'admin') ? BID_APPROVAL_STATUS.APPROVED : BID_APPROVAL_STATUS.PENDING;
+    const approvalStatus = (role === ROLES.ADMIN) ? BID_APPROVAL_STATUS.APPROVED : BID_APPROVAL_STATUS.PENDING;
     const bid = await createBid({ ...req.body, approvalStatus });
 
-    if (role === 'admin') {
+    if (role === ROLES.ADMIN) {
         const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: bid._id } });
         if (!updatedLc) return next({
-            message: 'Lc not found',
+            message: 'Lc not found with status "Add bid"',
             statusCode: STATUS_CODES.NOT_FOUND
         });
     }
