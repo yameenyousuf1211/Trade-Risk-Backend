@@ -1,0 +1,23 @@
+diff --git a/node_modules/country-state-city/lib/city.js b/node_modules/country-state-city/lib/city.js
+index 8d74b28..d0199da 100644
+--- a/node_modules/country-state-city/lib/city.js
++++ b/node_modules/country-state-city/lib/city.js
+@@ -1,4 +1,4 @@
+-import cityList from './assets/city.json';
++import cityList from '../../../src/utils/data/city.json';
+ import { compare, convertArrayToObject } from './utils';
+ const KEYS = [
+     "name",
+diff --git a/node_modules/country-state-city/lib/cjs/city.js b/node_modules/country-state-city/lib/cjs/city.js
+index 4592c49..0d0f1c7 100644
+--- a/node_modules/country-state-city/lib/cjs/city.js
++++ b/node_modules/country-state-city/lib/cjs/city.js
+@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
+     return (mod && mod.__esModule) ? mod : { "default": mod };
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+-const city_json_1 = __importDefault(require("./assets/city.json"));
++const city_json_1 = __importDefault(require("../../../../src/utils/data/city.json"));
+ const utils_1 = require("./utils");
+ const KEYS = [
+     "name",
