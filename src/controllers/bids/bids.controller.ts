@@ -58,7 +58,7 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
     const bid = await createBid({ ...req.body, approvalStatus });
 
     if (role === ROLES.ADMIN) {
-        const updatedLc = await updateLc({ _id: req.body.lc, status: 'Add bid' }, { $addToSet: { bids: bid._id } });
+        const updatedLc = await updateLc({ _id: req.body.lc, status: LC_STATUS.ADD_BID }, { $addToSet: { bids: bid._id } });
         if (!updatedLc) return next({
             message: 'Lc not found with status "Add bid"',
             statusCode: STATUS_CODES.NOT_FOUND
