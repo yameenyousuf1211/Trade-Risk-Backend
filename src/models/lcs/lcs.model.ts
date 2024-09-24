@@ -101,7 +101,7 @@ const LcsSchema: Schema = new Schema({
   createdBy: { type: Schema.Types.ObjectId, ref: "Business" },
 
   attachments: [Object],
-  draft: Boolean,
+  draft: { type: Boolean, default: false },
   status: { type: String, enum: Object.values(LC_STATUS), default: LC_STATUS.ADD_BID },
 
   lgDetailsType: String,  //  for LG Re-Issuance
@@ -169,8 +169,10 @@ const LcsSchema: Schema = new Schema({
   lgDetails: {
     currency: String,
     amount: Number,
-    LgTenor: { type: String, enum: ["Days", "Months", "Years"] },
-    number: Number,
+    lgTenor: {
+      lgTenorType: String,
+      lgTenorValue: Number,
+    },
     expectedDateToIssueLg: Date,
     lgExpiryDate: Date,
   },

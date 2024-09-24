@@ -18,16 +18,16 @@ export const fetchAllLcs = asyncHandler(
 
     const filters: any[] = [{ draft: req.query.draft ? true : false }];
     if (req.query.type) filters.push({ type: req.query.type });
-    if (req.query.refId) filters.push({ refId: req.query.refId });
+    if (req.query.refId) filters.push({ refId: +(req.query.refId) });
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
 
     const query = filters.length > 0 ? { $and: filters } : {};
-    const populate = {
-      path: "bids",
-      populate: { 'path': 'bidBy' }
-    };
+    // const populate = {
+    //   path: "bids",
+    //   populate: { 'path': 'bidBy' }
+    // };
 
-    const data = await fetchLcs({ limit, page, query, populate });
+    const data = await fetchLcs({ limit, page, query });
     generateResponse(data, "List fetched successfully", res);
   });
 
