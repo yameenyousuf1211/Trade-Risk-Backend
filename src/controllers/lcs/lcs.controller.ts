@@ -24,7 +24,8 @@ export const fetchAllLcs = asyncHandler(
     const query = filters.length > 0 ? { $and: filters } : {};
     const populate = {
       path: "bids",
-      populate: { 'path': 'bidBy' }
+      populate: { 'path': 'bidBy' },
+      populate: { 'path': 'createdBy', select: 'accountCity accountNumber accountHolderName' }
     };
 
     const data = await fetchLcs({ limit, page, query, populate });
