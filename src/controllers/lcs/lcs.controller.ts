@@ -22,11 +22,10 @@ export const fetchAllLcs = asyncHandler(
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
 
     const query = filters.length > 0 ? { $and: filters } : {};
-    const populate = {
-      path: "bids",
-      populate: { 'path': 'bidBy' },
-      populate: { 'path': 'createdBy', select: 'accountCity accountNumber accountHolderName' }
-    };
+    const populate = [
+      { path: "bids", populate: { 'path': 'bidBy' } },
+      { path: "createdBy", select: "accountCity accountNumber accountHolderName" }
+    ]
 
     const data = await fetchLcs({ limit, page, query, populate });
     generateResponse(data, "List fetched successfully", res);
