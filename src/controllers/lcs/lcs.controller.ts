@@ -22,12 +22,12 @@ export const fetchAllLcs = asyncHandler(
     if (req.query.createdBy) filters.push({ createdBy: req.query.createdBy });
 
     const query = filters.length > 0 ? { $and: filters } : {};
-    // const populate = {
-    //   path: "bids",
-    //   populate: { 'path': 'bidBy' }
-    // };
+    const populate = {
+      path: "bids",
+      populate: { 'path': 'bidBy' }
+    };
 
-    const data = await fetchLcs({ limit, page, query });
+    const data = await fetchLcs({ limit, page, query, populate });
     generateResponse(data, "List fetched successfully", res);
   });
 
