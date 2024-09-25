@@ -33,6 +33,7 @@ const BusinessSchema: Schema = new Schema({
     },
     currentBanks: { type: [{ name: String, country: String, city: String }], _id: false },
     bank: { type: String, },
+    accountNumber: { type: Number },
     accountHolderName: { type: String },
     accountCountry: { type: String },
     accountCity: { type: String },
