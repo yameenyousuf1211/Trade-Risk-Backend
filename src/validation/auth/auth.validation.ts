@@ -61,6 +61,7 @@ const registerValidator = joi.object({
             })
         ).when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         bank: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
+        accountNumber: joi.number().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountHolderName: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountCountry: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
         accountCity: joi.string().when('type', { is: 'corporate', then: joi.required(), otherwise: joi.forbidden() }),
