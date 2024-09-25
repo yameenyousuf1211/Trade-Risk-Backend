@@ -50,8 +50,8 @@ const bidSchema: Schema = new Schema({
     }],
 
     attachments: [Object],                                                      // for LG 100% Cash Margin
-    issueLg: { email: String, branchName: String, branchAddress: String },      // for LG 100% Cash Margin
-    collectLg: { email: String, branchName: String, branchAddress: String }     // for LG 100% Cash Margin
+    issueLg: { email: String, city: String, branchName: String, branchAddress: String },      // for LG 100% Cash Margin
+    collectLg: { email: String, city: String, branchName: String, branchAddress: String }     // for LG 100% Cash Margin
 
 }, { timestamps: true, versionKey: false });
 
