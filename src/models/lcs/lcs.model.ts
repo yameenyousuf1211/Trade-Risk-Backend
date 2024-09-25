@@ -190,10 +190,10 @@ const LcsSchema: Schema = new Schema({
   },
 
   // 8 - 100% cash margin
-  lgIssueIn: { country: String, city: String },
+  lgIssueIn: { country: String, city: String, isoCode: String },
 
   // 9 - 100% cash margin
-  lgCollectIn: { country: String, city: String },
+  lgCollectIn: { country: String, city: String, isoCode: String },
 
   // 10 - 100% cash margin
   remarks: String,
