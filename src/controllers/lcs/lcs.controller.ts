@@ -69,10 +69,12 @@ export const deleteLcs = asyncHandler(
 export const fetchLc = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const { lcId } = req.params;
 
-  const lc = await findLc({ _id: lcId }).populate({
-    path: "bids",
-    populate: { 'path': 'bidBy' }
-  });
+  const populate = [
+    { path: "bids", populate: { 'path': 'bidBy' } },
+    { path: "createdBy", select: "accountCity accountNumber accountHolderName" }
+  ]
+
+  const lc = await findLc({ _id: lcId }).populate(populate);
 
   if (!lc) return next({
     message: "Lc not found",
