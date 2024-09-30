@@ -193,7 +193,7 @@ const LcsSchema: Schema = new Schema({
   lgIssueIn: { country: String, city: String, isoCode: String },
 
   // 9 - 100% cash margin
-  isSameAsIssuance: { type: Boolean, default: false },
+  isSameAsIssuance: Boolean,
   lgCollectIn: { country: String, city: String, isoCode: String },
 
   // 10 - 100% cash margin
