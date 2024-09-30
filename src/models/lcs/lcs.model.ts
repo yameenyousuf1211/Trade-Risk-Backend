@@ -4,7 +4,7 @@ import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongoosePaginatedData } from "../../utils/helpers";
 import { QueryWithHelpers } from "mongoose";
-import ILcs from "../../interface/lc.interface";
+// import ILcs from "../../interface/lc.interface";
 import { LC_STATUS } from "../../utils/constants";
 
 const bondSchema = new Schema({
@@ -213,10 +213,10 @@ const LcsSchema: Schema = new Schema({
 LcsSchema.plugin(mongoosePaginate);
 LcsSchema.plugin(aggregatePaginate);
 // Create and export the model
-const LcsModel = mongoose.model<ILcs>("lcs", LcsSchema);
+const LcsModel = mongoose.model<any>("lcs", LcsSchema);
 
-export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunctionParams): Promise<IPaginationResult<ILcs>> => {
-  const { data, pagination }: IPaginationResult<ILcs> =
+export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunctionParams): Promise<IPaginationResult<any>> => {
+  const { data, pagination }: IPaginationResult<any> =
     await getMongoosePaginatedData({
       model: LcsModel,
       query,
@@ -227,9 +227,9 @@ export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunc
   return { data, pagination };
 };
 
-export const createLc = (obj: ILcs) => LcsModel.create(obj);
+export const createLc = (obj: any) => LcsModel.create(obj);
 export const findLc = (query: Record<string, any>): QueryWithHelpers<any, Document> => LcsModel.findOne(query);
-export const updateLc = (query: FilterQuery<ILcs>, update: UpdateQuery<ILcs>):
+export const updateLc = (query: FilterQuery<any>, update: UpdateQuery<any>):
   QueryWithHelpers<any, Document> => LcsModel.findOneAndUpdate(query, update, { new: true });
 
 export const deleteLc = (id: string) => LcsModel.findByIdAndDelete(id);
