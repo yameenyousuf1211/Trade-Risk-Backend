@@ -83,16 +83,9 @@ export const fetchAllLcsWithPendingBids = asyncHandler(async (req: Request, res:
     // order by updatedAt
     { $sort: { updatedAt: -1 } }
   ]);
-  console.log('lcs.length >>>>>>>> ', lcs.length);
-
 
   generateResponse(lcs, "List fetched successfully", res);
-
-
 });
-
-
-
 
 export const createLcOrLg = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   if (!req.body.type) return next({
