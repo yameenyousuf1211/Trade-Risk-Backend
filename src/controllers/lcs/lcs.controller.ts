@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import {
   asyncHandler,
   generateResponse,
+  getMongoId,
 } from "../../utils/helpers";
 import { BID_STATUS, LC_STATUS, NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
 import { aggregateFetchLcs, createAndSendNotifications, createLc, deleteLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
@@ -32,9 +33,16 @@ export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next
 
 // top 10 lcs with pending bids
 export const fetchAllLcsWithPendingBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  const createdBy = req.user.business;
+
   const lcs = await aggregateFetchLcs([
     // Match only lcs with status LC_STATUS.ADD_BID
-    { $match: { status: LC_STATUS.ADD_BID } },
+    {
+      $match: {
+        status: LC_STATUS.ADD_BID,
+        createdBy: getMongoId(createdBy),
+      }
+    },
     {
       $lookup: {
         from: "businesses",
