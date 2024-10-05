@@ -43,23 +43,12 @@ export const fetchAllLcsWithPendingBids = asyncHandler(async (req: Request, res:
         createdBy: getMongoId(createdBy),
       }
     },
-    {
-      $lookup: {
-        from: "businesses",
-        let: { createdBy: "$createdBy" },
-        pipeline: [
-          { $match: { $expr: { $eq: ["$_id", "$$createdBy"] } } },
-          { $project: { accountCity: 1, accountNumber: 1, accountHolderName: 1 } },
-        ],
-        as: "createdBy",
-      },
-    },
-    { $unwind: { path: "$createdBy" } },
 
+    { $lookup: { from: "bids", localField: "bids", foreignField: "_id", as: "bids" } },
+    { $unwind: "$bids" },
 
-    { $lookup: { from: "bids", localField: "bids", foreignField: "_id", as: "bids" } }, { $unwind: "$bids" },
-
-    { $match: { "bids.status": BID_STATUS.PENDING } },
+    // bid.status = PENDING && bid.bidvalidity > now
+    { $match: { "bids.status": BID_STATUS.PENDING, "bids.bidValidity": { $gt: new Date() } } },
 
     // Perform the lookup to fetch the 'bidBy' details for each bid
     {
@@ -70,10 +59,14 @@ export const fetchAllLcsWithPendingBids = asyncHandler(async (req: Request, res:
         as: "bids.bidBy",
       }
     },
+
     // Unwind the 'bidBy' array to flatten the results
     { $unwind: "$bids.bidBy" },
 
-    // // Optional: If you want to group the results back into arrays
+    // order by updatedAt
+    { $sort: { updatedAt: -1 } },
+
+    // Optional: If you want to group the results back into arrays
     {
       $group: {
         _id: "$_id",
@@ -85,11 +78,11 @@ export const fetchAllLcsWithPendingBids = asyncHandler(async (req: Request, res:
     // Use $replaceRoot to merge the original document with the updated bids
     { $replaceRoot: { newRoot: { $mergeObjects: ["$originalDoc", { bids: "$bids" }] } } },
 
+    // order by updatedAt
+    { $sort: { updatedAt: -1 } },
+
     // limit to 10
     { $limit: 10 },
-
-    // order by updatedAt
-    { $sort: { updatedAt: -1 } }
   ]);
 
   generateResponse(lcs, "List fetched successfully", res);
