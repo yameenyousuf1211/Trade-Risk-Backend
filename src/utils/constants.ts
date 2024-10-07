@@ -34,7 +34,7 @@ export enum NOTIFICATION_TYPES {
 
 export enum SOCKET_EVENTS {
   LC_CREATED = 'lc-created',
-  // BID_CREATED = 'bid-created',
+  BID_CREATED = 'bid-created',
   // BID_ACCEPTED = 'bid-accepted',
   // BID_REJECTED = 'bid-rejected',
 }

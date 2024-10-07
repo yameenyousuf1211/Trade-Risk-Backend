@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse, getMongoId } from "../../utils/helpers";
 import { BidsStatusCount, countBids, createAndSendNotifications, createBid, fetchAllBids, fetchAllLcsWithoutPagination, findBid, findLc, findRisk, updateBid, updateBids, updateLc } from "../../models";
-import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, ROLES, STATUS_CODES } from "../../utils/constants";
+import { BID_APPROVAL_STATUS, LC_STATUS, NOTIFICATION_TYPES, ROLES, SOCKET_EVENTS, STATUS_CODES } from "../../utils/constants";
 import { ICreateAndSendNotificationParams } from "../../utils/interfaces";
+import { emitSocketEvent } from "../../socket";
 
 export const getAllBids = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { type } = req.query;
@@ -70,6 +71,13 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         type: NOTIFICATION_TYPES.BID_CREATED,
         sender: req.user._id
     });
+
+    emitSocketEvent(
+        req,
+        lc.createdBy as string,
+        SOCKET_EVENTS.BID_CREATED,
+        bid
+    );
 
     generateResponse(bid, 'Bids created successfully', res);
 })
