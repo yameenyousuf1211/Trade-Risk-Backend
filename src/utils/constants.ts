@@ -32,6 +32,13 @@ export enum NOTIFICATION_TYPES {
   RISK_REJECTED = 'risk_rejected',
 }
 
+export enum SOCKET_EVENTS {
+  LC_CREATED = 'lc-created',
+  // BID_CREATED = 'bid-created',
+  // BID_ACCEPTED = 'bid-accepted',
+  // BID_REJECTED = 'bid-rejected',
+}
+
 export enum LC_STATUS {
   PENDING = 'Pending',
   EXPIRED = 'Expired',
