@@ -4,13 +4,14 @@ import {
   generateResponse,
   getMongoId,
 } from "../../utils/helpers";
-import { BID_STATUS, LC_STATUS, NOTIFICATION_TYPES, STATUS_CODES } from "../../utils/constants";
+import { BID_STATUS, LC_STATUS, NOTIFICATION_TYPES, ROLE_TYPES, SOCKET_EVENTS, STATUS_CODES } from "../../utils/constants";
 import { aggregateFetchLcs, createAndSendNotifications, createLc, deleteLc, fetchLcs, findBid, findLc, lcsCount, updateLc } from "../../models";
 import mongoose from "mongoose";
 import { ValidationResult } from "joi";
 import { lcsValidator } from "../../validation/lcs/lcs.validation";
 import { CustomError } from "../../middlewares/validation.middleware";
 import { lgValidator } from "../../validation/lcs/lg.validation";
+import { emitSocketEvent } from "../../socket";
 
 export const fetchAllLcs = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const page = +(req.query.page || 1);
@@ -100,7 +101,6 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
   req.body.createdBy = req.user.business;
 
   const lc = await createLc(req.body);
-  generateResponse(lc, "Lcs created successfully", res);
 
   if (!req.body.draft)
     await createAndSendNotifications({
@@ -108,6 +108,9 @@ export const createLcOrLg = asyncHandler(async (req: Request, res: Response, nex
       type: NOTIFICATION_TYPES.LC_CREATED,
       sender: req.user._id,
     });
+
+  emitSocketEvent(req, ROLE_TYPES.BANK, SOCKET_EVENTS.LC_CREATED, lc);
+  generateResponse(lc, "Lcs created successfully", res);
 });
 
 export const deleteLcs = asyncHandler(
