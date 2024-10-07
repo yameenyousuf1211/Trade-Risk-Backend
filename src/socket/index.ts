@@ -19,11 +19,16 @@ import { Request } from "express";
 export const initializeSocketIO = (io: Server) => {
     return io.on("connection", async (socket: Socket) => {
         try {
-            const { business } = socket.handshake.headers;
-            console.log('socket connected >>>>', business);
+            const { business, type } = socket.handshake.headers;
+            console.log('socket connected');
 
-            // join the room with user id
+            // join the room with business ID
             socket.join(business as string);
+            console.log('joined business >>>>', business);
+
+            // join the room with type
+            socket.join(type as string);
+            console.log('joined type >>>>', type);
 
             // Common events that needs to be mounted on the initialization
             // unreadCountEvent(socket);
