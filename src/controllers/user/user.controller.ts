@@ -40,48 +40,13 @@ export const updateBusinessCurrentBanks = asyncHandler(async (req: Request, res:
 });
 
 export const updateUserBank = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.user._id;
-    const { action, bankId, name, country, city } = req.body;
+    const currentBanks = req.body;
 
-    if (action === 'add') {
-        const bank = await createBank({ name, country, city });
+    const user = await updateBusiness({ _id: req.user.business }, { $set: { currentBanks } });
+    if (!user) return next({
+        message: 'User not found',
+        statusCode: STATUS_CODES.NOT_FOUND
+    });
 
-        if (!bank) return next({
-            message: 'Bank not created',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
-
-        // const user = await updateUser(id, { $push: { currentBanks: bank._id } });
-        const user = await updateBusiness({ _id: req.user.business }, { $push: { currentBanks: bank } });
-        if (!user) return next({
-            message: 'User not found',
-            statusCode: STATUS_CODES.NOT_FOUND
-        });
-
-        return generateResponse(user, 'Bank added and user updated successfully', res);
-
-    } else if (action === 'remove') {
-        if (!bankId) return next({
-            message: 'Bank ID is required to remove a bank',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
-
-        const user = await updateUser(id, { $pull: { currentBanks: bankId } });
-
-        if (!user) return next({
-            message: 'User not found',
-            statusCode: STATUS_CODES.NOT_FOUND
-        });
-
-        const bank = await findBank({ _id: bankId });
-        bank.isDeleted = true;
-        await bank.save();
-
-        return generateResponse(user, 'Bank removed and user updated successfully', res);
-    } else {
-        return next({
-            message: 'Invalid action',
-            statusCode: STATUS_CODES.BAD_REQUEST
-        });
-    }
+    generateResponse(user, 'Banks updated successfully', res);
 });
