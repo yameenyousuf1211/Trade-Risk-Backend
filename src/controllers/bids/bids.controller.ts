@@ -72,9 +72,11 @@ export const createBids = asyncHandler(async (req: Request, res: Response, next:
         sender: req.user._id
     });
 
+    console.log('lc.createdBy >>>>>>>> ', lc.createdBy);
+
     emitSocketEvent(
         req,
-        lc.createdBy as string,
+        lc.createdBy.toString(),
         SOCKET_EVENTS.BID_CREATED,
         bid
     );
