@@ -31,7 +31,7 @@ const BusinessSchema: Schema = new Schema({
         annualValueExports: Number,
         annualValueImports: Number
     },
-    currentBanks: { type: [{ name: String, country: String, city: String }], _id: false },
+    currentBanks: { type: [{ name: String, country: String, city: String }] },
     bank: { type: String, },
     accountNumber: { type: Number },
     accountHolderName: { type: String },

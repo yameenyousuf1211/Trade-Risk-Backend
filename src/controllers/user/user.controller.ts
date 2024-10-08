@@ -51,7 +51,8 @@ export const updateUserBank = asyncHandler(async (req: Request, res: Response, n
             statusCode: STATUS_CODES.BAD_REQUEST
         });
 
-        const user = await updateUser(id, { $push: { currentBanks: bank._id } });
+        // const user = await updateUser(id, { $push: { currentBanks: bank._id } });
+        const user = await updateBusiness({ _id: req.user.business }, { $push: { currentBanks: bank } });
         if (!user) return next({
             message: 'User not found',
             statusCode: STATUS_CODES.NOT_FOUND
