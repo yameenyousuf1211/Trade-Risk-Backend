@@ -5,7 +5,7 @@ import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interf
 import { getMongoosePaginatedData } from "../../utils/helpers";
 import { QueryWithHelpers } from "mongoose";
 // import ILcs from "../../interface/lc.interface";
-import { LC_STATUS } from "../../utils/constants";
+import { LC_STATUS, LG_ISSUANCE_TYPES } from "../../utils/constants";
 
 const bondSchema = new Schema({
   Contract: Boolean,
@@ -133,7 +133,7 @@ const LcsSchema: Schema = new Schema({
   totalContractCurrency: String,
   bids: { type: [Schema.Types.ObjectId], ref: "Bid", default: [] },
 
-  lgIssuance: String,
+  lgIssuance: { type: String, enum: LG_ISSUANCE_TYPES, default: LG_ISSUANCE_TYPES.NONE },
   // enum: [
   // "LG Re-Issuance within counrty", 
   // "LG Re-Issuance in anothor country", 
@@ -207,6 +207,29 @@ const LcsSchema: Schema = new Schema({
 
   // 13 - 100% cash margin
   lastDateOfReceivingBids: Date,
+
+
+  // 100% LG Issuance within the country
+  // 1 - applicantDetails
+  // 2 - preferredBanks
+  // 3 - beneficiaryDetails
+  // 4 - lgDetails
+  // lgDetailsType: String,
+  // bidBond: bondSchema,
+  // advancePaymentBond: bondSchema,
+  // performanceBond: bondSchema,
+  // retentionMoneyBond: bondSchema,
+  // otherBond: bondSchema,
+  // totalContractValue: String,
+  // totalContractCurrency: String,
+  // 5 - lgIssueIn
+  // 6 - lgCollectIn & isSameAsIssuance
+  // 7 - purpose
+  // 8 - remarks
+  // 9 - priceQuotes
+  // 10 - expectedPrice: { expectedPrice: Boolean, pricePerAnnum: Number },
+  // 11 - lastDateOfReceivingBids
+
 
 }, { timestamps: true, versionKey: false });
 
