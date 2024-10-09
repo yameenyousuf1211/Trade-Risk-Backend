@@ -38,15 +38,3 @@ export const updateBusinessCurrentBanks = asyncHandler(async (req: Request, res:
 
     generateResponse(business, 'Business updated successfully', res);
 });
-
-export const updateUserBank = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const currentBanks = req.body;
-
-    const user = await updateBusiness({ _id: req.user.business }, { $set: { currentBanks } });
-    if (!user) return next({
-        message: 'User not found',
-        statusCode: STATUS_CODES.NOT_FOUND
-    });
-
-    generateResponse(user, 'Banks updated successfully', res);
-});

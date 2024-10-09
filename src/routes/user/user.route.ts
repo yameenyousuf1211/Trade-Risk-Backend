@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { fetchAllUsers, updateUsers, updateUserBank } from "../../controllers";
+import { fetchAllUsers, updateUsers } from "../../controllers";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLE_TYPES, ROLES } from "../../utils/constants";
 
@@ -12,7 +12,6 @@ export default class UserAPI {
     setupRoutes() {
         this.router.get('/', fetchAllUsers);
         this.router.put('/', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateUsers);
-        this.router.put('/bank', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), updateUserBank);
     }
 
     getRouter() {
