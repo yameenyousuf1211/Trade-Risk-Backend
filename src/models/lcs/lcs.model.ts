@@ -133,7 +133,10 @@ const LcsSchema: Schema = new Schema({
   totalContractCurrency: String,
   bids: { type: [Schema.Types.ObjectId], ref: "Bid", default: [] },
 
-  lgIssuance: { type: String, enum: LG_ISSUANCE_TYPES, default: LG_ISSUANCE_TYPES.NONE },
+  lgIssuance: {
+    type: String,
+     enum: LG_ISSUANCE_TYPES, default: LG_ISSUANCE_TYPES.NONE 
+  },
   // enum: [
   // "LG Re-Issuance within counrty", 
   // "LG Re-Issuance in anothor country", 
