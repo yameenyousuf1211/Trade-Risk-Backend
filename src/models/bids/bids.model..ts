@@ -28,7 +28,7 @@ const bidSchema: Schema = new Schema({
     lc: { type: Schema.Types.ObjectId, ref: 'lcs' },
     risk: { type: Schema.Types.ObjectId, ref: 'risks' },
     bidValidity: Date,
-    confirmationPrice: Number,
+    confirmationPrice: Number,  
     discountingPrice: Number,
     bidBy: { type: Schema.Types.ObjectId, ref: 'Business' },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },

@@ -17,7 +17,7 @@ export enum STATUS_CODES {
 // value="LG Re-issuance in another country"
 export enum LG_ISSUANCE_TYPES {
   LG_ISSUANCE_WITHIN_COUNTRY = "LG issuance within the country",
-  LG_ISSUANCE_ANOTHER_COUNTRY = "LG Re-issuance in another country",
+  LG_RE_ISSUANCE_IN_ANOTHER_COUNTRY = "LG Re-issuance in another country",
   LG_100_PERCENT_CASH_MARGIN = "LG 100% Cash Margin",
   NONE = "None"
 }

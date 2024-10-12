@@ -135,12 +135,8 @@ const LcsSchema: Schema = new Schema({
 
   lgIssuance: {
     type: String,
-     enum: LG_ISSUANCE_TYPES, default: LG_ISSUANCE_TYPES.NONE 
+    enum: LG_ISSUANCE_TYPES, default: LG_ISSUANCE_TYPES.NONE
   },
-  // enum: [
-  // "LG Re-Issuance within counrty", 
-  // "LG Re-Issuance in anothor country", 
-  // "100% Cash Margin"],
 
   // 100% cash margin form fields
   // 1 - 100% cash margin
