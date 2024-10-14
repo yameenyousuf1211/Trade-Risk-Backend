@@ -88,7 +88,8 @@ interface BanksByCountry {
   "Nigeria": string[];
   "India": string[],
   "Bangladesh": string[],
-  "Qatar": string[]
+  "Qatar": string[],
+  "France": string[]
 }
 export const banks: BanksByCountry = {
   "United Arab Emirates": [
@@ -364,7 +365,31 @@ export const banks: BanksByCountry = {
     "Ahlibank",
     "Masraf Al Rayan",
     "Dukhan Bank"
+  ],
+  "France": [
+    "BNP Paribas",
+    "Société Générale",
+    "Crédit Agricole",
+    "Natixis",
+    "HSBC France",
+    "La Banque Postale",
+    "Crédit Lyonnais (LCL)",
+    "BPCE (Banque Populaire-Caisse d'Épargne)",
+    "Société Générale Equipment Finance",
+    "BRED Banque Populaire",
+    "CIC (Crédit Industriel et Commercial)",
+    "Eurobank",
+    "ING France",
+    "DNB France",
+    "Commerzbank France",
+    "Standard Chartered France",
+    "UniCredit France",
+    "Bank of China (France)",
+    "Deutsche Bank France",
+    "ABN AMRO France"
   ]
+
+
 };
 interface PortsByCountry {
   "United Arab Emirates": string[];
