@@ -92,6 +92,7 @@ interface BanksByCountry {
   "France": string[],
   "Egypt": string[]
 }
+
 export const banks: BanksByCountry = {
   "United Arab Emirates": [
     "Abu Dhabi Commercial Bank",
@@ -101,6 +102,7 @@ export const banks: BanksByCountry = {
     "Al Maryah Community Bank",
     "Al Masraf Arab Bank for Investment & Foreign Trade",
     "Bank of Sharjah",
+    "Citibank",
     "Commercial Bank International",
     "Commercial Bank of Dubai",
     "Dubai Bank",
@@ -442,11 +444,12 @@ export const banks: BanksByCountry = {
     "Qatar Islamic Bank (UK) Egypt"
   ],
 
-  
+
 
 
 
 };
+
 interface PortsByCountry {
   "United Arab Emirates": string[];
   "Saudi Arabia": string[];
