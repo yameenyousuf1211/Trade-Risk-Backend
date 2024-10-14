@@ -117,6 +117,7 @@ export const banks: BanksByCountry = {
     "National Bank of Fujairah",
   ],
   "Saudi Arabia": [
+    "J.P. Morgan",
     "Saudi National Bank (SNB)",
     "Saudi Awwal Bank (SAB)",
     "The Saudi Investment Bank (SAIB)",
