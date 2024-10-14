@@ -89,7 +89,8 @@ interface BanksByCountry {
   "India": string[],
   "Bangladesh": string[],
   "Qatar": string[],
-  "France": string[]
+  "France": string[],
+  "Egypt": string[]
 }
 export const banks: BanksByCountry = {
   "United Arab Emirates": [
@@ -387,7 +388,62 @@ export const banks: BanksByCountry = {
     "Bank of China (France)",
     "Deutsche Bank France",
     "ABN AMRO France"
-  ]
+  ],
+  "Egypt": [
+    "National Bank of Egypt (NBE)",
+    "Banque Misr",
+    "Commercial International Bank (CIB)",
+    "Qatar National Bank Alahli (QNB ALAHLI)",
+    "Arab African International Bank (AAIB)",
+    "Bank of Alexandria",
+    "HSBC Egypt",
+    "Suez Canal Bank",
+    "Egyptian Gulf Bank (EGB)",
+    "Faisal Islamic Bank of Egypt",
+    "Alexbank (Intesa Sanpaolo)",
+    "Banque du Caire",
+    "Union National Bank - Egypt",
+    "Emirates NBD Egypt",
+    "Arab International Bank (AIB)",
+    "National Bank of Kuwait (NBK) Egypt",
+    "National Bank of Oman (NBO) Egypt",
+    "Bank of China (Egypt)",
+    "Cairo Amman Bank",
+    "Kuwait Finance House Egypt",
+    "Bank of Palestine",
+    "Egyptian Arab Land Bank",
+    "Egyptian Commercial Bank",
+    "Piraeus Bank Egypt",
+    "Suez Canal Bank",
+    "First Abu Dhabi Bank Egypt",
+    "RAK Bank Egypt",
+    "Jordan Kuwait Bank Egypt",
+    "Arab Bank Egypt",
+    "Qatar Islamic Bank Egypt",
+    "Kuwait Investment Authority Egypt",
+    "SGBL Egypt (Société Générale de Banque au Liban)",
+    "Cairo Bank",
+    "Invest Bank Egypt",
+    "Hellenic Bank Egypt",
+    "Al Baraka Bank Egypt",
+    "Bank AlJazira Egypt",
+    "Bank AlEtihad Egypt",
+    "Lebanon & Gulf Bank Egypt",
+    "Samba Financial Group Egypt",
+    "Jordan Ahli Bank Egypt",
+    "Union Bank Egypt",
+    "Misr Iran Development Bank",
+    "Roya Bank Egypt",
+    "Ahli United Bank Egypt",
+    "Arab Investment Bank",
+    "Oman Arab Bank Egypt",
+    "Al Ahli Bank Egypt",
+    "National Bank of Greece Egypt",
+    "Qatar Islamic Bank (UK) Egypt"
+  ],
+
+  
+
 
 
 };
