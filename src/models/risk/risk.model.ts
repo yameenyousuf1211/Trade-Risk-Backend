@@ -1,193 +1,67 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, QueryWithHelpers, FilterQuery, UpdateQuery } from 'mongoose';
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
 import { getMongooseAggregatePaginatedData } from "../../utils/helpers";
-
-interface IRisk extends Document {
-    banks: string[];
-    baftAgreement: {
-        agreement: string;
-        signCopy: string;
-    };
-    refId: Number,
-    status: string;
-    transaction: "Risk Participation" | "Outright Sales";
-    riskParticipation?: string;
-    outrightSales?: string;
-    riskParticipationTransaction: {
-        type: string;
-        amount: number;
-        returnOffer: string;
-        baseRate: string;
-        perAnnum: string;
-        participationRate: string;
-    };
-    issuingBanks: [{
-        bank: string;
-        country: string;
-    }];
-    advisingBank: {
-        bank: string;
-        country: string;
-    };
-    confirmingBank: {
-        bank: string;
-        country: string;
-    };
-    days: number;
-    isLcDiscounting?: boolean;
-    expectedDiscounting?: boolean;
-    expectedDateDiscounting?: Date;
-    expiryDate?: Date;
-    paymentTerms?: string;
-    shipmentPort: {
-        country: string;
-        port: string;
-    };
-    currency: string;
-    transhipment?: boolean;
-    expectedDateConfirmation?: Date;
-    description?: string;
-    importerInfo: {
-        applicantName: string;
-        countryOfImport: string;
-    };
-    exporterInfo: {
-        beneficiaryName: string;
-        countryOfExport: string;
-        beneficiaryCountry: string;
-    };
-    paymentReceivedType?: string;
-    attachment: string[];
-    note?: string;
-    createdBy: {
-        _id: Schema.Types.ObjectId;
-        ref: string;
-    };
-    draft?: boolean;
-    isDeleted: boolean;
-    period: {
-        expectedDate: boolean;
-        startDate?: Date;
-    };
-    country: string;
-    swiftCode: string;
-}
+import { IRisk } from './risk.interface';
 
 const RiskSchema: Schema = new Schema({
-    banks: [{ type: String }],
-    baftAgreement: {
-        agreement: { type: String },
-        signCopy: { type: String }
-    },
-    refId: { type: Number },
+    // createdBy is business id / user id
+    business: { type: Schema.Types.ObjectId, ref: "Business" },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+    draft: { type: Boolean, default: false },
+    refId: Number,
+    status: { type: String, enum: ["", ""], default: "" },
+
+
+    banks: [{ country: String, city: String, bank: String, swiftCode: String }],
+    signedCopy: [Object],
+    // 1
     transaction: { type: String, enum: ["Risk Participation", "Outright Sales"] },
-    riskParticipation: { type: String },
-    outrightSales: { type: String },
+
+    // 2
+    riskParticipation: { type: String, enum: ["Non-Funded", "Funded"] },
+    transactionType: { type: String, enum: ["LC Confirmation", "LG", "SBLC", "Analization", "Supply Chain Finance"] },
     riskParticipationTransaction: {
-        type: { type: String },
+        currency: { type: String },
         amount: { type: Number },
-        returnOffer: { type: String },
-        baseRate: { type: String },
-        perAnnum: { type: String },
-        participationRate: { type: String },
+        isParticipationOffered: { type: Boolean },
+        percentage: { type: Number },
+        participationCurrency: { type: String },
+        participationValue: { type: Number },
+        pricingOffered: { type: Number },
     },
-    issuingBank: {
-        bank: {
-            type: String,
-        },
-        country: {
-            type: String,
-        },
-    },
-    advisingBank: {
-        bank: {
-            type: String,
-        },
-        country: {
-            type: String,
-        },
-    },
-    confirmingBank: {
-        bank: {
-            type: String,
-        },
-        country: {
-            type: String,
-        },
-    },
-    days: { type: Number },
-    isLcDiscounting: { type: Boolean },
-    expectedDiscounting: { type: Boolean },
-    expectedDateDiscounting: { type: Date },
-    expiryDate: { type: Date },
-    paymentTerms: { type: String },
-    shipmentPort: {
-        country: {
-            type: String,
-        },
-        port: {
-            type: String,
-        },
-    },
-    transhipment: {
-        type: Boolean,
-    },
-    currency: {
-        type: String
-    },
-    expectedDateConfirmation: { type: Date },
-    description: { type: String },
-    importerInfo: {
-        applicantName: {
-            type: String,
-        },
-        countryOfImport: {
-            type: String,
-        },
-    },
-    exporterInfo: {
-        beneficiaryName: {
-            type: String,
-        },
-        countryOfExport: {
-            type: String,
-        },
-        beneficiaryCountry: {
-            type: String,
-        },
-    },
-    paymentReceviedType: { type: String },
-    attachment: [{ type: String }],
-    note: { type: String },
-    createdBy: {
-        type: Schema.Types.ObjectId,
-        ref: 'user'
-    },
-    draft: {
-        type: Boolean,
-    },
-    isDeleted: {
-        type: Boolean,
-        default: false
-    },
-    status: {
-        type: String,
-        enum: ['Pending', 'Expired', 'Rejected', 'Accepted', 'Add bid'],
-        default: 'Add bid'
-    },
-    period: {
-        expectedDate: {
-            type: Boolean,
-            default: false
-        },
-        startDate: {
-            type: Date
-        }
-    },
-    country: { type: String },
-    swiftCode: { type: String },
+
+    // 3 
+    // LC Issuing Bank
+    issuingBank: { bank: String, country: String },
+    // LC Advising Bank
+    advisingBank: { bank: String, country: String },
+    // LC Confirming Bank
+    confirmingBank: { bank: String, country: String, dateType: { type: String, enum: ["Date LC confirmed", "Expected date to confirm"] }, date: { type: Date } },
+    lcPeriod: { dateType: { type: String, enum: ["Date LC issued", "Expected date of LC issuance"] }, date: { type: Date }, lcExpiry: { type: Date } },
+    // Payment Terms
+    paymentTerms: { type: String, enum: ["Sight LC", "Usance LC", "Deferred LC", "UPAS LC"] },
+    extraInfo: { days: Number, other: String },
+    // Port of Shipment
+    shipmentPort: { country: String, port: String },
+    transhipment: { type: Boolean },
+    productDescription: { type: String },
+
+    // 4 - Importer Info
+    importerInfo: { name: String, countryOfImport: String, port: String },
+
+    // 5 - Exporter Info
+    exporterInfo: { name: String, countryOfExport: String, beneficiaryCountry: String },
+
+    // 6 - Attach LC copy
+    attachment: [Object],
+
+    // 7 - Last Date of receiving bids
+    lastDateOfReceivingBids: Date,
+
+    // 8 - Additional notes
+    additionalNotes: { type: String },
 }, { timestamps: true });
 
 RiskSchema.plugin(mongoosePaginate);
@@ -202,9 +76,10 @@ export const fetchRisks = async ({ query, page, limit, populate }: IPaginationFu
     });
     return { data, pagination };
 };
-export const createRisk = (payload: IRisk) => RiskModel.create(payload);
-export const findRisk = (query: Record<string, any>) => RiskModel.findOne(query);
-export const updateRisk = async (query: Record<string, any>, payload: Record<string, any>) => RiskModel.findOneAndUpdate(query, payload, { new: true });
-export const riskCount = (query?: any) => RiskModel.countDocuments(query);
-
-
+export const createRisk = (obj: IRisk) => RiskModel.create(obj);
+export const findRisk = (query: Record<string, any>): QueryWithHelpers<any, Document> => RiskModel.findOne(query);
+export const updateRisk = (query: FilterQuery<IRisk>, update: UpdateQuery<IRisk>): QueryWithHelpers<any, Document> => RiskModel.findOneAndUpdate(query, update, { new: true });
+// export const deleteRisk = (id: string) => RiskModel.findByIdAndDelete(id);
+// export const riskCount = (query?: any) => RiskModel.countDocuments(query);
+// export const fetchRisksAggregate = (query: any) => RiskModel.aggregate(query);
+// export const fetchAllRisksWithoutPagination = (query: any) => RiskModel.find(query);
