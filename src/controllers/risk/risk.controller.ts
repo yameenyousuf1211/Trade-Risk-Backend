@@ -1,22 +1,26 @@
 import { NextFunction, Request, Response } from "express";
-import { asyncHandler, generateResponse, parseBody } from "../../utils/helpers";
-// import { createRisk, fetchRisks, findRisk, getAllUsers, riskCount, updateRisk } from "../../models";
-import mongoose, { PipelineStage } from "mongoose";
-import { ValidationResult } from "joi";
-import { riskValidator } from "../../validation/risk/risk.validation";
-import { CustomError } from "../../middlewares/validation.middleware";
+import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
+import { getAllRisks } from "../../models";
 
 export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const limit = Number(req.query.limit) || 10;
-    const page = Number(req.query.page) || 1;
-    const draft = req.query.draft == 'true' ? true : false;
-    const risk = req.query.risk;
-    const createdBy = req.query.createdBy == 'true' ? true : false;
-    const filter = req.query.filter;
-    const search = req.query.search
+    const page = +(req.query.page || 1);
+    const limit = +(req.query.limit || 10);
 
+    const filters: any[] = [{ draft: req.query.draft === 'true' ? true : false }];
+    if (req.query.type) filters.push({ type: req.query.type });
+    if (req.query.refId) filters.push({ refId: +(req.query.refId) });
+    if (req.query.business) filters.push({ business: req.query.business });
+    if (req.query.user) filters.push({ user: req.query.user });
 
+    const query = filters.length > 0 ? { $and: filters } : {};
+    const populate = [
+        // { path: "bids", populate: { 'path': 'bidBy' } },
+        { path: "business", select: "accountCity accountNumber accountHolderName" }
+    ]
+
+    const risks = await getAllRisks({ limit, page, query, populate });
+    generateResponse(risks, "fetched successfully", res);
 
     // const data = await fetchRisks({ limit, page, query });
     // generateResponse(data, "Risk fetched successfully", res);
