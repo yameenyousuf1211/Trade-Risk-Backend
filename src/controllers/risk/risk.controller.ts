@@ -7,8 +7,11 @@ export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, ne
     const page = +(req.query.page || 1);
     const limit = +(req.query.limit || 10);
 
-    const filters: any[] = [{ draft: req.query.draft === 'true' ? true : false }];
-    if (req.query.type) filters.push({ type: req.query.type });
+    const isDraft = typeof req.query.draft === 'string' && req.query.draft.toLowerCase() === 'true';
+
+    const filters: any[] = [{ draft: isDraft }];
+
+    // if (req.query.type) filters.push({ type: req.query.type });
     if (req.query.refId) filters.push({ refId: +(req.query.refId) });
     if (req.query.business) filters.push({ business: req.query.business });
     if (req.query.user) filters.push({ user: req.query.user });
@@ -21,9 +24,6 @@ export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, ne
 
     const risks = await getAllRisks({ limit, page, query, populate });
     generateResponse(risks, "fetched successfully", res);
-
-    // const data = await fetchRisks({ limit, page, query });
-    // generateResponse(data, "Risk fetched successfully", res);
 });
 
 export const addRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
