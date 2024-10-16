@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { STATUS_CODES } from "../../utils/constants";
-import { getAllRisks } from "../../models";
+import { createAndSendNotifications, createRisk, getAllRisks, riskCount } from "../../models";
 
 export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page = +(req.query.page || 1);
@@ -26,25 +26,25 @@ export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, ne
     // generateResponse(data, "Risk fetched successfully", res);
 });
 
-export const createRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    // const body = parseBody(req.body);
+export const addRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const countRisks = await riskCount();
+    req.body.refId = countRisks + 1;
 
-    // if (!req.body.draft) {
-    //     const { error }: ValidationResult = riskValidator.validate(body);
-    //     if (error) {
-    //         const customError: CustomError = {
-    //             statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY!,
-    //             message: error.details[0].message.replace(/"/g, ''),
-    //         };
-    //         return next(customError);
-    //     }
-    // }
-    // const countRisks = await riskCount();
-    // req.body.refId = countRisks + 1;
-    // req.body.createdBy = req.user._id;
+    req.body.business = req.user.business;
+    req.body.user = req.user._id;
 
-    // const risk = await createRisk(body);
-    // generateResponse(risk, "Risk created successfully", res);
+    const risk = await createRisk(req.body);
+
+    // send notification only if it is not a draft
+    // if (req.body.draft !== true)
+    //     await createAndSendNotifications({
+    //         lc: risk._id,
+    //         type: NOTIFICATION_TYPES.LC_CREATED,
+    //         sender: req.user._id,
+    //     });
+
+    // emitSocketEvent(req, ROLE_TYPES.BANK, SOCKET_EVENTS.LC_CREATED, risk);
+    // generateResponse(risk, "Lcs created successfully", res);
 });
 
 // export const riskUpdate = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {

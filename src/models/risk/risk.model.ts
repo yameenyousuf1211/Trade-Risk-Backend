@@ -84,7 +84,7 @@ export const getAllRisks = async ({ query, page, limit, populate }: IPaginationF
 export const createRisk = (obj: IRisk) => RiskModel.create(obj);
 export const findRisk = (query: Record<string, any>): QueryWithHelpers<any, Document> => RiskModel.findOne(query);
 export const updateRisk = (query: FilterQuery<IRisk>, update: UpdateQuery<IRisk>): QueryWithHelpers<any, Document> => RiskModel.findOneAndUpdate(query, update, { new: true });
+export const riskCount = (query?: any) => RiskModel.countDocuments(query);
 // export const deleteRisk = (id: string) => RiskModel.findByIdAndDelete(id);
-// export const riskCount = (query?: any) => RiskModel.countDocuments(query);
 // export const fetchRisksAggregate = (query: any) => RiskModel.aggregate(query);
 // export const fetchAllRisksWithoutPagination = (query: any) => RiskModel.find(query);
