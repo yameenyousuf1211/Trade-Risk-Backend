@@ -26,7 +26,7 @@ const bondSchema = new Schema({
 }, { id: false });
 
 // Define the schema
-const LcsSchema: Schema = new Schema({
+const LcSchema: Schema = new Schema({
   // Assuming participant can be either importer or exporter
   participantRole: { type: String, enum: ["importer", "exporter"] },
   currency: String,
@@ -232,10 +232,10 @@ const LcsSchema: Schema = new Schema({
 
 }, { timestamps: true, versionKey: false });
 
-LcsSchema.plugin(mongoosePaginate);
-LcsSchema.plugin(aggregatePaginate);
+LcSchema.plugin(mongoosePaginate);
+LcSchema.plugin(aggregatePaginate);
 // Create and export the model
-const LcsModel = mongoose.model<any>("lcs", LcsSchema);
+const LcsModel = mongoose.model<any>("Lcs", LcSchema);
 
 export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunctionParams): Promise<IPaginationResult<any>> => {
   const { data, pagination }: IPaginationResult<any> =
@@ -251,8 +251,7 @@ export const fetchLcs = async ({ query, page, limit, populate }: IPaginationFunc
 
 export const createLc = (obj: any) => LcsModel.create(obj);
 export const findLc = (query: Record<string, any>): QueryWithHelpers<any, Document> => LcsModel.findOne(query);
-export const updateLc = (query: FilterQuery<any>, update: UpdateQuery<any>):
-  QueryWithHelpers<any, Document> => LcsModel.findOneAndUpdate(query, update, { new: true });
+export const updateLc = (query: FilterQuery<any>, update: UpdateQuery<any>): QueryWithHelpers<any, Document> => LcsModel.findOneAndUpdate(query, update, { new: true });
 
 export const deleteLc = (id: string) => LcsModel.findByIdAndDelete(id);
 export const lcsCount = (query?: any) => LcsModel.countDocuments(query);
