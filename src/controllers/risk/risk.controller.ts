@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
-import { STATUS_CODES } from "../../utils/constants";
+import { NOTIFICATION_TYPES, ROLE_TYPES, SOCKET_EVENTS, STATUS_CODES } from "../../utils/constants";
 import { createAndSendNotifications, createRisk, getAllRisks, riskCount } from "../../models";
+import { emitSocketEvent } from "../../socket";
 
 export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const page = +(req.query.page || 1);
@@ -39,12 +40,12 @@ export const addRisk = asyncHandler(async (req: Request, res: Response, next: Ne
     // if (req.body.draft !== true)
     //     await createAndSendNotifications({
     //         lc: risk._id,
-    //         type: NOTIFICATION_TYPES.LC_CREATED,
+    //         type: NOTIFICATION_TYPES.RISK_CREATED,
     //         sender: req.user._id,
     //     });
 
-    // emitSocketEvent(req, ROLE_TYPES.BANK, SOCKET_EVENTS.LC_CREATED, risk);
-    // generateResponse(risk, "Lcs created successfully", res);
+    emitSocketEvent(req, ROLE_TYPES.BANK, SOCKET_EVENTS.RISK_CREATED, risk);
+    generateResponse(risk, "Lcs created successfully", res);
 });
 
 // export const riskUpdate = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
