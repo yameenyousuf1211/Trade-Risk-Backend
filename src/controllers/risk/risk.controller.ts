@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { asyncHandler, generateResponse } from "../../utils/helpers";
 import { NOTIFICATION_TYPES, ROLE_TYPES, SOCKET_EVENTS, STATUS_CODES } from "../../utils/constants";
-import { createAndSendNotifications, createRisk, getAllRisks, riskCount, updateRisk } from "../../models";
+import { createAndSendNotifications, createRisk, deleteRisk, findRisk, getAllRisks, riskCount, updateRisk } from "../../models";
 import { emitSocketEvent } from "../../socket";
 
 export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
@@ -66,27 +66,21 @@ export const editRisk = asyncHandler(async (req: Request, res: Response, next: N
 }
 );
 
-// export const riskUpdate = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-//     if (!req.body.draft) {
-//         const { error }: ValidationResult = riskValidator.validate(req.body);
-//         if (error) {
-//             const customError: CustomError = {
-//                 statusCode: STATUS_CODES.UNPROCESSABLE_ENTITY!,
-//                 message: error.details[0].message.replace(/"/g, ''),
-//             };
-//             return next(customError);
-//         }
-//     }
-//     req.body.createdBy = req.user._id;
+export const removeRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const risk = await findRisk({ _id: req.params.id });
+    if (!risk) return next({
+        statusCode: STATUS_CODES.NOT_FOUND,
+        message: "not found"
+    });
 
-//     const data = await updateRisk({ _id: req.params.id }, req.body);
-//     generateResponse(data, "Risk updated successfully", res);
-// });
+    const deletedRisk = await deleteRisk(req.params.id);
+    if (!deletedRisk) return next({
+        statusCode: STATUS_CODES.INTERNAL_SERVER_ERROR,
+        message: "Error in deleting"
+    });
 
-// export const deleteRisks = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-//     const data = await updateRisk({ _id: req.params.id }, { isDeleted: true });
-//     generateResponse(data, "Risk deleted successfully", res);
-// });
+    generateResponse(risk, "deleted successfully", res);
+});
 
 // export const findSingleRisk = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
 //     const data = await findRisk({ _id: req.params.id });

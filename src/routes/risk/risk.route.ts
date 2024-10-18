@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authMiddleware from "../../middlewares/auth.middleware";
 import { ROLE_TYPES, ROLES } from "../../utils/constants";
-import { addRisk, fetchAllRisks } from "../../controllers";
+import { addRisk, fetchAllRisks, removeRisk } from "../../controllers";
 import { updateRisk } from "../../models";
 
 export default class RiskAPI {
@@ -13,8 +13,8 @@ export default class RiskAPI {
     setupRoutes() {
         this.router.get('/', authMiddleware(Object.values(ROLES), [ROLE_TYPES.BANK]), fetchAllRisks);
         this.router.post('/', authMiddleware(Object.values(ROLES), [ROLE_TYPES.BANK]), addRisk);
-        // this.router.delete('/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), deleteRisks);
         this.router.put('/:id', authMiddleware(Object.values(ROLES), [ROLE_TYPES.BANK]), updateRisk);
+        this.router.delete('/:id', authMiddleware(Object.values(ROLES), [ROLE_TYPES.BANK]), removeRisk);
         // this.router.get('/:id', authMiddleware(Object.values(ROLES), Object.values(ROLE_TYPES)), findSingleRisk);
     }
 
