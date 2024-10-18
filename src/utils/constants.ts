@@ -45,6 +45,7 @@ export enum NOTIFICATION_TYPES {
 export enum SOCKET_EVENTS {
   LC_CREATED = 'lc-created',
   BID_CREATED = 'bid-created',
+  RISK_CREATED = 'risk-created',
   // BID_ACCEPTED = 'bid-accepted',
   // BID_REJECTED = 'bid-rejected',
 }
