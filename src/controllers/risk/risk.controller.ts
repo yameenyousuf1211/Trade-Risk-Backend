@@ -18,12 +18,7 @@ export const fetchAllRisks = asyncHandler(async (req: Request, res: Response, ne
     if (req.query.user) filters.push({ user: req.query.user });
 
     const query = filters.length > 0 ? { $and: filters } : {};
-    const populate = [
-        // { path: "bids", populate: { 'path': 'bidBy' } },
-        { path: "business", select: "accountCity accountNumber accountHolderName" }
-    ]
-
-    const risks = await getAllRisks({ limit, page, query, populate });
+    const risks = await getAllRisks({ limit, page, query });
     generateResponse(risks, "fetched successfully", res);
 });
 
