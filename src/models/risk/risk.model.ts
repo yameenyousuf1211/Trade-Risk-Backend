@@ -2,7 +2,7 @@ import mongoose, { Schema, Document, QueryWithHelpers, FilterQuery, UpdateQuery 
 import mongoosePaginate from "mongoose-paginate-v2";
 import aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import { IPaginationFunctionParams, IPaginationResult } from "../../utils/interfaces";
-import { getMongooseAggregatePaginatedData, getMongoosePaginatedData } from "../../utils/helpers";
+import { getMongoosePaginatedData } from "../../utils/helpers";
 import { IRisk } from './risk.interface';
 
 const RiskSchema: Schema = new Schema({
@@ -69,8 +69,7 @@ RiskSchema.plugin(aggregatePaginate);
 
 const RiskModel = mongoose.model<IRisk>('risks', RiskSchema);
 
-export const getAllRisks = async ({ query, page, limit, populate }: IPaginationFunctionParams)
-    : Promise<IPaginationResult<IRisk>> => {
+export const getAllRisks = async ({ query, page, limit, populate }: IPaginationFunctionParams): Promise<IPaginationResult<IRisk>> => {
     const { data, pagination }: IPaginationResult<IRisk> = await getMongoosePaginatedData({
         model: RiskModel,
         query,
